@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStats();
     renderDeadlines();
     renderCalendar();
-    renderCourseProgress();
     setupNotificationPanel();
 });
 
@@ -184,35 +183,7 @@ function nextMonth() {
     renderCalendar();
 }
 
-// Course Progress
-function renderCourseProgress() {
-    const courses = KairosStorage.getCourses();
-    const container = document.getElementById('courseProgress');
-    
-    if (courses.length === 0) {
-        container.innerHTML = `
-            <p style="text-align: center; color: var(--text-secondary);">
-                No courses yet. Add assignments to get started!
-            </p>
-        `;
-        return;
-    }
-    
-    container.innerHTML = courses.map(course => {
-        const progress = Math.round((course.completed / course.total) * 100);
-        return `
-            <div class="progress-item">
-                <div class="progress-label">
-                    <span class="progress-label-name">${course.code}</span>
-                    <span class="progress-label-percent">${progress}%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${progress}%"></div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
+
 
 // Notification Panel
 function setupNotificationPanel() {
