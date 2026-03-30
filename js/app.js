@@ -4,7 +4,7 @@
 
 // Theme Management
 function initTheme() {
-    const savedTheme = localStorage.getItem('kairos_theme') || 'dark-mode';
+    const savedTheme = localStorage.getItem('kairos_theme') || 'light-mode';
     document.body.className = savedTheme;
     updateThemeToggle(savedTheme === 'dark-mode');
 }
