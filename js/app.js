@@ -498,8 +498,8 @@ function closeProfileMenu() {
 }
 
 function updateProfileMenuUser() {
-    const user = handleGetUser();
-    if (user) {
+    const user = JSON.parse(localStorage.getItem('kairos_user') || '{}');
+    if (user && user.name) {
         const nameDisplay1 = document.getElementById('userNameDisplay');
         const nameDisplay2 = document.getElementById('userNameDisplay2');
         const emailDisplay = document.getElementById('userEmailDisplay');
@@ -514,6 +514,13 @@ function updateProfileMenuUser() {
 document.addEventListener('click', (e) => {
     const profileMenu = document.querySelector('.user-profile-menu');
     if (profileMenu && !profileMenu.contains(e.target)) {
+        closeProfileMenu();
+    }
+});
+
+// Close profile menu when clicking menu items
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.user-profile-item')) {
         closeProfileMenu();
     }
 });
