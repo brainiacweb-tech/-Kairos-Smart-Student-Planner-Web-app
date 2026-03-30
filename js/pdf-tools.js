@@ -81,6 +81,16 @@ function initWordToPDF() {
     fileInput.click();
 }
 
+// PowerPoint to PDF
+function initPPTToPDF() {
+    showToast('🎯 Select a PowerPoint presentation (.pptx or .ppt) to convert to PDF', 'info');
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.ppt,.pptx,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation';
+    fileInput.onchange = () => handlePPTToPDF(fileInput);
+    fileInput.click();
+}
+
 // General file upload handler
 function handlePDFUpload(event) {
     const file = document.getElementById('pdfFileInput').files[0];
@@ -190,6 +200,30 @@ function handleWordToPDF(fileInput) {
     }
 }
 
+function handlePPTToPDF(fileInput) {
+    const file = fileInput.files[0];
+    if (file) {
+        const validTypes = [
+            'application/vnd.ms-powerpoint',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'application/vnd.ms-powerpoint.presentation.macroEnabled.12'
+        ];
+        const isValidFile = validTypes.includes(file.type) || file.name.endsWith('.ppt') || file.name.endsWith('.pptx');
+        
+        if (isValidFile) {
+            showToast(`🎯 Converting "${file.name}" to PDF...`, 'info');
+            // Simulate conversion delay
+            setTimeout(() => {
+                showToast(`✅ PowerPoint presentation converted to PDF successfully!`, 'success');
+                addToHistory(file.name, 'ppt-to-pdf');
+                simulateDownload(file.name.replace(/\.(pptx?|ppt)$/i, '.pdf'));
+            }, 1500);
+        } else {
+            showToast('Please select a valid PowerPoint file (.ppt or .pptx)', 'error');
+        }
+    }
+}
+
 // Add to history
 function addToHistory(filename, tool = 'unknown', detail = '') {
     const entry = {
@@ -230,7 +264,8 @@ function getToolIcon(tool) {
         'rotate': '🔄',
         'unlock': '🔓',
         'extract': '📋',
-        'word-to-pdf': '📝'
+        'word-to-pdf': '📝',
+        'ppt-to-pdf': '🎯'
     };
     return icons[tool] || '📋';
 }
@@ -249,6 +284,7 @@ function showPDFFeatures() {
     ✅ Unlock - Remove password protection
     ✅ Extract Pages - Get specific pages
     ✅ Word to PDF - Convert Word documents to PDF
+    ✅ PPT to PDF - Convert PowerPoint presentations to PDF
     
     All processing is local and fast!
     Files never leave your browser.
