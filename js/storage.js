@@ -267,6 +267,94 @@ class KairosStorage {
         return updated;
     }
 
+    // COURSES - KNUST Business School Curriculum
+    static getCourses(filter = {}) {
+        const allCourses = this.getAllCourses();
+        
+        if (filter.year) {
+            return allCourses.filter(c => c.year === filter.year);
+        }
+        if (filter.semester) {
+            return allCourses.filter(c => c.semester === filter.semester);
+        }
+        if (filter.year && filter.semester) {
+            return allCourses.filter(c => c.year === filter.year && c.semester === filter.semester);
+        }
+        
+        return allCourses;
+    }
+
+    static getAllCourses() {
+        return [
+            // YEAR 1 - SEMESTER 1
+            { code: 'ENGL157', title: 'Communication Skills I', year: 1, semester: 1, credits: 3 },
+            { code: 'ISD151', title: 'Business Mathematics', year: 1, semester: 1, credits: 3 },
+            { code: 'ISD155', title: 'ICT in Business', year: 1, semester: 1, credits: 3 },
+            { code: 'SOC151', title: 'Introduction to Sociology', year: 1, semester: 1, credits: 3 },
+            { code: 'FC181', title: 'French for Communication I', year: 1, semester: 1, credits: 2 },
+            { code: 'AFS161', title: 'Ethics in Traditional African Society', year: 1, semester: 1, credits: 3 },
+            { code: 'MAS151', title: 'Business in Ghana', year: 1, semester: 1, credits: 3 },
+            
+            // YEAR 1 - SEMESTER 2
+            { code: 'ENGL158', title: 'Communication Skills II', year: 1, semester: 2, credits: 3 },
+            { code: 'FC182', title: 'French for Communication II', year: 1, semester: 2, credits: 2 },
+            { code: 'AFS162', title: 'Traditional System of Conflict Resolution in Africa', year: 1, semester: 2, credits: 3 },
+            { code: 'ISD152', title: 'Business Statistics', year: 1, semester: 2, credits: 3 },
+            { code: 'LCT162', title: 'Logic and Critical Thinking', year: 1, semester: 2, credits: 3 },
+            { code: 'MAS152', title: 'Business Communication', year: 1, semester: 2, credits: 3 },
+            { code: 'PSY152', title: 'Intro to Psychology', year: 1, semester: 2, credits: 3 },
+            
+            // YEAR 2 - SEMESTER 1
+            { code: 'ACF255', title: 'Financial Accounting I', year: 2, semester: 1, credits: 3 },
+            { code: 'MAS263', title: 'Introduction to HRM', year: 2, semester: 1, credits: 3 },
+            { code: 'ACF265', title: 'Microeconomics I', year: 2, semester: 1, credits: 3 },
+            { code: 'MCS267', title: 'Introduction to International Business', year: 2, semester: 1, credits: 3 },
+            { code: 'MAS261', title: 'Principles of Management', year: 2, semester: 1, credits: 3 },
+            { code: 'ISD251', title: 'Quantitative Methods', year: 2, semester: 1, credits: 3 },
+            { code: 'ACF261', title: 'Business Finance', year: 2, semester: 1, credits: 3 },
+            
+            // YEAR 2 - SEMESTER 2
+            { code: 'MAS262', title: 'Corporate Social Responsibility', year: 2, semester: 2, credits: 3 },
+            { code: 'MAS264', title: 'Organizational Behavior', year: 2, semester: 2, credits: 3 },
+            { code: 'ACF256', title: 'Financial Accounting II', year: 2, semester: 2, credits: 3 },
+            { code: 'ISD256', title: 'Management Information Systems', year: 2, semester: 2, credits: 3 },
+            { code: 'ACF266', title: 'Macroeconomics II', year: 2, semester: 2, credits: 3 },
+            { code: 'MCS272', title: 'Principles of Marketing', year: 2, semester: 2, credits: 3 },
+            { code: 'ISD252', title: 'Introduction to Logistics & Supply Chain', year: 2, semester: 2, credits: 3 },
+            
+            // YEAR 3 - SEMESTER 1
+            { code: 'MAS353', title: 'Business Law', year: 3, semester: 1, credits: 3 },
+            { code: 'ISD353', title: 'Business Research Methods', year: 3, semester: 1, credits: 3 },
+            { code: 'ISD357', title: 'Operations Management', year: 3, semester: 1, credits: 3 },
+            { code: 'ISD331', title: 'Introduction to Business Analytics', year: 3, semester: 1, credits: 3 },
+            { code: 'ISD356', title: 'Computer Operating System', year: 3, semester: 1, credits: 3 },
+            { code: 'ISD355', title: 'Data Management for Business I', year: 3, semester: 1, credits: 3 },
+            { code: 'ISD359', title: 'Introduction to Programming', year: 3, semester: 1, credits: 3 },
+            
+            // YEAR 3 - SEMESTER 2
+            { code: 'MAS354', title: 'Company Law', year: 3, semester: 2, credits: 3 },
+            { code: 'ISD354', title: 'Database Management For Business', year: 3, semester: 2, credits: 3 },
+            { code: 'ISD358', title: 'Networking and Security', year: 3, semester: 2, credits: 3 },
+            { code: 'ISD366', title: 'Visual Basic For Business', year: 3, semester: 2, credits: 3 },
+            { code: 'ISD368', title: 'Mobile Applications Design', year: 3, semester: 2, credits: 3 },
+            { code: 'ISD378', title: 'Information Technology for Business', year: 3, semester: 2, credits: 3 },
+            
+            // YEAR 4 - SEMESTER 1
+            { code: 'MCS451', title: 'Strategic Management & Policy', year: 4, semester: 1, credits: 3 },
+            { code: 'ISD477', title: 'Web Application for Business I', year: 4, semester: 1, credits: 3 },
+            { code: 'ISD453', title: 'Decision Support Systems', year: 4, semester: 1, credits: 3 },
+            { code: 'ISD459', title: 'Information Systems Strategy', year: 4, semester: 1, credits: 3 },
+            { code: 'ISD463', title: 'Systems Analysis and Design', year: 4, semester: 1, credits: 3 },
+            
+            // YEAR 4 - SEMESTER 2
+            { code: 'MCS498', title: 'Research Project', year: 4, semester: 2, credits: 6 },
+            { code: 'MCS472', title: 'Fundamentals of Entrepreneurship', year: 4, semester: 2, credits: 3 },
+            { code: 'ISD455', title: 'Information Technology Innovation In The Digital Age', year: 4, semester: 2, credits: 3 },
+            { code: 'ISD470', title: 'E-Business', year: 4, semester: 2, credits: 3 },
+            { code: 'ISD472', title: 'Information Systems Ethics', year: 4, semester: 2, credits: 3 }
+        ];
+    }
+
     // BULK OPERATIONS
     static clearAllData() {
         localStorage.removeItem('kairos_assignments');
@@ -279,65 +367,65 @@ class KairosStorage {
         const mockAssignments = [
             {
                 id: 1,
-                title: 'Business Administration (Accounting)',
-                course: 'BUS101',
+                title: 'Financial Accounting Assignment',
+                course: 'ACF255',
                 dueDate: new Date(Date.now() + 2*24*60*60*1000).toISOString(),
                 priority: 'high',
                 status: 'in-progress',
                 estimatedHours: 5,
                 completed: 40,
-                notes: 'BSc Business Administration (Accounting) - Financial reporting assignment'
+                notes: 'Financial Accounting I - Journal entries and financial statements'
             },
             {
                 id: 2,
-                title: 'Business Administration (Banking & Finance)',
-                course: 'BUS102',
+                title: 'Business Research Methods Project',
+                course: 'ISD353',
                 dueDate: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
                 priority: 'medium',
                 status: 'pending',
                 estimatedHours: 8,
                 completed: 0,
-                notes: 'BSc Business Administration (Banking & Finance) - Study chapters 5-8'
+                notes: 'Business Research Methods - Design research proposal'
             },
             {
                 id: 3,
-                title: 'Business Administration (Marketing)',
-                course: 'BUS103',
+                title: 'Marketing Strategy Case Study',
+                course: 'MCS272',
                 dueDate: new Date(Date.now() + 4*24*60*60*1000).toISOString(),
                 priority: 'high',
                 status: 'pending',
                 estimatedHours: 4,
                 completed: 0,
-                notes: 'BSc Business Administration (Marketing) - Analyze brand positioning'
+                notes: 'Principles of Marketing - Analyze market trends'
             },
             {
                 id: 4,
-                title: 'Business Administration (International Business)',
-                course: 'BUS104',
+                title: 'Systems Analysis & Design Project',
+                course: 'ISD463',
                 dueDate: new Date(Date.now() - 1*24*60*60*1000).toISOString(),
                 priority: 'high',
                 status: 'pending',
                 estimatedHours: 3,
                 completed: 0,
-                notes: 'BSc Business Administration (International Business) - Overdue project submission'
+                notes: 'Systems Analysis and Design - Project submission overdue'
             },
             {
                 id: 5,
-                title: 'Business Administration (Human Resource Management)',
-                course: 'BUS105',
+                title: 'HRM Policy Development',
+                course: 'MAS263',
                 dueDate: new Date(Date.now() + 10*24*60*60*1000).toISOString(),
                 priority: 'low',
                 status: 'completed',
                 estimatedHours: 2,
                 completed: 100,
-                notes: 'BSc Business Administration (Human Resource Management) - Submitted'
+                notes: 'Introduction to HRM - HR policy framework completed'
             }
         ];
 
         const mockEvents = [
             {
                 id: 1,
-                title: 'CS101 Lecture',
+                title: 'ACF255 - Financial Accounting Lecture',
                 type: 'class',
                 date: new Date().toISOString(),
                 startTime: '09:00',
@@ -345,7 +433,7 @@ class KairosStorage {
             },
             {
                 id: 2,
-                title: 'Study Session - Data Structures',
+                title: 'Study Session - Business Research Methods',
                 type: 'study',
                 date: new Date(Date.now() + 1*24*60*60*1000).toISOString(),
                 startTime: '14:00',
