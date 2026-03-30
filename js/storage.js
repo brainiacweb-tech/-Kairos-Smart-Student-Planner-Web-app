@@ -279,58 +279,58 @@ class KairosStorage {
         const mockAssignments = [
             {
                 id: 1,
-                title: 'Data Structures Assignment',
-                course: 'CS101',
+                title: 'Accounting Principles Assignment',
+                course: 'BUS101',
                 dueDate: new Date(Date.now() + 2*24*60*60*1000).toISOString(),
                 priority: 'high',
                 status: 'in-progress',
                 estimatedHours: 5,
                 completed: 40,
-                notes: 'Implement linked list and stack data structures'
+                notes: 'BSc Business Administration (Accounting) - Financial reporting assignment'
             },
             {
                 id: 2,
-                title: 'Linear Algebra Midterm Prep',
-                course: 'MATH201',
+                title: 'Banking & Finance Midterm Prep',
+                course: 'BUS102',
                 dueDate: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
                 priority: 'medium',
                 status: 'pending',
                 estimatedHours: 8,
                 completed: 0,
-                notes: 'Study chapters 5-8, focus on eigenvalues'
+                notes: 'BSc Business Administration (Banking & Finance) - Study chapters 5-8'
             },
             {
                 id: 3,
-                title: 'Physics Lab Report',
-                course: 'PHYS150',
+                title: 'Marketing Strategy Case Study',
+                course: 'BUS103',
                 dueDate: new Date(Date.now() + 4*24*60*60*1000).toISOString(),
                 priority: 'high',
                 status: 'pending',
                 estimatedHours: 4,
                 completed: 0,
-                notes: 'Write up experiment on thermodynamics'
+                notes: 'BSc Business Administration (Marketing) - Analyze brand positioning'
             },
             {
                 id: 4,
-                title: 'Psychology Case Study Analysis',
-                course: 'PSY101',
+                title: 'International Business Project',
+                course: 'BUS104',
                 dueDate: new Date(Date.now() - 1*24*60*60*1000).toISOString(),
                 priority: 'high',
                 status: 'pending',
                 estimatedHours: 3,
                 completed: 0,
-                notes: 'Complete overdue - analyze provided case study'
+                notes: 'BSc Business Administration (International Business) - Overdue project submission'
             },
             {
                 id: 5,
-                title: 'English Essay Revision',
-                course: 'ENG201',
+                title: 'HRM Policy Development',
+                course: 'BUS105',
                 dueDate: new Date(Date.now() + 10*24*60*60*1000).toISOString(),
                 priority: 'low',
                 status: 'completed',
                 estimatedHours: 2,
                 completed: 100,
-                notes: 'Already submitted, revision for grade improvement'
+                notes: 'BSc Business Administration (Human Resource Management) - Submitted'
             }
         ];
 
