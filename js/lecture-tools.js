@@ -96,11 +96,15 @@ function saveNote() {
         }
         course = 'Protected Note';
     } else {
-        course = document.getElementById('noteCourseSelect').value;
-        if (!course) {
-            showToast('Please select a course', 'warning');
+        const courseCode = document.getElementById('noteCourseCode').value.trim();
+        const courseName = document.getElementById('noteCourseName').value.trim();
+        
+        if (!courseCode || !courseName) {
+            showToast('Please enter course code and name', 'warning');
             return;
         }
+        
+        course = `${courseCode} - ${courseName}`;
     }
 
     const notes = JSON.parse(localStorage.getItem('kairos_lecture_notes') || '[]');
@@ -124,11 +128,12 @@ function saveNote() {
 
 function clearNoteInput() {
     document.getElementById('noteInput').value = '';
-    document.getElementById('noteCourseSelect').value = '';
+    document.getElementById('noteCourseCode').value = '';
+    document.getElementById('noteCourseName').value = '';
     document.getElementById('notePassword').value = '';
     document.getElementById('passwordProtectToggle').checked = false;
     isPasswordProtected = false;
-    document.getElementById('courseSelectSection').style.display = 'block';
+    document.getElementById('courseSelectSection').style.display = 'flex';
     document.getElementById('passwordSection').style.display = 'none';
 }
 
@@ -388,7 +393,7 @@ function saveRecording(audioBlob) {
             audioData: reader.result,
             duration: calculateDuration(recordingStartTime),
             savedAt: new Date().toLocaleString(),
-            course: document.getElementById('noteCourseSelect').value || 'General'
+            course: `${(document.getElementById('noteCourseCode').value || 'General').trim()} - ${(document.getElementById('noteCourseName').value || 'Recording').trim()}`
         };
 
         recordings.push(newRecording);
