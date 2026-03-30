@@ -51,7 +51,129 @@
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
+}
+
+.user-profile-menu {
+  position: relative;
+}
+
+.user-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 0.9rem;
+}
+
+.user-profile-btn:hover {
+  background: var(--border);
+}
+
+.user-profile-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6C63FF, #4c3dd9);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: white;
+}
+
+.user-profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: var(--spacing-sm);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  min-width: 200px;
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-dropdown);
+  display: none;
+  animation: slideDown var(--transition-smooth);
+}
+
+.user-profile-dropdown.active {
+  display: block;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-profile-header {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.user-profile-name {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.user-profile-email {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.user-profile-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  color: var(--text);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.user-profile-item:hover {
+  background: var(--surface);
+  color: var(--primary);
+}
+
+.user-profile-item i {
+  width: 16px;
+  text-align: center;
+}
+
+.user-profile-item.danger {
+  color: var(--danger);
+  border-top: 1px solid var(--border);
+}
+
+.user-profile-item.danger:hover {
+  background: rgba(255, 71, 87, 0.1);
+}
+
+.user-profile-divider {
+  height: 1px;
+  background: var(--border);
+  margin: var(--spacing-xs) 0;
 }
 
 .theme-toggle {

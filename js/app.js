@@ -475,3 +475,50 @@ function togglePasswordVisibility(fieldId) {
         icon.classList.add('fa-eye');
     }
 }
+
+/* ===========================
+   USER PROFILE MENU
+   =========================== */
+
+function toggleProfileMenu() {
+    const dropdown = document.getElementById('profileDropdown');
+    if (!dropdown) return;
+    
+    dropdown.classList.toggle('active');
+    
+    // Update user info display
+    updateProfileMenuUser();
+}
+
+function closeProfileMenu() {
+    const dropdown = document.getElementById('profileDropdown');
+    if (dropdown) {
+        dropdown.classList.remove('active');
+    }
+}
+
+function updateProfileMenuUser() {
+    const user = handleGetUser();
+    if (user) {
+        const nameDisplay1 = document.getElementById('userNameDisplay');
+        const nameDisplay2 = document.getElementById('userNameDisplay2');
+        const emailDisplay = document.getElementById('userEmailDisplay');
+        
+        if (nameDisplay1) nameDisplay1.textContent = user.name || 'User';
+        if (nameDisplay2) nameDisplay2.textContent = user.name || 'User';
+        if (emailDisplay) emailDisplay.textContent = user.email || 'user@example.com';
+    }
+}
+
+// Close profile menu when clicking outside
+document.addEventListener('click', (e) => {
+    const profileMenu = document.querySelector('.user-profile-menu');
+    if (profileMenu && !profileMenu.contains(e.target)) {
+        closeProfileMenu();
+    }
+});
+
+// Initialize profile menu on page load
+document.addEventListener('DOMContentLoaded', () => {
+    updateProfileMenuUser();
+});
