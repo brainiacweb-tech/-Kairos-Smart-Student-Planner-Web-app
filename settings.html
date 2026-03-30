@@ -46,6 +46,7 @@
                     <button class="settings-tab" onclick="showSettingTab('notifications')"><i class="fas fa-bell"></i> Notifications</button>
                     <button class="settings-tab" onclick="showSettingTab('appearance')"><i class="fas fa-palette"></i> Appearance</button>
                     <button class="settings-tab" onclick="showSettingTab('semester')"><i class="fas fa-calendar-alt"></i> Semester</button>
+                    <button class="settings-tab" onclick="showSettingTab('google')"><i class="fab fa-google"></i> Google Services</button>
                     <button class="settings-tab danger" onclick="showSettingTab('danger')"><i class="fas fa-exclamation"></i> Danger Zone</button>
                 </div>
                 <div id="profileTab" class="settings-section">
@@ -181,6 +182,79 @@
                         </div>
                     </div>
                 </div>
+                <div id="googleTab" class="settings-section hidden">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">Google Cloud Integration</div>
+                            <div class="section-description">Connect your Google Drive and Calendar</div>
+                        </div>
+                    </div>
+
+                    <!-- Google Integration Status -->
+                    <div id="googleIntegrationStatus" style="margin-bottom: var(--spacing-lg);"></div>
+
+                    <!-- Google Drive Options -->
+                    <div id="googleDriveOptions" style="display: none; margin-bottom: var(--spacing-lg);">
+                        <div class="integration-card">
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                                <i class="fab fa-google" style="font-size: 1.8rem; color: #34A8E0;"></i>
+                                <div>
+                                    <div style="font-weight: 600;">Google Drive Backup</div>
+                                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Auto-backup your data to Google Drive</div>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md);">
+                                <button class="btn btn-secondary" onclick="uploadAssignmentsToDrive()" style="text-align: left;">
+                                    <i class="fas fa-tasks"></i> Export Assignments
+                                </button>
+                                <button class="btn btn-secondary" onclick="uploadNotesToDrive()" style="text-align: left;">
+                                    <i class="fas fa-sticky-note"></i> Export Notes
+                                </button>
+                                <button class="btn btn-secondary" onclick="uploadRecordingsToDrive()" style="text-align: left;">
+                                    <i class="fas fa-microphone"></i> Upload Recordings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Google Calendar Options -->
+                    <div id="googleCalendarOptions" style="display: none; margin-bottom: var(--spacing-lg);">
+                        <div class="integration-card">
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                                <i class="fas fa-calendar" style="font-size: 1.8rem; color: #FF6B6B;"></i>
+                                <div>
+                                    <div style="font-weight: 600;">Google Calendar Sync</div>
+                                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Keep your assignments synchronized</div>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md);">
+                                <button class="btn btn-secondary" onclick="syncAssignmentsToCalendar()" style="text-align: left;">
+                                    <i class="fas fa-sync"></i> Sync Assignments
+                                </button>
+                                <button class="btn btn-secondary" onclick="importCalendarEvents()" style="text-align: left;">
+                                    <i class="fas fa-download"></i> Import Events
+                                </button>
+                                <button class="btn btn-secondary" onclick="toggleCalendarSync()" style="text-align: left;">
+                                    <i class="fas fa-exchange-alt"></i> Toggle Auto-Sync
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integration Help -->
+                    <div style="padding: var(--spacing-md); background: rgba(100, 100, 100, 0.05); border-radius: var(--radius-lg); border-left: 3px solid #6C63FF;">
+                        <div style="font-weight: 600; margin-bottom: var(--spacing-sm);">
+                            <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i> Setup Instructions
+                        </div>
+                        <ol style="margin-left: 1rem; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+                            <li>Sign in with your Google account above</li>
+                            <li>For each service, click the button to enable integration</li>
+                            <li>Your data will be automatically backed up to Google Drive</li>
+                            <li>Calendar events will sync bi-directionally</li>
+                            <li>You can disconnect at any time</li>
+                        </ol>
+                    </div>
+                </div>
                 <div id="dangerTab" class="settings-section hidden">
                     <div class="danger-zone">
                         <div class="danger-zone-header">
@@ -198,8 +272,10 @@
         </div>
     </div>
     <div class="toast-container" id="toastContainer"></div>
+    <script src="https://apis.google.com/js/api.js"></script>
     <script src="js/app.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/google-integration.js"></script>
 </body>
 </html>

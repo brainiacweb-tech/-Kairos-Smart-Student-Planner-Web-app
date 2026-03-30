@@ -336,6 +336,67 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- GOOGLE INTEGRATION SECTION -->
+                <div class="section-divider" style="margin-top: var(--spacing-2xl); margin-bottom: var(--spacing-lg);">
+                    <h2 class="section-title" style="display: flex; align-items: center; gap: var(--spacing-md);">
+                        <i class="fab fa-google" style="color: #4285F4;"></i> Cloud Integration
+                    </h2>
+                </div>
+
+                <!-- Google Integration Status Cards -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--spacing-lg);">
+                    <!-- Google Drive Card -->
+                    <div class="card feature-card">
+                        <div class="card-header" style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                            <i class="fab fa-google" style="color: #34A8E0; font-size: 1.5rem;"></i>
+                            <h3 style="margin: 0;">Google Drive</h3>
+                        </div>
+                        <div id="driveStatus" style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-md);">
+                            <i class="fas fa-circle" style="color: #FF9800; margin-right: 0.5rem;"></i> Not Connected
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-md); line-height: 1.5;">
+                            Backup assignments, notes, and recordings to Google Drive
+                        </p>
+                        <button class="btn btn-primary" style="width: 100%; font-size: 0.85rem;" onclick="window.location.href='settings.html#google'">
+                            <i class="fas fa-link"></i> Configure Drive
+                        </button>
+                    </div>
+
+                    <!-- Google Calendar Card -->
+                    <div class="card feature-card">
+                        <div class="card-header" style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                            <i class="fas fa-calendar" style="color: #FF6B6B; font-size: 1.5rem;"></i>
+                            <h3 style="margin: 0;">Google Calendar</h3>
+                        </div>
+                        <div id="calendarStatus" style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-md);">
+                            <i class="fas fa-circle" style="color: #FF9800; margin-right: 0.5rem;"></i> Not Connected
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-md); line-height: 1.5;">
+                            Sync assignments and get calendar event reminders
+                        </p>
+                        <button class="btn btn-primary" style="width: 100%; font-size: 0.85rem;" onclick="window.location.href='settings.html#google'">
+                            <i class="fas fa-link"></i> Configure Calendar
+                        </button>
+                    </div>
+
+                    <!-- Data Backup Card -->
+                    <div class="card feature-card">
+                        <div class="card-header" style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                            <i class="fas fa-backup" style="color: #2ED573; font-size: 1.5rem;"></i>
+                            <h3 style="margin: 0;">Data Backup</h3>
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-md);">
+                            <i class="fas fa-check-circle" style="color: var(--success); margin-right: 0.5rem;"></i> Local Storage
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: var(--spacing-md); line-height: 1.5;">
+                            Your data is secure in browser storage
+                        </p>
+                        <button class="btn btn-outline" style="width: 100%; font-size: 0.85rem;" onclick="exportDataAsJSON()">
+                            <i class="fas fa-download"></i> Export Data
+                        </button>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -361,8 +422,61 @@
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <script src="https://apis.google.com/js/api.js"></script>
     <script src="js/app.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/dashboard.js"></script>
+    <script src="js/google-integration.js"></script>
+    <script>
+        // Update Google Integration Status on Dashboard
+        function updateGoogleStatusOnDashboard() {
+            const driveStatus = document.getElementById('driveStatus');
+            const calendarStatus = document.getElementById('calendarStatus');
+            
+            if (driveStatus) {
+                if (googleIntegration.isSignedIn && googleIntegration.driveEnabled) {
+                    driveStatus.innerHTML = '<i class="fas fa-circle" style="color: #2ED573; margin-right: 0.5rem;"></i> Connected';
+                } else if (googleIntegration.isSignedIn) {
+                    driveStatus.innerHTML = '<i class="fas fa-circle" style="color: #FF9800; margin-right: 0.5rem;"></i> Ready to Configure';
+                }
+            }
+            
+            if (calendarStatus) {
+                if (googleIntegration.isSignedIn && googleIntegration.calendarEnabled) {
+                    calendarStatus.innerHTML = '<i class="fas fa-circle" style="color: #2ED573; margin-right: 0.5rem;"></i> Connected';
+                } else if (googleIntegration.isSignedIn) {
+                    calendarStatus.innerHTML = '<i class="fas fa-circle" style="color: #FF9800; margin-right: 0.5rem;"></i> Ready to Configure';
+                }
+            }
+        }
+        
+        // Export data as JSON
+        function exportDataAsJSON() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                assignments: JSON.parse(localStorage.getItem('kairos_assignments') || '[]'),
+                notes: JSON.parse(localStorage.getItem('kairos_lecture_notes') || '[]'),
+                profile: JSON.parse(localStorage.getItem('kairos_user') || '{}'),
+                settings: {
+                    theme: localStorage.getItem('kairos_theme'),
+                    notifications: localStorage.getItem('kairos_notifications')
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `kairos-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('✅ Data exported successfully', 'success');
+        }
+        
+        // Update dashboard when page loads
+        document.addEventListener('DOMContentLoaded', updateGoogleStatusOnDashboard);
+    </script>
 </body>
 </html>
