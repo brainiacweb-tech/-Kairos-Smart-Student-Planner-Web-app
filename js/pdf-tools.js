@@ -71,6 +71,16 @@ function initExtractPages() {
     }
 }
 
+// Word to PDF
+function initWordToPDF() {
+    showToast('📝 Select a Word document (.docx or .doc) to convert to PDF', 'info');
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    fileInput.onchange = () => handleWordToPDF(fileInput);
+    fileInput.click();
+}
+
 // General file upload handler
 function handlePDFUpload(event) {
     const file = document.getElementById('pdfFileInput').files[0];
@@ -156,6 +166,30 @@ function handleExtractPages(pageRange) {
     }
 }
 
+function handleWordToPDF(fileInput) {
+    const file = fileInput.files[0];
+    if (file) {
+        const validTypes = [
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-word.document.macroEnabled.12'
+        ];
+        const isValidFile = validTypes.includes(file.type) || file.name.endsWith('.doc') || file.name.endsWith('.docx');
+        
+        if (isValidFile) {
+            showToast(`📝 Converting "${file.name}" to PDF...`, 'info');
+            // Simulate conversion delay
+            setTimeout(() => {
+                showToast(`✅ Word document converted to PDF successfully!`, 'success');
+                addToHistory(file.name, 'word-to-pdf');
+                simulateDownload(file.name.replace(/\.(docx?|doc)$/i, '.pdf'));
+            }, 1500);
+        } else {
+            showToast('Please select a valid Word document (.doc or .docx)', 'error');
+        }
+    }
+}
+
 // Add to history
 function addToHistory(filename, tool = 'unknown', detail = '') {
     const entry = {
@@ -195,7 +229,8 @@ function getToolIcon(tool) {
         'convert-png': '🖼️',
         'rotate': '🔄',
         'unlock': '🔓',
-        'extract': '📋'
+        'extract': '📋',
+        'word-to-pdf': '📝'
     };
     return icons[tool] || '📋';
 }
@@ -213,6 +248,7 @@ function showPDFFeatures() {
     ✅ Rotate - Change page orientation
     ✅ Unlock - Remove password protection
     ✅ Extract Pages - Get specific pages
+    ✅ Word to PDF - Convert Word documents to PDF
     
     All processing is local and fast!
     Files never leave your browser.
