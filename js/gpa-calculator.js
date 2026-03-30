@@ -5,33 +5,43 @@
 let courses = JSON.parse(localStorage.getItem('kairos_courses') || '[]');
 let targetCWA = parseFloat(localStorage.getItem('kairos_target_cwa') || '70.0');
 
-// Function to convert score (0-100) to grade letter
-function scoreToGrade(score) {
+// Function to convert score (0-100) to CWA grade letter
+function scoreToCWAGrade(score) {
     if (score >= 70) return 'A';
     if (score >= 60) return 'B';
     if (score >= 50) return 'C';
-    if (score >= 45) return 'D';
     if (score >= 40) return 'D';
     return 'F';
 }
 
-// Function to convert CWA percentage to GPA (4.0 scale)
-function cwaToGPA(cwa) {
-    if (cwa >= 70) return { gpa: 3.7 + ((cwa - 70) / 30) * 0.3, grade: 'A', range: '3.7 – 4.0' };
-    if (cwa >= 60) return { gpa: 3.0 + ((cwa - 60) / 9) * 0.6, grade: 'B+/B', range: '3.0 – 3.6' };
-    if (cwa >= 50) return { gpa: 2.5 + ((cwa - 50) / 9) * 0.4, grade: 'B-/C+', range: '2.5 – 2.9' };
-    if (cwa >= 45) return { gpa: 2.0 + ((cwa - 45) / 4) * 0.4, grade: 'C/D', range: '2.0 – 2.4' };
-    if (cwa >= 40) return { gpa: 1.0 + ((cwa - 40) / 4) * 0.9, grade: 'D', range: '1.0 – 1.9' };
-    return { gpa: 0.0, grade: 'F', range: '0.0' };
+// Function to get CWA grade description
+function getCWADescription(score) {
+    if (score >= 70) return 'Excellent';
+    if (score >= 60) return 'Very Good';
+    if (score >= 50) return 'Good';
+    if (score >= 40) return 'Satisfactory/Pass';
+    return 'Fail';
 }
 
-// Function to get degree classification based on CWA
-function getClassification(cwa) {
-    if (cwa >= 70) return 'First Class';
-    if (cwa >= 60) return 'Second Class (Upper)';
-    if (cwa >= 50) return 'Second Class (Lower)';
-    if (cwa >= 45) return 'Third Class';
-    if (cwa >= 40) return 'Pass';
+// Function to convert score to GPA (4.0 scale) with detailed mapping
+function scoreToGPA(score) {
+    if (score >= 80) return { gpa: 4.0, grade: 'A', description: 'Excellent' };
+    if (score >= 75) return { gpa: 3.5, grade: 'B+', description: 'Very Good' };
+    if (score >= 70) return { gpa: 3.0, grade: 'B', description: 'Good' };
+    if (score >= 65) return { gpa: 2.5, grade: 'C+', description: 'Fairly Good' };
+    if (score >= 60) return { gpa: 2.0, grade: 'C', description: 'Fair' };
+    if (score >= 55) return { gpa: 1.5, grade: 'D+', description: 'Barely Satisfactory' };
+    if (score >= 50) return { gpa: 1.0, grade: 'D', description: 'Weak Pass' };
+    return { gpa: 0.0, grade: 'E/F', description: 'Fail' };
+}
+
+// Function to get degree classification based on FGPA
+function getClassification(fgpa) {
+    if (fgpa >= 3.60) return 'First Class';
+    if (fgpa >= 3.00) return 'Second Class (Upper)';
+    if (fgpa >= 2.50) return 'Second Class (Lower)';
+    if (fgpa >= 2.00) return 'Third Class';
+    if (fgpa >= 1.00) return 'Pass';
     return 'Fail';
 }
 
@@ -103,12 +113,13 @@ function renderCourses() {
     
     emptyState.style.display = 'none';
     tbody.innerHTML = courses.map(course => {
-        const grade = scoreToGrade(course.score);
+        const cwaGrade = scoreToCWAGrade(course.score);
+        const gpaData = scoreToGPA(course.score);
         const points = (course.score * course.credits).toFixed(2);
         return `
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: var(--spacing-md);">${course.name}</td>
-                <td style="padding: var(--spacing-md); text-align: center; font-weight: 600;">${grade} (${course.score}%)</td>
+                <td style="padding: var(--spacing-md); text-align: center; font-weight: 600;">${cwaGrade} (${course.score}%)</td>
                 <td style="padding: var(--spacing-md); text-align: center;">${course.credits}</td>
                 <td style="padding: var(--spacing-md); text-align: center; color: var(--primary); font-weight: 600;">${points}</td>
                 <td style="padding: var(--spacing-md); text-align: center;">
@@ -126,8 +137,8 @@ function calculateGPA() {
     if (courses.length === 0) {
         document.getElementById('currentGPA').textContent = '0.00';
         document.getElementById('equivalentGPA').textContent = '0.00';
-        document.getElementById('cwaClassification').textContent = 'No courses added';
-        document.getElementById('gpaGradeLabel').textContent = '—';
+        document.getElementById('cwaGrade').textContent = 'No courses added';
+        document.getElementById('degreeClass').textContent = '—';
         return;
     }
     
@@ -140,13 +151,15 @@ function calculateGPA() {
     });
     
     const cwa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
-    const classification = getClassification(cwa);
-    const gpaConversion = cwaToGPA(cwa);
+    const cwaGrade = scoreToCWAGrade(cwa);
+    const cwaDescription = getCWADescription(cwa);
+    const gpaData = scoreToGPA(cwa);
+    const degreeClass = getClassification(gpaData.gpa);
     
     document.getElementById('currentGPA').textContent = cwa.toFixed(2);
-    document.getElementById('equivalentGPA').textContent = gpaConversion.gpa.toFixed(2);
-    document.getElementById('cwaClassification').textContent = classification;
-    document.getElementById('gpaGradeLabel').textContent = gpaConversion.grade;
+    document.getElementById('equivalentGPA').textContent = gpaData.gpa.toFixed(2);
+    document.getElementById('cwaGrade').textContent = `${cwaGrade} - ${cwaDescription}`;
+    document.getElementById('degreeClass').textContent = degreeClass;
 }
 
 // Clear all courses
@@ -174,25 +187,25 @@ function exportCWA() {
     const currentCWAElement = document.getElementById('currentGPA').textContent;
     const currentCWA = parseFloat(currentCWAElement);
     const equivalentGPA = parseFloat(document.getElementById('equivalentGPA').textContent);
-    const classification = getClassification(currentCWA);
-    const gpaConversion = cwaToGPA(currentCWA);
+    const cwaGrade = document.getElementById('cwaGrade').textContent;
+    const degreeClass = document.getElementById('degreeClass').textContent;
     
     // Create CSV
     let csv = 'Kairos CWA Calculator Report (KNUST)\n';
     csv += `Generated: ${new Date().toLocaleString()}\n\n`;
-    csv += 'Course,Score,Grade,Credits,Grade Points\n';
+    csv += 'Course,Score,CWA Grade,Credits,Grade Points\n';
     
     courses.forEach(course => {
         const points = (course.score * course.credits).toFixed(2);
-        const grade = scoreToGrade(course.score);
-        csv += `"${course.name}",${course.score}%,${grade},${course.credits},${points}\n`;
+        const cwaGrade = scoreToCWAGrade(course.score);
+        csv += `"${course.name}",${course.score}%,${cwaGrade},${course.credits},${points}\n`;
     });
     
     csv += `\nGrade Summary\n`;
     csv += `Current CWA,${currentCWA.toFixed(2)}%\n`;
-    csv += `Equivalent GPA (4.0),${equivalentGPA.toFixed(2)}\n`;
-    csv += `US Grade Equivalent,${gpaConversion.grade}\n`;
-    csv += `Degree Classification,${classification}\n`;
+    csv += `CWA Grade,${cwaGrade}\n`;
+    csv += `FGPA (4.0 Scale),${equivalentGPA.toFixed(2)}\n`;
+    csv += `Degree Class,${degreeClass}\n`;
     csv += `Target CWA,${targetCWA.toFixed(2)}%\n`;
     csv += `Remaining to Target,${Math.max(0, (targetCWA - currentCWA)).toFixed(2)}%\n`;
     
