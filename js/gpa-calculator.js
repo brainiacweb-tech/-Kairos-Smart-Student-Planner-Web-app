@@ -5,17 +5,14 @@
 let courses = JSON.parse(localStorage.getItem('kairos_courses') || '[]');
 let targetCWA = parseFloat(localStorage.getItem('kairos_target_cwa') || '70.0');
 
-// Function to convert grade points to percentage (KNUST CWA system)
-function gradePointToCWA(gradePoint) {
-    // KNUST Grading: 5.0->100%, 4.0->80%, 3.0->60%, 2.0->40%, 0.0->0%
-    const conversion = {
-        '5.0': 100,
-        '4.0': 80,
-        '3.0': 60,
-        '2.0': 40,
-        '0.0': 0
-    };
-    return conversion[gradePoint.toString()] || 0;
+// Function to convert score (0-100) to grade letter
+function scoreToGrade(score) {
+    if (score >= 70) return 'A';
+    if (score >= 60) return 'B';
+    if (score >= 50) return 'C';
+    if (score >= 45) return 'D';
+    if (score >= 40) return 'D';
+    return 'F';
 }
 
 // Function to convert CWA percentage to GPA (4.0 scale)
@@ -56,18 +53,18 @@ document.addEventListener('DOMContentLoaded', () => {
 // Add course
 function addCourse() {
     const name = document.getElementById('courseName').value.trim();
-    const grade = parseFloat(document.getElementById('courseGrade').value);
+    const score = parseFloat(document.getElementById('courseScore').value);
     const credits = parseInt(document.getElementById('courseCredits').value);
     
-    if (!name || isNaN(grade) || isNaN(credits) || credits < 1) {
-        showToast('Please fill in all fields correctly', 'error');
+    if (!name || isNaN(score) || isNaN(credits) || credits < 1 || score < 0 || score > 100) {
+        showToast('Please fill in all fields correctly (Score: 0-100)', 'error');
         return;
     }
     
     const course = {
         id: Date.now(),
         name: name,
-        grade: grade,
+        score: score,
         credits: credits
     };
     
@@ -76,12 +73,12 @@ function addCourse() {
     
     // Clear inputs
     document.getElementById('courseName').value = '';
-    document.getElementById('courseGrade').value = '5.0';
+    document.getElementById('courseScore').value = '';
     document.getElementById('courseCredits').value = '';
     
     renderCourses();
     calculateGPA();
-    showToast(`Added "${name}" to your CWA calculation`, 'success');
+    showToast(`Added "${name}" with score ${score}%`, 'success');
 }
 
 // Delete course
@@ -106,15 +103,12 @@ function renderCourses() {
     
     emptyState.style.display = 'none';
     tbody.innerHTML = courses.map(course => {
-        const points = (course.grade * course.credits).toFixed(2);
-        const gradeLabel = course.grade === 5.0 ? 'A' : 
-                          course.grade === 4.0 ? 'B' : 
-                          course.grade === 3.0 ? 'C' : 
-                          course.grade === 2.0 ? 'D' : 'F';
+        const grade = scoreToGrade(course.score);
+        const points = (course.score * course.credits).toFixed(2);
         return `
             <tr style="border-bottom: 1px solid var(--border);">
                 <td style="padding: var(--spacing-md);">${course.name}</td>
-                <td style="padding: var(--spacing-md); text-align: center; font-weight: 600;">${gradeLabel}</td>
+                <td style="padding: var(--spacing-md); text-align: center; font-weight: 600;">${grade} (${course.score}%)</td>
                 <td style="padding: var(--spacing-md); text-align: center;">${course.credits}</td>
                 <td style="padding: var(--spacing-md); text-align: center; color: var(--primary); font-weight: 600;">${points}</td>
                 <td style="padding: var(--spacing-md); text-align: center;">
@@ -141,16 +135,15 @@ function calculateGPA() {
     let totalCredits = 0;
     
     courses.forEach(course => {
-        totalPoints += course.grade * course.credits;
+        totalPoints += course.score * course.credits;
         totalCredits += course.credits;
     });
     
     const cwa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
-    const cwaPercentage = gradePointToCWA(cwa.toFixed(1));
-    const classification = getClassification(cwaPercentage);
-    const gpaConversion = cwaToGPA(cwaPercentage);
+    const classification = getClassification(cwa);
+    const gpaConversion = cwaToGPA(cwa);
     
-    document.getElementById('currentGPA').textContent = cwaPercentage.toFixed(2);
+    document.getElementById('currentGPA').textContent = cwa.toFixed(2);
     document.getElementById('equivalentGPA').textContent = gpaConversion.gpa.toFixed(2);
     document.getElementById('cwaClassification').textContent = classification;
     document.getElementById('gpaGradeLabel').textContent = gpaConversion.grade;
@@ -187,15 +180,12 @@ function exportCWA() {
     // Create CSV
     let csv = 'Kairos CWA Calculator Report (KNUST)\n';
     csv += `Generated: ${new Date().toLocaleString()}\n\n`;
-    csv += 'Course,Grade,Credits,Grade Points\n';
+    csv += 'Course,Score,Grade,Credits,Grade Points\n';
     
     courses.forEach(course => {
-        const points = (course.grade * course.credits).toFixed(2);
-        const gradeLabel = course.grade === 5.0 ? 'A' : 
-                          course.grade === 4.0 ? 'B' : 
-                          course.grade === 3.0 ? 'C' : 
-                          course.grade === 2.0 ? 'D' : 'F';
-        csv += `"${course.name}",${gradeLabel},${course.credits},${points}\n`;
+        const points = (course.score * course.credits).toFixed(2);
+        const grade = scoreToGrade(course.score);
+        csv += `"${course.name}",${course.score}%,${grade},${course.credits},${points}\n`;
     });
     
     csv += `\nGrade Summary\n`;

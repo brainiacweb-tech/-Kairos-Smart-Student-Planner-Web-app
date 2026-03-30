@@ -232,15 +232,10 @@
                                        background: var(--surface); border: 1px solid var(--border); color: var(--text);">
                             </div>
                             <div>
-                                <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--spacing-xs);">Grade</label>
-                                <select id="courseGrade" style="width: 100%; padding: var(--spacing-sm); border-radius: var(--radius-md); 
-                                        background: var(--surface); border: 1px solid var(--border); color: var(--text);">
-                                    <option value="5.0">A (70-100%)</option>
-                                    <option value="4.0">B (60-69%)</option>
-                                    <option value="3.0">C (50-59%)</option>
-                                    <option value="2.0">D (40-49%)</option>
-                                    <option value="0.0">F (0-39%)</option>
-                                </select>
+                                <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--spacing-xs);">Score (%)</label>
+                                <input type="number" id="courseScore" placeholder="85" min="0" max="100" step="0.01"
+                                       style="width: 100%; padding: var(--spacing-sm); border-radius: var(--radius-md); 
+                                       background: var(--surface); border: 1px solid var(--border); color: var(--text);">
                             </div>
                             <div>
                                 <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--spacing-xs);">Credits</label>
