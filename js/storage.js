@@ -279,7 +279,7 @@ class KairosStorage {
         const mockAssignments = [
             {
                 id: 1,
-                title: 'Accounting Principles Assignment',
+                title: 'Business Administration (Accounting)',
                 course: 'BUS101',
                 dueDate: new Date(Date.now() + 2*24*60*60*1000).toISOString(),
                 priority: 'high',
@@ -290,7 +290,7 @@ class KairosStorage {
             },
             {
                 id: 2,
-                title: 'Banking & Finance Midterm Prep',
+                title: 'Business Administration (Banking & Finance)',
                 course: 'BUS102',
                 dueDate: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
                 priority: 'medium',
@@ -301,7 +301,7 @@ class KairosStorage {
             },
             {
                 id: 3,
-                title: 'Marketing Strategy Case Study',
+                title: 'Business Administration (Marketing)',
                 course: 'BUS103',
                 dueDate: new Date(Date.now() + 4*24*60*60*1000).toISOString(),
                 priority: 'high',
@@ -312,7 +312,7 @@ class KairosStorage {
             },
             {
                 id: 4,
-                title: 'International Business Project',
+                title: 'Business Administration (International Business)',
                 course: 'BUS104',
                 dueDate: new Date(Date.now() - 1*24*60*60*1000).toISOString(),
                 priority: 'high',
@@ -323,7 +323,7 @@ class KairosStorage {
             },
             {
                 id: 5,
-                title: 'HRM Policy Development',
+                title: 'Business Administration (Human Resource Management)',
                 course: 'BUS105',
                 dueDate: new Date(Date.now() + 10*24*60*60*1000).toISOString(),
                 priority: 'low',
