@@ -25,14 +25,19 @@ function getCWADescription(score) {
 
 // Function to convert score to GPA (4.0 scale) with detailed mapping
 function scoreToGPA(score) {
-    if (score >= 80) return { gpa: 4.0, grade: 'A', description: 'Excellent' };
-    if (score >= 75) return { gpa: 3.5, grade: 'B+', description: 'Very Good' };
-    if (score >= 70) return { gpa: 3.0, grade: 'B', description: 'Good' };
-    if (score >= 65) return { gpa: 2.5, grade: 'C+', description: 'Fairly Good' };
-    if (score >= 60) return { gpa: 2.0, grade: 'C', description: 'Fair' };
-    if (score >= 55) return { gpa: 1.5, grade: 'D+', description: 'Barely Satisfactory' };
-    if (score >= 50) return { gpa: 1.0, grade: 'D', description: 'Weak Pass' };
-    return { gpa: 0.0, grade: 'E/F', description: 'Fail' };
+    // A (70-100%): Excellent → 4.0
+    if (score >= 70) return { gpa: 4.0, grade: 'A', description: 'Excellent' };
+    // B (60-69%): Very Good → 3.0-3.5
+    if (score >= 65) return { gpa: 3.5, grade: 'B+', description: 'Very Good' };
+    if (score >= 60) return { gpa: 3.0, grade: 'B', description: 'Very Good' };
+    // C (50-59%): Good → 1.0-2.5
+    if (score >= 55) return { gpa: 2.5, grade: 'C+', description: 'Good' };
+    if (score >= 50) return { gpa: 1.0, grade: 'C', description: 'Good' };
+    // D (40-49%): Satisfactory/Pass → 1.0-1.5
+    if (score >= 45) return { gpa: 1.5, grade: 'D+', description: 'Satisfactory/Pass' };
+    if (score >= 40) return { gpa: 1.0, grade: 'D', description: 'Satisfactory/Pass' };
+    // F (0-39%): Fail → 0.0
+    return { gpa: 0.0, grade: 'F', description: 'Fail' };
 }
 
 // Function to get degree classification based on FGPA
