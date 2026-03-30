@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kairos - Smart Student Planner | Sign Up</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/pages/auth.css">
+</head>
+<body class="dark-mode">
+    <div class="auth-container">
+        <div class="auth-bg">
+            <div class="floating-shape shape-1"></div>
+            <div class="floating-shape shape-2"></div>
+            <div class="floating-shape shape-3"></div>
+        </div>
+
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <div class="auth-logo-icon">⏰</div>
+                    <div class="auth-logo-text">Kairos</div>
+                </div>
+                <p class="auth-tagline">Act at the right time</p>
+            </div>
+
+            <div class="auth-header">
+                <h1 class="auth-title">Create Account</h1>
+                <p class="auth-subtitle">Start planning your academic journey</p>
+            </div>
+
+            <form class="auth-form" id="signupForm">
+                <div class="auth-form-group">
+                    <label for="fullname">Full Name</label>
+                    <input type="text" id="fullname" name="fullname" placeholder="Your full name" required>
+                </div>
+
+                <div class="auth-form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                </div>
+
+                <div class="auth-form-group">
+                    <label for="institution">Institution</label>
+                    <input type="text" id="institution" name="institution" placeholder="Your college/university">
+                </div>
+
+                <div class="auth-form-group">
+                    <label for="password">Password</label>
+                    <div class="password-field-wrapper">
+                        <input type="password" id="password" name="password" placeholder="At least 6 characters" required>
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password')" title="Show/Hide password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="password-field-wrapper">
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                        <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirmPassword')" title="Show/Hide password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-checkbox">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms" style="margin: 0;">I agree to the Terms of Service and Privacy Policy</label>
+                </div>
+
+                <div class="auth-actions">
+                    <button type="submit" class="btn btn-primary btn-lg">Create Account</button>
+                </div>
+            </form>
+
+            <div class="auth-divider">Or sign up with</div>
+
+            <div class="oauth-buttons">
+                <button type="button" class="oauth-btn oauth-google" title="Sign up with Google">
+                    <svg class="oauth-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#EA4335" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#4285F4" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    <span class="oauth-text">Google</span>
+                    <span class="oauth-text-mobile">G</span>
+                </button>
+                <button type="button" class="oauth-btn oauth-microsoft" title="Sign up with Microsoft">
+                    <svg class="oauth-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="1" y="1" width="9" height="9" fill="#F25022"/>
+                        <rect x="12" y="1" width="11" height="9" fill="#7FBA00"/>
+                        <rect x="1" y="12" width="9" height="11" fill="#00A4EF"/>
+                        <rect x="12" y="12" width="11" height="11" fill="#FFB900"/>
+                    </svg>
+                    <span class="oauth-text">Microsoft</span>
+                    <span class="oauth-text-mobile">M</span>
+                </button>
+            </div>
+
+            <div class="motivational-quote">
+                <p id="dailyQuote">"Success is the sum of small efforts repeated day in and day out." - Robert Collier</p>
+            </div>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="index.html">Sign In</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fullname = document.getElementById('fullname').value;
+            const email = document.getElementById('email').value;
+            const institution = document.getElementById('institution').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validation
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+
+            // Store user in localStorage
+            localStorage.setItem('kairos_user', JSON.stringify({
+                email: email,
+                name: fullname,
+                institution: institution,
+                logged_in: true,
+                created_at: new Date().toISOString()
+            }));
+
+            // Initialize mock data for new user
+            if (!localStorage.getItem('kairos_assignments')) {
+                initializeMockData();
+            }
+
+            showToast('Account created successfully! Welcome to Kairos!', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        });
+
+        // Check if already logged in
+        window.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('kairos_user') || '{}');
+            if (user.logged_in) {
+                window.location.href = 'dashboard.html';
+            }
+        });
+
+        function initializeMockData() {
+            const mockAssignments = [
+                {
+                    id: 1,
+                    title: 'Data Structures Assignment',
+                    course: 'CS101',
+                    dueDate: new Date(Date.now() + 2*24*60*60*1000).toISOString(),
+                    priority: 'high',
+                    status: 'in-progress',
+                    estimatedHours: 5,
+                    completed: 40
+                },
+                {
+                    id: 2,
+                    title: 'Linear Algebra Exam Prep',
+                    course: 'MATH201',
+                    dueDate: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
+                    priority: 'medium',
+                    status: 'pending',
+                    estimatedHours: 8,
+                    completed: 0
+                },
+                {
+                    id: 3,
+                    title: 'Essay on Thermodynamics',
+                    course: 'PHYS150',
+                    dueDate: new Date(Date.now() + 4*24*60*60*1000).toISOString(),
+                    priority: 'medium',
+                    status: 'pending',
+                    estimatedHours: 4,
+                    completed: 0
+                },
+                {
+                    id: 4,
+                    title: 'Psychology Case Study',
+                    course: 'PSY101',
+                    dueDate: new Date(Date.now() - 1*24*60*60*1000).toISOString(),
+                    priority: 'high',
+                    status: 'pending',
+                    estimatedHours: 3,
+                    completed: 0
+                }
+            ];
+            localStorage.setItem('kairos_assignments', JSON.stringify(mockAssignments));
+        }
+    </script>
+</body>
+</html>

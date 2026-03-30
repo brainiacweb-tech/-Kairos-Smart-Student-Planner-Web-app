@@ -1,0 +1,94 @@
+/* ===========================
+   PLANNER PAGE FUNCTIONALITY
+   =========================== */
+
+const HOURS = ['6AM', '7AM', '8AM', '9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10PM'];
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
+    renderTimetable();
+});
+
+function renderTimetable() {
+    const grid = document.getElementById('timetableGrid');
+    const events = KairosStorage.getCalendarEvents();
+    
+    let html = '';
+    
+    // Header row with days
+    html += '<div class="timetable-header"></div>'; // Empty corner
+    for (let i = 0; i < 7; i++) {
+        const today = new Date();
+        const date = new Date(today);
+        date.setDate(today.getDate() - today.getDay() + i);
+        html += `<div class="timetable-day-header">
+                    <span class="timetable-day-name">${DAYS[i]}</span>
+                    <span class="timetable-day-date">${date.getDate()}</span>
+                 </div>`;
+    }
+    
+    // Time slots
+    HOURS.forEach((hour, hourIdx) => {
+        html += `<div class="timetable-time-slot">${hour}</div>`;
+        for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
+            const hasEvent = events.some(e => e.hourIndex === hourIdx && e.dayIndex === dayIdx);
+            html += `<div class="timetable-cell ${hasEvent ? 'has-event' : ''}" ondrop="dropEvent(event)" ondragover="allowDrop(event)"></div>`;
+        }
+    });
+    
+    grid.innerHTML = html;
+    
+    // Add events to grid
+    events.forEach(event => {
+        const cells = grid.querySelectorAll('.timetable-cell');
+        const cellIndex = (event.hourIndex * 7) + event.dayIndex + 7; // +7 for header row
+        if (cells[cellIndex]) {
+            const eventEl = document.createElement('div');
+            eventEl.className = `timetable-event ${event.type}`;
+            eventEl.textContent = event.title.substring(0, 15);
+            eventEl.draggable = true;
+            eventEl.onclick = () => showEventDetails(event);
+            cells[cellIndex].appendChild(eventEl);
+        }
+    });
+}
+
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function dropEvent(ev) {
+    ev.preventDefault();
+}
+
+function generateStudyPlan() {
+    const assignments = KairosStorage.getAssignments().filter(a => a.status !== 'completed');
+    
+    if (assignments.length === 0) {
+        showToast('No pending assignments to schedule!', 'info');
+        return;
+    }
+    
+    assignments.slice(0, 3).forEach(assignment => {
+        const event = {
+            title: `Study: ${assignment.course}`,
+            type: 'study',
+            dayIndex: Math.floor(Math.random() * 7),
+            hourIndex: Math.floor(Math.random() * (HOURS.length - 2)) + 9 // 9AM onwards
+        };
+        
+        KairosStorage.addCalendarEvent(event);
+    });
+    
+    showToast('Study plan generated! Check your calendar.', 'success');
+    renderTimetable();
+}
+
+function addTimeSlot() {
+    showToast('Click on a time slot to add an event', 'info');
+}
+
+function showEventDetails(event) {
+    showToast(`${event.title} scheduled`, 'info');
+}

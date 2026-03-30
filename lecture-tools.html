@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kairos - Lecture Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/pages/dashboard.css">
+    <style>
+        /* Lecture Tools Specific Styles */
+        .lecture-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .lecture-tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        /* Password visibility toggle styles */
+        .password-field-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 44px;
+        }
+
+        .password-input {
+            width: 100%;
+            height: 100%;
+            padding-right: 45px !important;
+            flex: 1;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 6px 10px;
+            transition: color var(--transition-fast);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--primary);
+        }
+
+        .lecture-tool-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .lecture-tool-icon {
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), #a39bff);
+            border-radius: var(--radius-lg);
+            color: white;
+        }
+
+        .lecture-tool-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .lecture-tool-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .notes-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .note-input {
+            min-height: 120px;
+            padding: var(--spacing-md);
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            resize: vertical;
+        }
+
+        .note-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+        }
+
+        .recording-controls {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .recording-status {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background: rgba(255, 71, 87, 0.1);
+            border-radius: var(--radius-md);
+            color: var(--danger);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .recording-status.inactive {
+            background: rgba(46, 213, 115, 0.1);
+            color: var(--success);
+        }
+
+        .recording-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--danger);
+            animation: pulse 1s infinite;
+        }
+
+        .recording-status.inactive .recording-indicator {
+            background: var(--success);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .recordings-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .recording-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: rgba(108, 99, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+        }
+
+        .recording-item-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .recording-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .recording-item-name {
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .recording-item-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .recording-item-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .recording-item-actions button {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-play {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-play:hover {
+            background: #5248E5;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #E63946;
+        }
+
+        .btn-download {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #1DC64A;
+        }
+
+        .notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .note-item {
+            padding: var(--spacing-md);
+            background: rgba(108, 99, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+        }
+
+        .note-item:hover {
+            border-color: var(--primary);
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        .note-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .note-item-course {
+            display: inline-block;
+            padding: 4px 8px;
+            background: var(--primary);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .note-item-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .note-item-content {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            margin: var(--spacing-sm) 0;
+            line-height: 1.5;
+            max-height: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .note-item-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .note-item-actions button {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #5248E5;
+        }
+
+        .btn-delete-note {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-delete-note:hover {
+            background: #E63946;
+        }
+
+        .lecture-course-select {
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .lecture-course-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+        }
+
+        .audio-player {
+            width: 100%;
+            margin: var(--spacing-md) 0;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .stat-mini {
+            padding: var(--spacing-md);
+            background: linear-gradient(135deg, var(--primary), #a39bff);
+            border-radius: var(--radius-lg);
+            color: white;
+            text-align: center;
+        }
+
+        .stat-mini-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: var(--spacing-sm) 0;
+        }
+
+        .stat-mini-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .lecture-tools-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+
+            .lecture-tool-card {
+                padding: var(--spacing-md);
+            }
+
+            .lecture-tool-header {
+                gap: var(--spacing-sm);
+                margin-bottom: var(--spacing-md);
+            }
+
+            .lecture-tool-icon {
+                font-size: 1.5rem;
+                width: 40px;
+                height: 40px;
+            }
+
+            .lecture-tool-title {
+                font-size: 1.1rem;
+            }
+
+            .note-input {
+                min-height: 100px;
+                font-size: 16px;
+            }
+
+            .password-input {
+                font-size: 16px;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--spacing-sm);
+            }
+
+            .stat-mini {
+                padding: var(--spacing-md);
+            }
+
+            .stat-mini-value {
+                font-size: 1.5rem;
+            }
+
+            .notes-list {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="dashboard-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header" onclick="window.location.href='dashboard.html'">
+                <div class="sidebar-logo-icon"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="logoGrad8" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6C63FF;stop-opacity:1" /><stop offset="100%" style="stop-color:#4c3dd9;stop-opacity:1" /></linearGradient></defs><circle cx="50" cy="50" r="48" fill="url(#logoGrad8)" opacity="0.15"/><path d="M 35 30 L 65 30 L 70 50 L 65 70 L 35 70 L 30 50 Z" fill="none" stroke="#6C63FF" stroke-width="3" stroke-linejoin="round"/><circle cx="50" cy="50" r="8" fill="#6C63FF"/></svg></div>
+                <div class="sidebar-logo-text">Kairos</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-chart-pie"></i></span>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+                <a href="assignments.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-tasks"></i></span>
+                    <span class="nav-label">Assignments</span>
+                </a>
+                <a href="planner.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-calendar"></i></span>
+                    <span class="nav-label">Planner</span>
+                </a>
+                <a href="timetable.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-table"></i></span>
+                    <span class="nav-label">Timetable</span>
+                </a>
+                <a href="analytics.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+                    <span class="nav-label">Analytics</span>
+                </a>
+                <a href="gpa-calculator.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-calculator"></i></span>
+                    <span class="nav-label">GPA Calc</span>
+                </a>
+                <a href="lecture-tools.html" class="nav-item active">
+                    <span class="nav-icon"><i class="fas fa-microphone"></i></span>
+                    <span class="nav-label">Lecture Tools</span>
+                </a>
+                <a href="pdf-tools.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-file-pdf"></i></span>
+                    <span class="nav-label">PDF Tools</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                    <span class="nav-label">Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="nav-item" onclick="logout()" data-action="logout">
+                    <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                    <span class="nav-label">Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <div style="flex: 1; display: flex; flex-direction: column;">
+            <!-- NAVBAR -->
+            <nav class="navbar">
+                <div class="navbar-left">
+                    <button class="navbar-toggle" title="Toggle sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="navbar-title">Lecture Tools</h1>
+                </div>
+
+                <div class="navbar-right">
+                    <button class="theme-toggle dark" title="Toggle theme" onclick="toggleTheme()"></button>
+                    <button class="btn-icon" onclick="openNotificationPanel()" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="user-avatar" title="User Menu">👤</div>
+                </div>
+            </nav>
+
+            <!-- PAGE CONTENT -->
+            <main class="main-content">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">🎓 Lecture Tools</h1>
+                        <p style="color: var(--text-secondary);">Take notes and record lectures during class</p>
+                    </div>
+                </div>
+
+                <!-- STATS -->
+                <div class="stats-row">
+                    <div class="stat-mini">
+                        <i class="fas fa-sticky-note" style="font-size: 1.5rem;"></i>
+                        <div class="stat-mini-value" id="totalNotes">0</div>
+                        <div class="stat-mini-label">Total Notes</div>
+                    </div>
+                    <div class="stat-mini" style="background: linear-gradient(135deg, #FF4757, #FF8C98);">
+                        <i class="fas fa-microphone" style="font-size: 1.5rem;"></i>
+                        <div class="stat-mini-value" id="totalRecordings">0</div>
+                        <div class="stat-mini-label">Recordings</div>
+                    </div>
+                </div>
+
+                <!-- TOOLS GRID -->
+                <div class="lecture-tools-grid">
+                    <!-- NOTE TAKING -->
+                    <div class="lecture-tool-card">
+                        <div class="lecture-tool-header">
+                            <div class="lecture-tool-icon">
+                                <i class="fas fa-pen-fancy"></i>
+                            </div>
+                            <div>
+                                <h2 class="lecture-tool-title">Note Taking</h2>
+                                <p class="lecture-tool-desc">Write and organize lecture notes</p>
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid var(--border); padding-top: var(--spacing-md); margin-top: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                                <h3 style="margin: 0; font-size: 0.95rem;">Settings</h3>
+                                <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                                    <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer; font-size: 0.9rem;">
+                                        <input type="checkbox" id="passwordProtectToggle" onchange="togglePasswordProtect()">
+                                        <i class="fas fa-lock"></i> Password Protect
+                                    </label>
+                                </div>
+                            </div>
+                            <div id="passwordSection" style="display: none; margin-bottom: var(--spacing-md);">
+                                <div class="password-field-wrapper">
+                                    <input type="password" id="notePassword" class="note-input password-input" placeholder="Set a password for this note">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('notePassword')" title="Show/Hide password">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <p style="font-size: 0.8rem; color: var(--text-secondary); margin: var(--spacing-xs) 0 0 0;">Password will protect this note</p>
+                            </div>
+                        </div>
+
+                        <div class="notes-container">
+                            <div id="courseSelectSection">
+                                <select class="lecture-course-select" id="noteCourseSelect">
+                                    <option value="">Select Course</option>
+                                    <option value="CS101">Computer Science 101</option>
+                                    <option value="MATH201">Calculus II</option>
+                                    <option value="PHYS101">Physics I</option>
+                                    <option value="ENG102">English 102</option>
+                                    <option value="HIST201">World History</option>
+                                </select>
+                            </div>
+                            <textarea class="note-input" id="noteInput" placeholder="Write your notes here... You can include formulas, equations, and code snippets."></textarea>
+                            <div style="display: flex; gap: var(--spacing-sm);">
+                                <button class="btn btn-primary" onclick="saveNote()">
+                                    <i class="fas fa-save"></i> Save Note
+                                </button>
+                                <button class="btn btn-secondary" onclick="clearNoteInput()">
+                                    <i class="fas fa-trash"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid var(--border); padding-top: var(--spacing-md); margin-top: var(--spacing-md);">
+                            <h3 style="margin: 0 0 var(--spacing-md) 0; font-size: 0.95rem;">Saved Notes</h3>
+                            <div class="notes-list" id="notesList">
+                                <p style="color: var(--text-secondary); text-align: center; margin: 0;">No notes yet. Start taking notes!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SOUND RECORDING -->
+                    <div class="lecture-tool-card">
+                        <div class="lecture-tool-header">
+                            <div class="lecture-tool-icon" style="background: linear-gradient(135deg, #FF4757, #FF8C98);">
+                                <i class="fas fa-microphone"></i>
+                            </div>
+                            <div>
+                                <h2 class="lecture-tool-title">Sound Recording</h2>
+                                <p class="lecture-tool-desc">Record and save audio lectures</p>
+                            </div>
+                        </div>
+
+                        <div class="notes-container">
+                            <div class="recording-status inactive" id="recordingStatus">
+                                <div class="recording-indicator"></div>
+                                <span id="recordingStatusText">Ready to record</span>
+                            </div>
+
+                            <div class="recording-controls">
+                                <button class="btn btn-primary" id="startRecordBtn" onclick="startRecording()">
+                                    <i class="fas fa-circle"></i> Start Recording
+                                </button>
+                                <button class="btn btn-secondary" id="stopRecordBtn" onclick="stopRecording()" disabled>
+                                    <i class="fas fa-square"></i> Stop Recording
+                                </button>
+                                <button class="btn btn-ghost" id="pauseRecordBtn" onclick="pauseRecording()" disabled>
+                                    <i class="fas fa-pause"></i> Pause
+                                </button>
+                            </div>
+
+                            <div style="background: rgba(108, 99, 255, 0.05); padding: var(--spacing-md); border-radius: var(--radius-md); text-align: center;">
+                                <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-sm);">Recording Time</div>
+                                <div id="recordingTimer" style="font-size: 1.75rem; font-weight: 700; color: var(--primary); font-family: 'Courier New', monospace;">00:00:00</div>
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid var(--border); padding-top: var(--spacing-md); margin-top: var(--spacing-md);">
+                            <h3 style="margin: 0 0 var(--spacing-md) 0; font-size: 0.95rem;">Your Recordings</h3>
+                            <div class="recordings-list" id="recordingsList">
+                                <p style="color: var(--text-secondary); text-align: center; margin: 0;">No recordings yet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/app.js"></script>
+    <script src="js/lecture-tools.js"></script>
+</body>
+</html>
+
+        /* ===========================
+           DECORATIVE DOODLES - jjjj.jpg
+           =========================== */
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('../jjjj.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: -1;
+        }

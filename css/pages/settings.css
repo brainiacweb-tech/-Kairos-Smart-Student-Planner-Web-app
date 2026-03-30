@@ -1,0 +1,578 @@
+/* ===========================
+   SETTINGS PAGE
+   =========================== */
+
+.settings-container {
+  display: flex;
+  gap: var(--spacing-lg);
+  min-height: 100vh;
+}
+
+.settings-content {
+  flex: 1;
+  padding: var(--spacing-lg);
+  max-width: 1000px;
+}
+
+.settings-header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.settings-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.settings-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* ===========================
+   SETTINGS SIDEBAR (Tabs)
+   =========================== */
+
+.settings-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: var(--spacing-lg);
+}
+
+.settings-tab {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  font-family: var(--font-primary);
+  text-align: left;
+  border-left: 3px solid transparent;
+}
+
+.settings-tab:hover {
+  color: var(--text);
+}
+
+.settings-tab.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+}
+
+/* ===========================
+   SETTINGS SECTION
+   =========================== */
+
+.settings-section {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.section-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.section-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ===========================
+   PROFILE SECTION
+   =========================== */
+
+.profile-section {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
+.profile-avatar-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.avatar-upload-input {
+  display: none;
+}
+
+.avatar-upload-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  font-family: var(--font-primary);
+}
+
+.avatar-upload-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.avatar-help-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.profile-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+.profile-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.profile-form-group label {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.profile-form-group input {
+  width: 100%;
+}
+
+/* ===========================
+   NOTIFICATIONS PREFERENCES
+   =========================== */
+
+.notification-settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.notification-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.notification-info {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.notification-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.notification-toggle {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  background: var(--border);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.notification-toggle::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: white;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: left var(--transition-fast);
+}
+
+.notification-toggle.active {
+  background: var(--primary);
+}
+
+.notification-toggle.active::after {
+  left: 26px;
+}
+
+/* ===========================
+   APPEARANCE SETTINGS
+   =========================== */
+
+.appearance-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.appearance-option {
+  padding: var(--spacing-md);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+}
+
+.appearance-option:hover {
+  border-color: var(--primary);
+}
+
+.appearance-option.selected {
+  border-color: var(--primary);
+  background: rgba(108, 99, 255, 0.1);
+}
+
+.appearance-option-icon {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.appearance-option-label {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ===========================
+   COLOR PICKER
+   =========================== */
+
+.color-picker-section {
+  margin-top: var(--spacing-lg);
+}
+
+.color-picker-title {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-md);
+}
+
+.color-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.color-option {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+}
+
+.color-option.selected {
+  border-color: var(--text);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===========================
+   SEMESTER MANAGEMENT
+   =========================== */
+
+.semester-management {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.semester-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.semester-actions .btn {
+  flex: 1;
+  min-width: 200px;
+}
+
+.semester-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.semester-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.semester-info {
+  flex: 1;
+}
+
+.semester-name {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.semester-dates {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.semester-actions-group {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.semester-actions-group .btn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: 0.85rem;
+}
+
+/* ===========================
+   DANGER ZONE
+   =========================== */
+
+.danger-zone {
+  background: rgba(255, 71, 87, 0.05);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.danger-zone-header {
+  margin-bottom: var(--spacing-md);
+}
+
+.danger-zone-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--danger);
+}
+
+.danger-zone-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-sm);
+}
+
+.danger-zone-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.btn-danger-action {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  font-family: var(--font-primary);
+}
+
+.btn-danger-action:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===========================
+   CONFIRMATION DIALOG
+   =========================== */
+
+.confirmation-modal {
+  max-width: 400px;
+}
+
+.confirmation-icon {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.confirmation-icon.warning {
+  color: var(--warning);
+}
+
+.confirmation-icon.danger {
+  color: var(--danger);
+}
+
+.confirmation-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-sm);
+  text-align: center;
+}
+
+.confirmation-message {
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.95rem;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+}
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+
+@media (max-width: 1024px) {
+  .profile-form {
+    grid-template-columns: 1fr;
+  }
+
+  .appearance-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .settings-content {
+    padding: var(--spacing-md);
+  }
+
+  .settings-tabs {
+    flex-direction: row;
+    gap: var(--spacing-md);
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .settings-tab {
+    padding: var(--spacing-sm) var(--spacing-md);
+    white-space: nowrap;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    border-left: none;
+  }
+
+  .settings-tab.active {
+    background: var(--primary);
+    color: white;
+    border: 1px solid var(--primary);
+  }
+
+  .profile-section {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-form {
+    grid-template-columns: 1fr;
+  }
+
+  .appearance-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .color-picker-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .semester-item {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+  }
+
+  .semester-actions-group {
+    width: 100%;
+  }
+
+  .semester-actions-group .btn {
+    flex: 1;
+  }
+
+  .danger-zone-actions {
+    flex-direction: column;
+  }
+
+  .btn-danger-action {
+    width: 100%;
+  }
+}
+
+/* ===========================
+   DECORATIVE DOODLES - jjjj.jpg
+   =========================== */
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('../../jjjj.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: -1;
+}

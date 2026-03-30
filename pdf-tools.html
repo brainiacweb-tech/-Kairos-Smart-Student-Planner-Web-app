@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kairos - PDF Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/pages/dashboard.css">
+    <style>
+        /* Mobile Optimization for PDF Tools */
+        @media (max-width: 768px) {
+            [style*="minmax(280px, 1fr)"] {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+            }
+
+            .page-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="dashboard-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header" onclick="window.location.href='dashboard.html'">
+                <div class="sidebar-logo-icon"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="logoGrad7" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6C63FF;stop-opacity:1" /><stop offset="100%" style="stop-color:#4c3dd9;stop-opacity:1" /></linearGradient></defs><circle cx="50" cy="50" r="48" fill="url(#logoGrad7)" opacity="0.15"/><path d="M 35 30 L 65 30 L 70 50 L 65 70 L 35 70 L 30 50 Z" fill="none" stroke="#6C63FF" stroke-width="3" stroke-linejoin="round"/><circle cx="50" cy="50" r="8" fill="#6C63FF"/></svg></div>
+                <div class="sidebar-logo-text">Kairos</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-chart-pie"></i></span>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+                <a href="assignments.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-tasks"></i></span>
+                    <span class="nav-label">Assignments</span>
+                </a>
+                <a href="planner.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-calendar"></i></span>
+                    <span class="nav-label">Planner</span>
+                </a>
+                <a href="timetable.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-table"></i></span>
+                    <span class="nav-label">Timetable</span>
+                </a>
+                <a href="analytics.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+                    <span class="nav-label">Analytics</span>
+                </a>
+                <a href="gpa-calculator.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-calculator"></i></span>
+                    <span class="nav-label">GPA Calc</span>
+                </a>
+                <a href="lecture-tools.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-microphone"></i></span>
+                    <span class="nav-label">Lecture Tools</span>
+                </a>
+                <a href="pdf-tools.html" class="nav-item active">
+                    <span class="nav-icon"><i class="fas fa-file-pdf"></i></span>
+                    <span class="nav-label">PDF Tools</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                    <span class="nav-label">Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="nav-item" onclick="logout()" data-action="logout">
+                    <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                    <span class="nav-label">Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <div style="flex: 1; display: flex; flex-direction: column;">
+            <!-- NAVBAR -->
+            <nav class="navbar">
+                <div class="navbar-left">
+                    <button class="navbar-toggle" title="Toggle sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="navbar-title">PDF Tools</h1>
+                </div>
+
+                <div class="navbar-right">
+                    <button class="theme-toggle dark" title="Toggle theme" onclick="toggleTheme()"></button>
+                    <button class="btn-icon" onclick="openNotificationPanel()" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="user-avatar" title="User Menu">👤</div>
+                </div>
+            </nav>
+
+            <!-- PAGE CONTENT -->
+            <main class="main-content">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">📄 PDF Tools</h1>
+                        <p style="color: var(--text-secondary);">Manage, edit, and convert your PDF files</p>
+                    </div>
+                </div>
+
+                <!-- PDF Tools Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+                    <!-- Merge PDF -->
+                    <div class="card">
+                        <div style="text-align: center; padding: var(--spacing-lg);">
+                            <i class="fas fa-object-ungroup" style="font-size: 2.5rem; color: var(--primary); margin-bottom: var(--spacing-md); display: block;"></i>
+                            <h3 style="margin: var(--spacing-md) 0;">Merge PDFs</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Combine multiple PDF files into one</p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="initMergePDF()">
+                                <i class="fas fa-plus"></i> Upload Files
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Split PDF -->
+                    <div class="card">
+                        <div style="text-align: center; padding: var(--spacing-lg);">
+                            <i class="fas fa-cut" style="font-size: 2.5rem; color: var(--warning); margin-bottom: var(--spacing-md); display: block;"></i>
+                            <h3 style="margin: var(--spacing-md) 0;">Split PDF</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Split PDF into individual pages</p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="initSplitPDF()">
+                                <i class="fas fa-upload"></i> Choose PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Compress PDF -->
+                    <div class="card">
+                        <div style="text-align: center; padding: var(--spacing-lg);">
+                            <i class="fas fa-compress" style="font-size: 2.5rem; color: var(--success); margin-bottom: var(--spacing-md); display: block;"></i>
+                            <h3 style="margin: var(--spacing-md) 0;">Compress PDF</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Reduce PDF file size</p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="initCompressPDF()">
+                                <i class="fas fa-upload"></i> Choose PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Add Watermark -->
+                    <div class="card">
+                        <div style="text-align: center; padding: var(--spacing-lg);">
+                            <i class="fas fa-stamp" style="font-size: 2.5rem; color: var(--danger); margin-bottom: var(--spacing-md); display: block;"></i>
+                            <h3 style="margin: var(--spacing-md) 0;">Add Watermark</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Add text or image watermark</p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="initWatermark()">
+                                <i class="fas fa-upload"></i> Choose PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Convert to JPG -->
+                    <div class="card">
+                        <div style="text-align: center; padding: var(--spacing-lg);">
+                            <i class="fas fa-image" style="font-size: 2.5rem; color: #FF9999; margin-bottom: var(--spacing-md); display: block;"></i>
+                            <h3 style="margin: var(--spacing-md) 0;">PDF to JPG</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Convert PDF pages to JPG images</p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="initConvertToImage('jpg')">
+                                <i class="fas fa-upload"></i> Choose PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Convert to PNG -->
+                    <div class="card">
+                        <div style="text-align: center; padding: var(--spacing-lg);">
+                            <i class="fas fa-image" style="font-size: 2.5rem; color: #99CCFF; margin-bottom: var(--spacing-md); display: block;"></i>
+                            <h3 style="margin: var(--spacing-md) 0;">PDF to PNG</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Convert PDF pages to PNG images</p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="initConvertToImage('png')">
+                                <i class="fas fa-upload"></i> Choose PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Rotate PDF -->
+                    <div class="card">
+                        <div style="text-align: center; padding: var(--spacing-lg);">
+                            <i class="fas fa-sync-alt" style="font-size: 2.5rem; color: #FFCC99; margin-bottom: var(--spacing-md); display: block;"></i>
+                            <h3 style="margin: var(--spacing-md) 0;">Rotate PDF</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Rotate pages 90°, 180°, 270°</p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="initRotatePDF()">
+                                <i class="fas fa-upload"></i> Choose PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Unlock PDF -->
+                    <div class="card">
+                        <div style="text-align: center; padding: var(--spacing-lg);">
+                            <i class="fas fa-lock-open" style="font-size: 2.5rem; color: #CC99FF; margin-bottom: var(--spacing-md); display: block;"></i>
+                            <h3 style="margin: var(--spacing-md) 0;">Unlock PDF</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Remove password protection</p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="initUnlockPDF()">
+                                <i class="fas fa-upload"></i> Choose PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Extract Pages -->
+                    <div class="card">
+                        <div style="text-align: center; padding: var(--spacing-lg);">
+                            <i class="fas fa-clone" style="font-size: 2.5rem; color: #99FF99; margin-bottom: var(--spacing-md); display: block;"></i>
+                            <h3 style="margin: var(--spacing-md) 0;">Extract Pages</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Extract specific pages from PDF</p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="initExtractPages()">
+                                <i class="fas fa-upload"></i> Choose PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recently Processed -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 style="margin: 0;">✨ Features</h3>
+                    </div>
+                    <div style="padding: var(--spacing-md);">
+                        <ul style="list-style: none;">
+                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
+                                <i class="fas fa-check" style="color: var(--success);"></i>
+                                <span>Fast and secure PDF processing</span>
+                            </li>
+                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
+                                <i class="fas fa-check" style="color: var(--success);"></i>
+                                <span>No file size limits</span>
+                            </li>
+                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
+                                <i class="fas fa-check" style="color: var(--success);"></i>
+                                <span>Works offline - files stay private</span>
+                            </li>
+                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
+                                <i class="fas fa-check" style="color: var(--success);"></i>
+                                <span>Works on Windows, Mac & Android</span>
+                            </li>
+                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
+                                <i class="fas fa-check" style="color: var(--success);"></i>
+                                <span>Tools available 24/7</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- File Input (Hidden) -->
+                <input type="file" id="pdfFileInput" accept=".pdf" style="display: none;" onchange="handlePDFUpload()">
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Notification Panel -->
+    <div class="drawer" id="notificationPanel">
+        <div class="drawer-header">
+            <h2 class="drawer-header-title">Notifications</h2>
+            <button class="modal-close" onclick="closeDrawer('notificationPanel')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="drawer-body" id="notificationList">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/pdf-tools.js"></script>
+</body>
+</html>

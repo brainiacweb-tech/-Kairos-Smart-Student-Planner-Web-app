@@ -1,0 +1,66 @@
+
+
+/* ===========================
+   DECORATIVE DOODLES
+   =========================== */
+
+/* Background doodles with jjjj.jpg */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 350px;
+    height: 350px;
+    background-image: url('../jjjj.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.08;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 300px;
+    height: 300px;
+    background-image: url('../jjjj.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.07;
+}
+
+@media (max-width: 1024px) {
+    body::before {
+        width: 250px;
+        height: 250px;
+        opacity: 0.06;
+    }
+    
+    body::after {
+        width: 220px;
+        height: 220px;
+        opacity: 0.05;
+    }
+}
+
+@media (max-width: 768px) {
+    body::before {
+        width: 180px;
+        height: 180px;
+        opacity: 0.05;
+    }
+    
+    body::after {
+        width: 160px;
+        height: 160px;
+        opacity: 0.04;
+    }
+}
