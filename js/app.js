@@ -480,7 +480,10 @@ function togglePasswordVisibility(fieldId) {
    USER PROFILE MENU
    =========================== */
 
-function toggleProfileMenu() {
+function toggleProfileMenu(e) {
+    if (e) {
+        e.stopPropagation();
+    }
     const dropdown = document.getElementById('profileDropdown');
     if (!dropdown) return;
     
@@ -513,6 +516,14 @@ function updateProfileMenuUser() {
 // Close profile menu when clicking outside
 document.addEventListener('click', (e) => {
     const profileMenu = document.querySelector('.user-profile-menu');
+    const profileBtn = document.querySelector('.user-profile-btn');
+    
+    // Don't close if clicking on the button itself
+    if (profileBtn && profileBtn.contains(e.target)) {
+        return;
+    }
+    
+    // Close if clicking outside the menu
     if (profileMenu && !profileMenu.contains(e.target)) {
         closeProfileMenu();
     }
@@ -520,8 +531,10 @@ document.addEventListener('click', (e) => {
 
 // Close profile menu when clicking menu items
 document.addEventListener('click', (e) => {
-    if (e.target.closest('.user-profile-item')) {
-        closeProfileMenu();
+    const menuItem = e.target.closest('.user-profile-item');
+    if (menuItem) {
+        // Small delay to allow navigation to complete  
+        setTimeout(closeProfileMenu, 0);
     }
 });
 
