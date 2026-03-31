@@ -190,6 +190,15 @@ function setupSidebarToggle() {
             document.body.classList.toggle('sidebar-open');
         });
         
+        // Close sidebar when clicking on nav links
+        const navLinks = document.querySelectorAll('.sidebar-nav .nav-item, .sidebar-footer .nav-item');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
+            });
+        });
+        
         // Close sidebar when clicking outside
         document.addEventListener('click', (e) => {
             if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
