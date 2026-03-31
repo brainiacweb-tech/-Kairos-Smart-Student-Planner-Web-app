@@ -39,16 +39,15 @@ function renderTimetable() {
     
     grid.innerHTML = html;
     
-    // Add events to grid
-    events.forEach(event => {
+    // Add events to grid with delete capability
+    events.forEach((event, index) => {
         const cells = grid.querySelectorAll('.timetable-cell');
         const cellIndex = (event.hourIndex * 7) + event.dayIndex + 7; // +7 for header row
         if (cells[cellIndex]) {
             const eventEl = document.createElement('div');
             eventEl.className = `timetable-event ${event.type}`;
-            eventEl.textContent = event.title.substring(0, 15);
-            eventEl.draggable = true;
-            eventEl.onclick = () => showEventDetails(event);
+            eventEl.innerHTML = `<span>${event.title.substring(0, 12)}</span><button class="event-delete-btn" onclick="deleteEvent(${index}, event)"><i class="fas fa-trash-alt"></i></button>`;
+            eventEl.style.cursor = 'pointer';
             cells[cellIndex].appendChild(eventEl);
         }
     });
@@ -62,133 +61,146 @@ function dropEvent(ev) {
     ev.preventDefault();
 }
 
-function generateStudyPlan() {
-    const assignments = KairosStorage.getAssignments().filter(a => a.status !== 'completed');
+/* ===========================
+   EVENT MANAGEMENT FUNCTIONS
+   =========================== */
+
+function openAddEventModal() {
+    document.getElementById('eventTitle').value = '';
+    document.getElementById('eventType').value = 'study';
+    document.getElementById('eventDay').value = '1';
+    document.getElementById('eventHour').value = '9';
+    openDrawer('addEventDrawer');
+}
+
+function handleAddEvent(e) {
+    e.preventDefault();
     
-    if (assignments.length === 0) {
-        showToast('No pending assignments to schedule!', 'info');
+    const title = document.getElementById('eventTitle').value.trim();
+    const type = document.getElementById('eventType').value;
+    const dayIndex = parseInt(document.getElementById('eventDay').value);
+    const hourIndex = parseInt(document.getElementById('eventHour').value);
+    
+    if (!title) {
+        showToast('Please enter an event title', 'warning');
         return;
     }
     
-    assignments.slice(0, 3).forEach(assignment => {
-        const event = {
-            title: `Study: ${assignment.course}`,
-            type: 'study',
-            dayIndex: Math.floor(Math.random() * 7),
-            hourIndex: Math.floor(Math.random() * (HOURS.length - 2)) + 9 // 9AM onwards
-        };
-        
-        KairosStorage.addCalendarEvent(event);
-    });
+    const event = {
+        title: title,
+        type: type,
+        dayIndex: dayIndex,
+        hourIndex: hourIndex,
+        id: 'event_' + Date.now()
+    };
     
-    showToast('Study plan generated! Check your calendar.', 'success');
+    KairosStorage.addCalendarEvent(event);
+    showToast(`"${title}" added to your schedule!`, 'success');
+    closeDrawer('addEventDrawer');
     renderTimetable();
 }
 
-function addTimeSlot() {
-    showToast('Click on a time slot to add an event', 'info');
+function deleteEvent(index, e) {
+    if (e) {
+        e.stopPropagation();
+    }
+    
+    const events = KairosStorage.getCalendarEvents();
+    if (events[index]) {
+        const eventTitle = events[index].title;
+        events.splice(index, 1);
+        localStorage.setItem('kairos_calendar_events', JSON.stringify(events));
+        showToast(`"${eventTitle}" removed from schedule`, 'info');
+        renderTimetable();
+    }
 }
 
-function showEventDetails(event) {
-    showToast(`${event.title} scheduled`, 'info');
+function clearWeeklyPlanner() {
+    if (confirm('Are you sure you want to clear all events from this week?')) {
+        localStorage.setItem('kairos_calendar_events', JSON.stringify([]));
+        showToast('Weekly schedule cleared!', 'info');
+        renderTimetable();
+    }
 }
 
 /* ===========================
-   PLANNER SAVE/LOAD FUNCTIONS
+   SCHEDULE MANAGEMENT FUNCTIONS
    =========================== */
 
-function savePlannerModal() {
-    document.getElementById('plannerName').value = '';
-    document.getElementById('plannerDescription').value = '';
-    openDrawer('savePlannerDrawer');
+function openManageSchedules() {
+    loadSavedSchedules();
+    openDrawer('manageSchedulesDrawer');
 }
 
-function handleSavePlanner(event) {
-    event.preventDefault();
+function saveCurrentSchedule() {
+    const scheduleName = prompt('Enter a name for this schedule:', `Schedule ${new Date().toLocaleDateString()}`);
     
-    const plannerName = document.getElementById('plannerName').value.trim();
-    const plannerDescription = document.getElementById('plannerDescription').value.trim();
-    
-    if (!plannerName) {
-        showToast('Please enter a planner name', 'warning');
+    if (!scheduleName || scheduleName.trim() === '') {
         return;
     }
     
     const events = KairosStorage.getCalendarEvents();
-    const planner = {
-        id: 'planner_' + Date.now(),
-        name: plannerName,
-        description: plannerDescription,
+    const schedule = {
+        id: 'schedule_' + Date.now(),
+        name: scheduleName.trim(),
         events: JSON.parse(JSON.stringify(events)),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
     
-    let planners = JSON.parse(localStorage.getItem('kairos_planners') || '[]');
-    planners.push(planner);
-    localStorage.setItem('kairos_planners', JSON.stringify(planners));
+    let schedules = JSON.parse(localStorage.getItem('kairos_schedules') || '[]');
+    schedules.push(schedule);
+    localStorage.setItem('kairos_schedules', JSON.stringify(schedules));
     
-    showToast(`Planner "${plannerName}" saved successfully!`, 'success');
-    closeDrawer('savePlannerDrawer');
+    showToast(`Schedule "${scheduleName}" saved!`, 'success');
+    loadSavedSchedules();
 }
 
-function openSavedPlanners() {
-    const planners = JSON.parse(localStorage.getItem('kairos_planners') || '[]');
-    const plannersList = document.getElementById('savedPlannersList');
+function loadSavedSchedules() {
+    const schedules = JSON.parse(localStorage.getItem('kairos_schedules') || '[]');
+    const schedulesList = document.getElementById('savedSchedulesList');
     
-    if (planners.length === 0) {
-        plannersList.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No saved planners yet. Create one to get started!</div>';
+    if (schedules.length === 0) {
+        schedulesList.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No saved schedules yet. Create one to get started!</div>';
     } else {
-        plannersList.innerHTML = '<div class="saved-planners-grid">' + 
-            planners.map(planner => `
-                <div class="planner-card">
-                    <div class="planner-card-header">
-                        <h3 class="planner-card-title">${planner.name}</h3>
-                        <button class="btn-icon" onclick="deletePlanner('${planner.id}')" title="Delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                    <div class="planner-card-description">${planner.description || 'No description'}</div>
-                    <div class="planner-card-meta">
-                        <small>${planner.events ? planner.events.length : 0} events</small>
-                        <small>${new Date(planner.createdAt).toLocaleDateString()}</small>
-                    </div>
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="loadPlanner('${planner.id}')">
-                        <i class="fas fa-download"></i> Load
-                    </button>
+        schedulesList.innerHTML = schedules.map((schedule, idx) => `
+            <div class="schedule-item">
+                <div class="schedule-item-info">
+                    <h4 class="schedule-item-name">${schedule.name}</h4>
+                    <small class="schedule-item-meta">${schedule.events ? schedule.events.length : 0} events • ${new Date(schedule.createdAt).toLocaleDateString()}</small>
                 </div>
-            `).join('') + 
-            '</div>';
+                <div class="schedule-item-actions">
+                    <button class="btn btn-small btn-primary" onclick="loadSchedule('${schedule.id}')"><i class="fas fa-download"></i> Load</button>
+                    <button class="btn btn-small btn-secondary" onclick="deleteSchedule('${schedule.id}')"><i class="fas fa-trash"></i> Delete</button>
+                </div>
+            </div>
+        `).join('');
     }
-    
-    openDrawer('loadPlannerDrawer');
 }
 
-function loadPlanner(plannerId) {
-    const planners = JSON.parse(localStorage.getItem('kairos_planners') || '[]');
-    const planner = planners.find(p => p.id === plannerId);
+function loadSchedule(scheduleId) {
+    const schedules = JSON.parse(localStorage.getItem('kairos_schedules') || '[]');
+    const schedule = schedules.find(s => s.id === scheduleId);
     
-    if (!planner) {
-        showToast('Planner not found', 'error');
+    if (!schedule) {
+        showToast('Schedule not found', 'error');
         return;
     }
     
-    localStorage.setItem('kairos_calendar_events', JSON.stringify(planner.events || []));
-    
-    showToast(`Planner "${planner.name}" loaded!`, 'success');
-    closeDrawer('loadPlannerDrawer');
-    
+    localStorage.setItem('kairos_calendar_events', JSON.stringify(schedule.events || []));
+    showToast(`Loaded "${schedule.name}"!`, 'success');
+    closeDrawer('manageSchedulesDrawer');
     renderTimetable();
 }
 
-function deletePlanner(plannerId) {
-    if (confirm('Are you sure you want to delete this planner?')) {
-        let planners = JSON.parse(localStorage.getItem('kairos_planners') || '[]');
-        planners = planners.filter(p => p.id !== plannerId);
-        localStorage.setItem('kairos_planners', JSON.stringify(planners));
-        
-        showToast('Planner deleted', 'info');
-        openSavedPlanners();
+function deleteSchedule(scheduleId) {
+    if (confirm('Delete this saved schedule?')) {
+        let schedules = JSON.parse(localStorage.getItem('kairos_schedules') || '[]');
+        const schedule = schedules.find(s => s.id === scheduleId);
+        schedules = schedules.filter(s => s.id !== scheduleId);
+        localStorage.setItem('kairos_schedules', JSON.stringify(schedules));
+        showToast(`"${schedule?.name}" deleted!`, 'info');
+        loadSavedSchedules();
     }
 }
 

@@ -343,3 +343,21 @@ function renderInsights() {
         }
     }
 }
+
+function resetAnalytics() {
+    if (confirm('Are you sure you want to reset all analytics data? This will clear all assignments and analytics records.')) {
+        localStorage.removeItem('kairos_assignments');
+        localStorage.removeItem('kairos_calendar_events');
+        localStorage.removeItem('kairos_planners');
+        
+        // Reinitialize mock data
+        KairosStorage.initializeMockData();
+        
+        showToast('Analytics data has been reset!', 'success');
+        
+        // Refresh page
+        setTimeout(() => {
+            location.reload();
+        }, 500);
+    }
+}

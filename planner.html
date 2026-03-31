@@ -40,9 +40,9 @@
                 <div class="planner-header">
                     <h1 class="planner-title">Weekly Planner</h1>
                     <div class="planner-actions">
-                        <button class="btn btn-secondary" onclick="openSavedPlanners()"><i class="fas fa-folder-open"></i> Load Planner</button>
-                        <button class="btn btn-secondary" onclick="savePlannerModal()"><i class="fas fa-save"></i> Save Planner</button>
-                        <button class="btn btn-primary" onclick="generateStudyPlan()"><i class="fas fa-magic"></i> Generate Study Plan</button>
+                        <button class="btn btn-primary" onclick="openAddEventModal()"><i class="fas fa-plus"></i> Add Event</button>
+                        <button class="btn btn-secondary" onclick="openManageSchedules()"><i class="fas fa-folder-open"></i> Manage Schedules</button>
+                        <button class="btn btn-secondary" onclick="clearWeeklyPlanner()" title="Clear current schedule"><i class="fas fa-trash"></i> Clear Week</button>
                     </div>
                 </div>
                 <div class="conflict-warning hidden" id="conflictWarning" style="display: none;">
@@ -70,48 +70,90 @@
         </div>
     </div>
 
-    <!-- SAVE PLANNER DRAWER -->
-    <div class="drawer" id="savePlannerDrawer">
+    <!-- ADD EVENT MODAL -->
+    <div class="drawer" id="addEventDrawer">
         <div class="drawer-header">
-            <h2 class="drawer-header-title">Save Weekly Planner</h2>
-            <button class="modal-close" onclick="closeDrawer('savePlannerDrawer')"><i class="fas fa-times"></i></button>
+            <h2 class="drawer-header-title">Add Event to Schedule</h2>
+            <button class="modal-close" onclick="closeDrawer('addEventDrawer')"><i class="fas fa-times"></i></button>
         </div>
         <div class="drawer-body">
-            <form id="savePlannerForm" onsubmit="handleSavePlanner(event)">
+            <form id="addEventForm" onsubmit="handleAddEvent(event)">
                 <div class="form-group">
-                    <label>Planner Name *</label>
-                    <input type="text" id="plannerName" placeholder="e.g., Week 1 Study Schedule" required>
+                    <label>Event Title *</label>
+                    <input type="text" id="eventTitle" placeholder="e.g., Math Class, Study Session" required>
                 </div>
                 <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="plannerDescription" placeholder="Add notes about this weekly plan..."></textarea>
+                    <label>Event Type *</label>
+                    <select id="eventType" required>
+                        <option value="class">Class</option>
+                        <option value="study">Study Time</option>
+                        <option value="personal">Personal Time</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Day *</label>
+                    <select id="eventDay" required>
+                        <option value="0">Sunday</option>
+                        <option value="1">Monday</option>
+                        <option value="2">Tuesday</option>
+                        <option value="3">Wednesday</option>
+                        <option value="4">Thursday</option>
+                        <option value="5">Friday</option>
+                        <option value="6">Saturday</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Time *</label>
+                    <select id="eventHour" required>
+                        <option value="0">6:00 AM</option>
+                        <option value="1">7:00 AM</option>
+                        <option value="2">8:00 AM</option>
+                        <option value="3">9:00 AM</option>
+                        <option value="4">10:00 AM</option>
+                        <option value="5">11:00 AM</option>
+                        <option value="6">12:00 PM</option>
+                        <option value="7">1:00 PM</option>
+                        <option value="8">2:00 PM</option>
+                        <option value="9">3:00 PM</option>
+                        <option value="10">4:00 PM</option>
+                        <option value="11">5:00 PM</option>
+                        <option value="12">6:00 PM</option>
+                        <option value="13">7:00 PM</option>
+                        <option value="14">8:00 PM</option>
+                        <option value="15">9:00 PM</option>
+                        <option value="16">10:00 PM</option>
+                    </select>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeDrawer('savePlannerDrawer')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Planner</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeDrawer('addEventDrawer')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Event</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- LOAD PLANNER DRAWER -->
-    <div class="drawer" id="loadPlannerDrawer">
+    <!-- MANAGE SCHEDULES DRAWER -->
+    <div class="drawer" id="manageSchedulesDrawer">
         <div class="drawer-header">
-            <h2 class="drawer-header-title">Load Saved Planner</h2>
-            <button class="modal-close" onclick="closeDrawer('loadPlannerDrawer')"><i class="fas fa-times"></i></button>
+            <h2 class="drawer-header-title">Manage Weekly Schedules</h2>
+            <button class="modal-close" onclick="closeDrawer('manageSchedulesDrawer')"><i class="fas fa-times"></i></button>
         </div>
         <div class="drawer-body">
-            <div id="savedPlannersList" style="max-height: 400px; overflow-y: auto;">
+            <div class="manage-schedules-top">
+                <button class="btn btn-primary" onclick="saveCurrentSchedule()" style="width: 100%;"><i class="fas fa-save"></i> Save Current Schedule</button>
+            </div>
+            <div class="schedules-divider">Saved Schedules</div>
+            <div id="savedSchedulesList" style="max-height: 400px; overflow-y: auto;">
                 <!-- Populated by JS -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeDrawer('loadPlannerDrawer')">Close</button>
+                <button type="button" class="btn btn-secondary" onclick="closeDrawer('manageSchedulesDrawer')">Close</button>
             </div>
         </div>
     </div>
 
     <!-- FLOATING ACTION BUTTON -->
-    <button class="fab" onclick="addTimeSlot()"><i class="fas fa-plus"></i></button>
+    <button class="fab hidden" title="Click an event to delete it"><i class="fas fa-info"></i></button>
     <div class="toast-container" id="toastContainer"></div>
     <script src="js/app.js"></script>
     <script src="js/storage.js"></script>
