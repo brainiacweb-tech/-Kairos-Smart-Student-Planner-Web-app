@@ -133,45 +133,54 @@ function renderCalendar() {
 
     // Empty cells for days before month starts
     for (let i = 0; i < firstDay; i++) {
-        datesContainer.innerHTML += "<div></div>";
+        const emptyDiv = document.createElement("div");
+        emptyDiv.style.visibility = "hidden";
+        datesContainer.appendChild(emptyDiv);
     }
 
     // Calendar date cells
+    const today = new Date();
     for (let i = 1; i <= lastDate; i++) {
         let div = document.createElement("div");
-        div.innerText = i;
+        div.textContent = i;
+        div.style.display = "flex";
+        div.style.alignItems = "center";
+        div.style.justifyContent = "center";
         div.style.padding = "10px";
-        div.style.margin = "2px";
+        div.style.minHeight = "45px";
         div.style.borderRadius = "6px";
         div.style.cursor = "pointer";
-        div.style.backgroundColor = "var(--surface)";
-        div.style.border = "1px solid var(--border)";
+        div.style.fontSize = "1rem";
+        div.style.fontWeight = "500";
+        div.style.border = "1px solid #ddd";
+        div.style.backgroundColor = "#f9f9f9";
+        div.style.color = "#333";
         div.style.transition = "all 0.2s ease";
 
         // Hover effect
         div.addEventListener("mouseenter", () => {
-            div.style.backgroundColor = "var(--primary)";
+            div.style.backgroundColor = "#007bff";
             div.style.color = "white";
+            div.style.border = "1px solid #0056b3";
         });
         div.addEventListener("mouseleave", () => {
             if (!div.classList.contains("today")) {
-                div.style.backgroundColor = "var(--surface)";
-                div.style.color = "var(--text)";
+                div.style.backgroundColor = "#f9f9f9";
+                div.style.color = "#333";
+                div.style.border = "1px solid #ddd";
             }
         });
 
-        const today = new Date();
         if (
             i === today.getDate() &&
             month === today.getMonth() &&
             year === today.getFullYear()
         ) {
             div.classList.add("today");
-            div.style.backgroundColor = "var(--primary)";
+            div.style.backgroundColor = "#007bff";
             div.style.color = "white";
             div.style.fontWeight = "bold";
-        } else {
-            div.style.color = "var(--text)";
+            div.style.border = "2px solid #0056b3";
         }
 
         datesContainer.appendChild(div);
