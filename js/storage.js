@@ -287,31 +287,6 @@ class KairosStorage {
         return allCourses;
     
 
-    // Course name mapping for ACC301, BUS401, MKT201, HRM301
-    static getCourseNameMap() {
-        return {
-            'ACC301': 'Financial Statements Analysis',
-            'BUS401': 'Strategic Management Project',
-            'MKT201': 'Marketing Campaign Presentation',
-            'HRM301': 'Human Resource Policies Case Study'
-        };
-    }
-
-    // Get full course display name (code + title)
-    static getCourseName(courseCode) {
-        const courseMap = this.getCourseNameMap();
-        return courseMap[courseCode] || courseCode;
-    }
-
-    // Get course display with both code and name
-    static getCourseDisplay(courseCode) {
-        const courseName = this.getCourseName(courseCode);
-        if (courseCode !== courseName) {
-            return `${courseCode} - ${courseName}`;
-        }
-        return courseCode;
-    }
-
     static getAllCourses() {
         return [
             // YEAR 1 - SEMESTER 1
