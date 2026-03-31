@@ -605,6 +605,22 @@
   opacity: 0.5;
 }
 
+/* Calendar dates grid */
+.calendar-dates div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.calendar-dates div:not(:empty) {
+  cursor: pointer;
+}
+
 /* ===========================
    PROGRESS BARS
    =========================== */

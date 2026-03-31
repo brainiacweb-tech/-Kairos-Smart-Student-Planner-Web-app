@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     updateStats();
     renderDeadlines();
+    renderCalendar();
     setupNotificationPanel();
 });
 
@@ -116,59 +117,64 @@ function editAssignment(assignmentId) {
 function renderCalendar() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    
-    // Update header
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                       'July', 'August', 'September', 'October', 'November', 'December'];
-    document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
-    
-    // Get first day of month and number of days
+
     const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
-    const calendarDays = document.getElementById('calendarDays');
-    calendarDays.innerHTML = '';
-    
-    // Empty cells for days before month
+    const lastDate = new Date(year, month + 1, 0).getDate();
+
+    const monthYear = document.getElementById("monthYear");
+    const datesContainer = document.getElementById("dates");
+
+    monthYear.innerText = currentDate.toLocaleString("default", {
+        month: "long",
+        year: "numeric"
+    });
+
+    datesContainer.innerHTML = "";
+
+    // Empty cells for days before month starts
     for (let i = 0; i < firstDay; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.className = 'calendar-day disabled';
-        emptyCell.textContent = '';
-        calendarDays.appendChild(emptyCell);
+        datesContainer.innerHTML += "<div></div>";
     }
-    
-    // Days of month
-    const today = new Date();
-    const assignments = KairosStorage.getAssignments();
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dayCell = document.createElement('div');
-        dayCell.className = 'calendar-day';
-        dayCell.textContent = day;
-        
-        const cellDate = new Date(year, month, day);
-        
-        // Check if today
-        if (cellDate.toDateString() === today.toDateString()) {
-            dayCell.classList.add('today');
-        }
-        
-        // Check if has assignments
-        const hasAssignment = assignments.some(a => {
-            const assignDate = new Date(a.dueDate);
-            return assignDate.toDateString() === cellDate.toDateString();
+
+    // Calendar date cells
+    for (let i = 1; i <= lastDate; i++) {
+        let div = document.createElement("div");
+        div.innerText = i;
+        div.style.padding = "10px";
+        div.style.margin = "2px";
+        div.style.borderRadius = "6px";
+        div.style.cursor = "pointer";
+        div.style.backgroundColor = "var(--surface)";
+        div.style.border = "1px solid var(--border)";
+        div.style.transition = "all 0.2s ease";
+
+        // Hover effect
+        div.addEventListener("mouseenter", () => {
+            div.style.backgroundColor = "var(--primary)";
+            div.style.color = "white";
         });
-        
-        if (hasAssignment) {
-            dayCell.classList.add('has-deadline');
-        }
-        
-        dayCell.addEventListener('click', () => {
-            // Could show assignments for this day
-            console.log(`Clicked date: ${cellDate.toDateString()}`);
+        div.addEventListener("mouseleave", () => {
+            if (!div.classList.contains("today")) {
+                div.style.backgroundColor = "var(--surface)";
+                div.style.color = "var(--text)";
+            }
         });
-        
-        calendarDays.appendChild(dayCell);
+
+        const today = new Date();
+        if (
+            i === today.getDate() &&
+            month === today.getMonth() &&
+            year === today.getFullYear()
+        ) {
+            div.classList.add("today");
+            div.style.backgroundColor = "var(--primary)";
+            div.style.color = "white";
+            div.style.fontWeight = "bold";
+        } else {
+            div.style.color = "var(--text)";
+        }
+
+        datesContainer.appendChild(div);
     }
 }
 

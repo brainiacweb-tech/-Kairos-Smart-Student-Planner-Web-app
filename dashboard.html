@@ -184,6 +184,33 @@
                     </div>
                 </div>
 
+                <!-- CALENDAR SECTION -->
+                <div class="calendar card" style="margin-top: var(--spacing-2xl); max-width: 400px;">
+                    <div style="padding: var(--spacing-lg);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+                            <div>
+                                <button onclick="prevMonth()" style="background: var(--primary); border: none; color: white; padding: 8px 12px; cursor: pointer; border-radius: 6px; font-size: 1rem;">◀</button>
+                            </div>
+                            <h2 id="monthYear" style="margin: 0; font-size: 1.3rem; font-weight: 600;"></h2>
+                            <div>
+                                <button onclick="nextMonth()" style="background: var(--primary); border: none; color: white; padding: 8px 12px; cursor: pointer; border-radius: 6px; font-size: 1rem;">▶</button>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; margin-bottom: var(--spacing-md);">
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Sun</div>
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Mon</div>
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Tue</div>
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Wed</div>
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Thu</div>
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Fri</div>
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Sat</div>
+                        </div>
+
+                        <div class="calendar-dates" id="dates" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;"></div>
+                    </div>
+                </div>
+
                 <!-- NEW FEATURES SECTION -->
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-lg); margin-top: var(--spacing-2xl);">
                     <!-- POMODORO TIMER -->
