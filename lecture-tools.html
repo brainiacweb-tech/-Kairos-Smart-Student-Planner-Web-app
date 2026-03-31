@@ -672,12 +672,12 @@
                         </div>
 
                         <div class="notes-container">
-                            <div id="courseSelectSection" style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
-                                <input type="text" id="noteCourseCode" class="note-input" placeholder="Course Code (e.g., CS101)" style="flex: 0.4;">
-                                <input type="text" id="noteCourseName" class="note-input" placeholder="Course Name (e.g., Computer Science 101)" style="flex: 1;">
+                            <div id="courseSelectSection" style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); flex-wrap: wrap;">
+                                <input type="text" id="noteCourseCode" class="note-input" placeholder="Course Code (e.g., ACC301)" style="flex: 1; min-width: 150px;">
+                                <input type="text" id="noteCourseName" class="note-input" placeholder="Course Name (e.g., Accounting)" style="flex: 1; min-width: 200px;">
                             </div>
                             <textarea class="note-input" id="noteInput" placeholder="Write your notes here... You can include formulas, equations, and code snippets."></textarea>
-                            <div style="display: flex; gap: var(--spacing-sm);">
+                            <div style="display: flex; gap: var(--spacing-sm); flex-wrap: wrap;">
                                 <button class="btn btn-primary" onclick="saveNote()">
                                     <i class="fas fa-save"></i> Save Note
                                 </button>
