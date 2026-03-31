@@ -190,14 +190,31 @@ function setupSidebarToggle() {
             document.body.classList.toggle('sidebar-open');
         });
         
-        // Close sidebar when clicking on nav links
-        const navLinks = document.querySelectorAll('.sidebar-nav .nav-item, .sidebar-footer .nav-item');
+        // Close sidebar when clicking on nav links and navigate after animation
+        const navLinks = document.querySelectorAll('.sidebar-nav .nav-item');
         navLinks.forEach(link => {
-            link.addEventListener('click', () => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href) {
+                    e.preventDefault();
+                    sidebar.classList.remove('active');
+                    document.body.classList.remove('sidebar-open');
+                    // Navigate after sidebar animation completes
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 300);
+                }
+            });
+        });
+        
+        // Close sidebar on logout button (doesn't navigate)
+        const logoutBtn = document.querySelector('.sidebar-footer .nav-item');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
                 sidebar.classList.remove('active');
                 document.body.classList.remove('sidebar-open');
             });
-        });
+        }
         
         // Close sidebar when clicking outside
         document.addEventListener('click', (e) => {
