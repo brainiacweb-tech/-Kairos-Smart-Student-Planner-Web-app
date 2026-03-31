@@ -16,6 +16,9 @@
         .toolbar { background: white; border-bottom: 1px solid #ddd; padding: 8px 12px; display: flex; gap: 6px; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-wrap: wrap; }
         .toolbar button { padding: 6px 10px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 3px; font-size: 13px; transition: all 0.2s; white-space: nowrap; }
         .toolbar button:hover { background: #f5f5f5; border-color: #999; }
+        .toolbar select { padding: 6px 8px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 3px; font-size: 13px; font-family: inherit; }
+        .toolbar select:hover { background: #f5f5f5; }
+        .color-picker { width: 30px; height: 30px; padding: 2px; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; }
         .separator { width: 1px; height: 20px; background: #ddd; margin: 0 3px; display: none; }
         .toolbar-menu { display: none; position: absolute; top: 45px; left: 12px; background: white; border: 1px solid #ddd; border-radius: 3px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 1000; min-width: 160px; }
         .toolbar-menu.open { display: block; }
@@ -62,6 +65,24 @@
         <button onclick="newSheet()" title="New"><i class="fas fa-file"></i></button>
         <button onclick="saveSheet()" title="Save"><i class="fas fa-save"></i></button>
         <button onclick="downloadSheet()" title="Download CSV"><i class="fas fa-download"></i></button>
+        <div class="separator"></div>
+        <select id="fontFamily" onchange="setFontForCell()" title="Font Family">
+            <option value="">Font</option>
+            <option value="Arial">Arial</option>
+            <option value="'Times New Roman'">Times New Roman</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Verdana">Verdana</option>
+        </select>
+        <select id="fontSize" onchange="setFontSizeForCell()" title="Font Size">
+            <option value="">Size</option>
+            <option value="10px">10</option>
+            <option value="12px">12</option>
+            <option value="14px">14</option>
+            <option value="16px">16</option>
+            <option value="18px">18</option>
+        </select>
+        <input type="color" id="fontColor" class="color-picker" title="Font Color" onchange="setFontColorForCell()">
         <div class="separator"></div>
         <button onclick="addRow()" title="Add Row"><i class="fas fa-plus"></i> Row</button>
         <button onclick="addColumn()" title="Add Column"><i class="fas fa-plus"></i> Column</button>
@@ -148,6 +169,21 @@
         }
         function addRow() { data.push(new Array(COLS).fill('')); render(); toggleToolMenu(); }
         function addColumn() { data.forEach(row => row.push('')); render(); toggleToolMenu(); }
+        function setFontForCell() { 
+            const family = document.getElementById('fontFamily').value; 
+            const inputs = document.querySelectorAll('input:focus');
+            inputs.forEach(inp => inp.style.fontFamily = family);
+        }
+        function setFontSizeForCell() { 
+            const size = document.getElementById('fontSize').value; 
+            const inputs = document.querySelectorAll('input:focus');
+            inputs.forEach(inp => inp.style.fontSize = size);
+        }
+        function setFontColorForCell() { 
+            const color = document.getElementById('fontColor').value; 
+            const inputs = document.querySelectorAll('input:focus');
+            inputs.forEach(inp => inp.style.color = color);
+        }
 
         window.addEventListener('load', () => {
             const saved = localStorage.getItem('excel_sheet');

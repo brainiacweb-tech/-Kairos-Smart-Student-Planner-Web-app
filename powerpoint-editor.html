@@ -20,6 +20,9 @@
         .toolbar { background: white; border-bottom: 1px solid #ddd; padding: 8px 12px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .toolbar button { padding: 6px 10px; border: 1px solid #ddd; background: white; color: #333; cursor: pointer; border-radius: 3px; font-size: 13px; transition: all 0.2s; white-space: nowrap; }
         .toolbar button:hover { background: #f5f5f5; border-color: #aaa; }
+        .toolbar select { padding: 6px 8px; border: 1px solid #ddd; background: white; color: #333; cursor: pointer; border-radius: 3px; font-size: 13px; font-family: inherit; }
+        .toolbar select:hover { background: #f5f5f5; }
+        .color-picker { width: 30px; height: 30px; padding: 2px; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; }
         .separator { width: 1px; height: 20px; background: #ddd; margin: 0 3px; display: none; }
         .toolbar-menu { display: none; position: absolute; top: 45px; left: 12px; background: white; border: 1px solid #ddd; border-radius: 3px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 1000; min-width: 160px; }
         .toolbar-menu.open { display: block; }
@@ -79,6 +82,27 @@
             <button onclick="newPresentation()" title="New"><i class="fas fa-file"></i></button>
             <button onclick="savePresentation()" title="Save"><i class="fas fa-save"></i></button>
             <button onclick="downloadPresentation()" title="Download"><i class="fas fa-download"></i></button>
+            <div class="separator"></div>
+            <select id="fontFamily" onchange="setSlideFont()" title="Font Family">
+                <option value="">Font</option>
+                <option value="Arial">Arial</option>
+                <option value="'Times New Roman'">Times New Roman</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Verdana">Verdana</option>
+                <option value="'Comic Sans MS'">Comic Sans</option>
+            </select>
+            <select id="fontSize" onchange="setSlideFontSize()" title="Font Size">
+                <option value="">Size</option>
+                <option value="14px">14</option>
+                <option value="16px">16</option>
+                <option value="18px">18</option>
+                <option value="20px">20</option>
+                <option value="24px">24</option>
+                <option value="28px">28</option>
+                <option value="32px">32</option>
+            </select>
+            <input type="color" id="fontColor" class="color-picker" title="Font Color" onchange="setSlideFontColor()">
             <div class="separator"></div>
             <button onclick="addSlide()" title="Add Slide"><i class="fas fa-plus"></i></button>
             <button onclick="deleteSlide()" title="Delete"><i class="fas fa-trash"></i></button>
@@ -163,6 +187,27 @@
             a.download = 'presentation.txt';
             a.click();
             toggleToolMenu();
+        }
+        function setSlideFont() {
+            const font = document.getElementById('fontFamily').value;
+            if(font) {
+                document.getElementById('slideTitle').style.fontFamily = font;
+                document.getElementById('slideContent').style.fontFamily = font;
+            }
+        }
+        function setSlideFontSize() {
+            const size = document.getElementById('fontSize').value;
+            if(size) {
+                document.getElementById('slideTitle').style.fontSize = size;
+                document.getElementById('slideContent').style.fontSize = size;
+            }
+        }
+        function setSlideFontColor() {
+            const color = document.getElementById('fontColor').value;
+            if(color) {
+                document.getElementById('slideTitle').style.color = color;
+                document.getElementById('slideContent').style.color = color;
+            }
         }
 
         window.addEventListener('load', () => {
