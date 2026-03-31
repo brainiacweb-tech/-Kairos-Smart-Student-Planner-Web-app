@@ -685,10 +685,6 @@
     z-index: 0;
     pointer-events: none;
   }
-
-  body.sidebar-open .navbar-toggle {
-    visibility: hidden;
-  }
 }
 
 

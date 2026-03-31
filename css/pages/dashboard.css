@@ -954,10 +954,6 @@ body.focus-mode .page-title {
     pointer-events: none;
   }
 
-  body.sidebar-open .navbar-toggle {
-    visibility: hidden;
-  }
-
   .main-content {
     margin-top: 80px;
     padding: var(--spacing-md);
