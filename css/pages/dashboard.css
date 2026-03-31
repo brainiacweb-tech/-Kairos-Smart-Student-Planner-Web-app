@@ -1011,6 +1011,10 @@ body.focus-mode .page-title {
     padding: var(--spacing-md);
   }
 
+  .calendar.card {
+    padding: 8px;
+  }
+
   .main-content {
     padding: var(--spacing-sm);
     margin-top: 80px;
@@ -1019,36 +1023,39 @@ body.focus-mode .page-title {
   /* Calendar mobile styles - small phones */
   .calendar {
     max-width: 100%;
+    padding: 0;
   }
 
   .calendar-grid {
     grid-template-columns: repeat(7, 1fr);
-    gap: 3px;
+    gap: 1px;
   }
 
   .calendar-day-header {
-    font-size: 0.75rem;
-    padding: 8px 2px;
+    font-size: 0.7rem;
+    padding: 4px 0;
     font-weight: 600;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .calendar-dates {
-    gap: 3px;
+    gap: 1px;
     grid-template-columns: repeat(7, 1fr);
   }
 
   .calendar-dates div {
-    min-height: 40px;
-    height: 40px;
-    font-size: 0.95rem;
+    min-height: 36px;
+    height: 36px;
+    font-size: 0.8rem;
     font-weight: 500;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow: visible;
   }
 
   .calendar-dates div:not(:empty) {
