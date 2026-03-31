@@ -438,7 +438,12 @@ class KairosStorage {
     }
 }
 
-// Initialize mock data on first visit
+// Initialize mock data immediately on page load
+if (!localStorage.getItem('kairos_assignments')) {
+    KairosStorage.initializeMockData();
+}
+
+// Also initialize on DOMContentLoaded as backup
 window.addEventListener('DOMContentLoaded', () => {
     if (!localStorage.getItem('kairos_assignments')) {
         KairosStorage.initializeMockData();

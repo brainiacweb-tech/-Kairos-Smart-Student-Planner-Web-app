@@ -6,10 +6,19 @@ let charts = {};
 
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
-    updateStats();
-    renderCharts();
-    renderHeatmap();
-    renderGantt();
+    
+    // Ensure mock data is initialized
+    if (!localStorage.getItem('kairos_assignments')) {
+        KairosStorage.initializeMockData();
+    }
+    
+    // Small delay to ensure data is ready
+    setTimeout(() => {
+        updateStats();
+        renderCharts();
+        renderHeatmap();
+        renderGantt();
+    }, 100);
 });
 
 function updateStats() {
@@ -25,7 +34,18 @@ function updateStats() {
 
 function renderCharts() {
     const stats = KairosStorage.getStats();
-    const courses = KairosStorage.getCourses();
+    let courses = KairosStorage.getCourses();
+    
+    // Ensure we have data
+    if (!courses || courses.length === 0) {
+        courses = [
+            { code: 'ACC301', total: 1, completed: 0 },
+            { code: 'BUS401', total: 1, completed: 0 },
+            { code: 'MKT201', total: 1, completed: 0 },
+            { code: 'HRM301', total: 1, completed: 0 }
+        ];
+    }
+    
     const isDark = document.body.classList.contains('dark-mode');
     const textColor = isDark ? '#E0E0E0' : '#1A1A2E';
     const gridColor = isDark ? '#2A2A3E' : '#E5E7EB';
