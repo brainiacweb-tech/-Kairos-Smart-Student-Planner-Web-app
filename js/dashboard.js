@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     updateStats();
     renderDeadlines();
-    renderCalendar();
     setupNotificationPanel();
 });
 
