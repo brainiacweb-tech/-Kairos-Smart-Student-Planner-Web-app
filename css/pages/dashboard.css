@@ -634,12 +634,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 45px;
+  min-height: 50px;
   border-radius: 6px;
   font-weight: 500;
   font-size: 1rem;
   transition: all 0.2s ease;
   aspect-ratio: 1;
+  padding: 0;
 }
 
 .calendar-dates div:not(:empty) {
@@ -974,15 +975,14 @@ body.focus-mode .page-title {
   }
 
   .calendar-dates div {
-    min-height: 36px;
-    height: auto;
+    min-height: 40px;
     aspect-ratio: 1;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 500;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px;
+    padding: 0;
     overflow: visible;
     border-radius: 4px;
   }
@@ -1063,14 +1063,13 @@ body.focus-mode .page-title {
 
   .calendar-dates div {
     min-height: 32px;
-    height: auto;
     aspect-ratio: 1;
     font-size: 0.85rem;
     font-weight: 500;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px;
+    padding: 0;
     overflow: visible;
     border-radius: 4px;
   }
