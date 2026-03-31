@@ -35,6 +35,7 @@ function handleAddAssignment(e) {
     const assignment = {
         title: document.getElementById('assignTitle').value,
         course: document.getElementById('assignCourse').value,
+        courseName: document.getElementById('assignCourseName').value,
         dueDate: document.getElementById('assignDueDate').value,
         priority: document.getElementById('assignPriority').value,
         status: document.getElementById('assignStatus').value,
@@ -47,17 +48,10 @@ function handleAddAssignment(e) {
     showToast('Assignment added successfully!', 'success');
     closeDrawer('addAssignmentDrawer');
     applyFilters();
-    populateFilters();
 }
 
 function populateFilters() {
-    const courses = KairosStorage.getCourses();
-    const courseFilter = document.getElementById('courseFilter');
-    
-    courseFilter.innerHTML = '<option value="">All Courses</option>';
-    courses.forEach(course => {
-        courseFilter.innerHTML += `<option value="${course.code}">${course.code}</option>`;
-    });
+    // Course filter is now a text input, no need to populate options
 }
 
 function applyFilters() {
@@ -128,7 +122,7 @@ function renderListCard(assignment) {
                 <div class="assignment-card-info">
                     <div class="assignment-card-title">${assignment.title}</div>
                     <div class="assignment-meta">
-                        <span><i class="fas fa-book"></i> ${assignment.course}</span>
+                        <span><i class="fas fa-book"></i> ${assignment.course}${assignment.courseName ? ' - ' + assignment.courseName : ''}</span>
                         <span><i class="fas fa-clock"></i> ${formatDate(assignment.dueDate)}</span>
                         <span><i class="fas fa-hourglass-half"></i> ${assignment.estimatedHours}h</span>
                     </div>
@@ -179,7 +173,7 @@ function renderGridCard(assignment) {
                     <button class="btn-icon" onclick="deleteAssignmentItem(${assignment.id})" style="color: var(--danger);"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
-            <div style="font-size: 0.85rem; color: var(--text-secondary);">${assignment.course}</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary);">${assignment.course}${assignment.courseName ? ' - ' + assignment.courseName : ''}</div>
             <div style="font-size: 0.85rem; color: var(--text-secondary);"><i class="fas fa-calendar"></i> ${formatDate(assignment.dueDate)}</div>
             <div style="margin: var(--spacing-md) 0;">
                 <div class="progress-bar">

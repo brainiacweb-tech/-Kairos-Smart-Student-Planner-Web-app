@@ -88,7 +88,7 @@
                     </div>
                     <div class="filter-group">
                         <label>Course</label>
-                        <select id="courseFilter" onchange="applyFilters()"><option value="">All Courses</option></select>
+                        <input type="text" id="courseFilter" placeholder="Enter course code..." onkeyup="applyFilters()">
                     </div>
                     <div class="filter-group">
                         <label>Priority</label>
@@ -133,9 +133,15 @@
                             <label>Title *</label>
                             <input type="text" id="assignTitle" required>
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label>Course Code</label>
-                            <input type="text" id="assignCourse">
+                            <input type="text" id="assignCourse" placeholder="e.g., ACC301">
+                        </div>
+                        <div class="form-group">
+                            <label>Course Name</label>
+                            <input type="text" id="assignCourseName" placeholder="e.g., Financial Accounting">
                         </div>
                     </div>
                     <div class="form-row">

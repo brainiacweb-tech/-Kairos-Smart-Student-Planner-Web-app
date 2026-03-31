@@ -14,13 +14,18 @@ class KairosStorage {
             assignments = assignments.filter(a => a.priority === filter.priority);
         }
         if (filter.course) {
-            assignments = assignments.filter(a => a.course === filter.course);
+            const courseTerm = filter.course.toLowerCase();
+            assignments = assignments.filter(a => 
+                a.course.toLowerCase().includes(courseTerm) ||
+                (a.courseName && a.courseName.toLowerCase().includes(courseTerm))
+            );
         }
         if (filter.search) {
             const term = filter.search.toLowerCase();
             assignments = assignments.filter(a => 
                 a.title.toLowerCase().includes(term) ||
-                a.course.toLowerCase().includes(term)
+                a.course.toLowerCase().includes(term) ||
+                (a.courseName && a.courseName.toLowerCase().includes(term))
             );
         }
         
