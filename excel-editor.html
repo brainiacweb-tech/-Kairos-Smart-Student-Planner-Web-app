@@ -148,6 +148,8 @@
                     const input = document.createElement('input');
                     input.value = data[r][c];
                     input.onchange = () => { data[r][c] = input.value; };
+                    input.onfocus = () => { activeInput = input; };
+                    input.onblur = () => { if(activeInput === input) activeInput = null; };
                     td.appendChild(input);
                     tr.appendChild(td);
                 }
@@ -167,22 +169,20 @@
             a.click();
             toggleToolMenu();
         }
+        let activeInput = null;
         function addRow() { data.push(new Array(COLS).fill('')); render(); toggleToolMenu(); }
         function addColumn() { data.forEach(row => row.push('')); render(); toggleToolMenu(); }
         function setFontForCell() { 
-            const family = document.getElementById('fontFamily').value; 
-            const inputs = document.querySelectorAll('input:focus');
-            inputs.forEach(inp => inp.style.fontFamily = family);
+            const family = document.getElementById('fontFamily').value;
+            if(family && activeInput) activeInput.style.fontFamily = family;
         }
         function setFontSizeForCell() { 
-            const size = document.getElementById('fontSize').value; 
-            const inputs = document.querySelectorAll('input:focus');
-            inputs.forEach(inp => inp.style.fontSize = size);
+            const size = document.getElementById('fontSize').value;
+            if(size && activeInput) activeInput.style.fontSize = size;
         }
         function setFontColorForCell() { 
-            const color = document.getElementById('fontColor').value; 
-            const inputs = document.querySelectorAll('input:focus');
-            inputs.forEach(inp => inp.style.color = color);
+            const color = document.getElementById('fontColor').value;
+            if(color && activeInput) activeInput.style.color = color;
         }
 
         window.addEventListener('load', () => {

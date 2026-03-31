@@ -127,9 +127,9 @@
         function saveDoc() { localStorage.setItem('word_doc', editor.innerHTML); showToast('Saved!', 'success'); toggleToolMenu(); }
         function downloadDoc() { const blob = new Blob([editor.innerHTML], {type:'text/html'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'document.docx'; a.click(); toggleToolMenu(); }
         function formatCmd(cmd, val) { document.execCommand(cmd, false, val || null); editor.focus(); toggleToolMenu(); }
-        function setFont() { const font = document.getElementById('fontFamily').value; if(font) formatCmd('fontName', font); }
-        function setFontSize() { const size = document.getElementById('fontSize').value; if(size) formatCmd('fontSize', size); }
-        function setFontColor() { const color = document.getElementById('fontColor').value; if(color) formatCmd('foreColor', color); }
+        function setFont() { const font = document.getElementById('fontFamily').value; if(font) { editor.focus(); formatCmd('fontName', font); } }
+        function setFontSize() { const size = document.getElementById('fontSize').value; if(size) { const sizeMap = {'10px': 1, '12px': 2, '14px': 3, '16px': 4, '18px': 5, '20px': 6, '24px': 7}; const sizeNum = sizeMap[size] || 3; editor.focus(); formatCmd('fontSize', sizeNum); } }
+        function setFontColor() { const color = document.getElementById('fontColor').value; if(color) { editor.focus(); formatCmd('foreColor', color); } }
 
         window.addEventListener('load', () => {
             const saved = localStorage.getItem('word_doc');
