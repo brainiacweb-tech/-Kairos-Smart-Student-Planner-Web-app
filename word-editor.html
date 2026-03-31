@@ -3,260 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kairos - Word Document Editor</title>
+    <title>Kairos - Word Editor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/pages/dashboard.css">
     <style>
-        .editor-container { display: flex; flex-direction: column; height: 100vh; }
-        .editor-toolbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: var(--spacing-md); display: flex; gap: var(--spacing-md); flex-wrap: wrap; z-index: 10; }
-        .editor-toolbar button, .editor-toolbar input, .editor-toolbar select { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--card-bg); color: var(--text); cursor: pointer; font-size: 0.9rem; transition: all var(--transition-fast); }
-        .editor-toolbar button:hover, .editor-toolbar input:focus, .editor-toolbar select:focus { border-color: var(--primary); background: var(--primary); color: white; }
-        .editor-content { flex: 1; overflow: hidden; }
-        .editor-main { height: 100%; display: flex; }
-        .editor-page { flex: 1; background: white; margin: var(--spacing-lg); padding: var(--spacing-xl); box-shadow: var(--shadow-lg); overflow-y: auto; min-height: 11in; font-family: 'Calibri', 'Times New Roman', serif; line-height: 1.5; color: #000; }
-        .editor-page:focus { outline: none; }
-        .editor-sidebar { width: 250px; background: var(--surface); border-left: 1px solid var(--border); padding: var(--spacing-lg); overflow-y: auto; }
-        .sidebar-section { margin-bottom: var(--spacing-lg); }
-        .sidebar-title { font-weight: 600; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: var(--spacing-md); }
-        .style-option { padding: var(--spacing-sm); margin-bottom: var(--spacing-sm); background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition-fast); }
-        .style-option:hover { border-color: var(--primary); }
-        .color-picker { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
-        .color-swatch { width: 30px; height: 30px; border-radius: var(--radius-sm); cursor: pointer; border: 2px solid transparent; transition: all var(--transition-fast); }
-        .color-swatch:hover { border-color: #333; transform: scale(1.1); }
-        .page-setup { display: grid; gap: var(--spacing-md); }
-        .input-group { display: flex; flex-direction: column; gap: var(--spacing-sm); }
-        .input-group label { font-size: 0.85rem; font-weight: 600; }
-        .input-group input { padding: 6px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { height: 100vh; display: flex; flex-direction: column; background: #f5f5f5; }
+        .editor-toolbar { background: white; border-bottom: 1px solid #ddd; padding: 12px 16px; display: flex; gap: 8px; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .toolbar-btn { padding: 8px 12px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 4px; font-size: 14px; transition: all 0.2s; }
+        .toolbar-btn:hover { background: #f0f0f0; }
+        .separator { width: 1px; height: 24px; background: #ddd; margin: 0 4px; }
+        .editor-content { flex: 1; overflow: hidden; display: flex; }
+        .editor-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .page { background: white; width: 100%; max-width: 900px; height: 1200px; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow-y: auto; border-radius: 2px; }
+        #editor { width: 100%; height: 100%; border: none; outline: none; font-family: 'Calibri', serif; font-size: 14px; line-height: 1.6; color: #333; resize: none; }
     </style>
 </head>
-<body class="light-mode">
-    <div class="editor-container">
-        <!-- TOOLBAR -->
-        <div class="editor-toolbar">
-            <button onclick="goBack()" title="Back to Dashboard"><i class="fas fa-arrow-left"></i> Back</button>
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <!-- File -->
-            <button onclick="newDocument()" title="New Document"><i class="fas fa-file"></i> New</button>
-            <button onclick="saveDocument()" title="Save Document"><i class="fas fa-save"></i> Save</button>
-            <button onclick="downloadDocument()" title="Download as HTML"><i class="fas fa-download"></i> Download</button>
-            
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <!-- Text Formatting -->
-            <button onclick="formatText('bold')" title="Bold"><i class="fas fa-bold"></i></button>
-            <button onclick="formatText('italic')" title="Italic"><i class="fas fa-italic"></i></button>
-            <button onclick="formatText('underline')" title="Underline"><i class="fas fa-underline"></i></button>
-            
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <!-- Font -->
-            <select onchange="changeFontFamily(this.value)" title="Font Family">
-                <option value="Calibri">Calibri</option>
-                <option value="Arial">Arial</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Georgia">Georgia</option>
-                <option value="Verdana">Verdana</option>
-            </select>
-            
-            <select onchange="changeFontSize(this.value)" title="Font Size">
-                <option value="12">12pt</option>
-                <option value="14">14pt</option>
-                <option value="16">16pt</option>
-                <option value="18">18pt</option>
-                <option value="20">20pt</option>
-                <option value="24">24pt</option>
-            </select>
-            
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <!-- Align -->
-            <button onclick="formatText('justifyLeft')" title="Align Left"><i class="fas fa-align-left"></i></button>
-            <button onclick="formatText('justifyCenter')" title="Center"><i class="fas fa-align-center"></i></button>
-            <button onclick="formatText('justifyRight')" title="Align Right"><i class="fas fa-align-right"></i></button>
-            
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <!-- Lists -->
-            <button onclick="formatText('insertUnorderedList')" title="Bullet List"><i class="fas fa-list-ul"></i></button>
-            <button onclick="formatText('insertOrderedList')" title="Numbered List"><i class="fas fa-list-ol"></i></button>
-            
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <!-- Color -->
-            <input type="color" id="colorPicker" onchange="changeTextColor(this.value)" title="Text Color" value="#000000">
-            <input type="color" id="bgColorPicker" onchange="changeBackgroundColor(this.value)" title="Highlight Color">
-            
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <!-- Undo/Redo -->
-            <button onclick="formatText('undo')" title="Undo"><i class="fas fa-undo"></i></button>
-            <button onclick="formatText('redo')" title="Redo"><i class="fas fa-redo"></i></button>
-        </div>
-
-        <!-- EDITOR AREA -->
-        <div class="editor-content">
-            <div class="editor-main">
-                <!-- Document Page -->
-                <div class="editor-page" id="documentEditor" contenteditable="true" spellcheck="true">
-                    <h1>My Document</h1>
-                    <p>Start typing here...</p>
-                </div>
-
-                <!-- Sidebar -->
-                <div class="editor-sidebar">
-                    <div class="sidebar-section">
-                        <div class="sidebar-title">Styles</div>
-                        <div class="style-option" onclick="applyStyle('heading')"><strong>Heading</strong></div>
-                        <div class="style-option" onclick="applyStyle('subheading')"><strong style="font-size: 0.95rem;">Subheading</strong></div>
-                        <div class="style-option" onclick="applyStyle('normal')">Normal text</div>
-                    </div>
-
-                    <div class="sidebar-section">
-                        <div class="sidebar-title">Text Color</div>
-                        <div class="color-picker">
-                            <div class="color-swatch" style="background: #000000;" onclick="changeTextColor('#000000')"></div>
-                            <div class="color-swatch" style="background: #FF0000;" onclick="changeTextColor('#FF0000')"></div>
-                            <div class="color-swatch" style="background: #0000FF;" onclick="changeTextColor('#0000FF')"></div>
-                            <div class="color-swatch" style="background: #008000;" onclick="changeTextColor('#008000')"></div>
-                            <div class="color-swatch" style="background: #FF6B00;" onclick="changeTextColor('#FF6B00')"></div>
-                            <div class="color-swatch" style="background: #800080;" onclick="changeTextColor('#800080')"></div>
-                            <div class="color-swatch" style="background: #FFC000;" onclick="changeTextColor('#FFC000')"></div>
-                            <div class="color-swatch" style="background: #00B0F0;" onclick="changeTextColor('#00B0F0')"></div>
-                            <div class="color-swatch" style="background: #70AD47;" onclick="changeTextColor('#70AD47')"></div>
-                            <div class="color-swatch" style="background: #A64D79;" onclick="changeTextColor('#A64D79')"></div>
-                        </div>
-                    </div>
-
-                    <div class="sidebar-section">
-                        <div class="sidebar-title">Page Setup</div>
-                        <div class="page-setup">
-                            <div class="input-group">
-                                <label>Page Margins (inches)</label>
-                                <input type="number" id="marginInput" min="0.5" max="2" step="0.1" value="1" onchange="setPageMargins(this.value)">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="sidebar-section">
-                        <div class="sidebar-title">Document Stats</div>
-                        <div id="docStats" style="font-size: 0.85rem; color: var(--text-secondary);">
-                            <div>Words: <span id="wordCount">0</span></div>
-                            <div>Characters: <span id="charCount">0</span></div>
-                        </div>
-                    </div>
-                </div>
+<body>
+    <div class="editor-toolbar">
+        <button class="toolbar-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
+        <div class="separator"></div>
+        <button class="toolbar-btn" onclick="newDoc()" title="New"><i class="fas fa-file"></i></button>
+        <button class="toolbar-btn" onclick="saveDoc()" title="Save"><i class="fas fa-save"></i></button>
+        <button class="toolbar-btn" onclick="downloadDoc()" title="Download"><i class="fas fa-download"></i></button>
+        <div class="separator"></div>
+        <button class="toolbar-btn" onclick="formatCmd('bold')" title="Bold"><strong>B</strong></button>
+        <button class="toolbar-btn" onclick="formatCmd('italic')" title="Italic"><em>I</em></button>
+        <button class="toolbar-btn" onclick="formatCmd('underline')" title="Underline"><u>U</u></button>
+        <div class="separator"></div>
+        <select class="toolbar-btn" onchange="formatCmd('formatBlock', this.value); this.value='';">
+            <option value="">Paragraph</option>
+            <option value="h1">Heading 1</option>
+            <option value="h2">Heading 2</option>
+            <option value="h3">Heading 3</option>
+        </select>
+    </div>
+    
+    <div class="editor-content">
+        <div class="editor-area">
+            <div class="page">
+                <div id="editor" contenteditable="true">Type your document here...</div>
             </div>
         </div>
     </div>
 
-    <div class="toast-container" id="toastContainer"></div>
     <script src="js/app.js"></script>
     <script>
-        const editor = document.getElementById('documentEditor');
+        const editor = document.getElementById('editor');
 
         function goBack() { window.location.href = 'dashboard.html'; }
-        
-        function newDocument() {
-            if (confirm('Create a new document? Your current content will be cleared.')) {
-                editor.innerHTML = '<h1>My Document</h1><p>Start typing here...</p>';
-            }
-        }
+        function newDoc() { if(confirm('Create new document?')) { editor.innerHTML = ''; } }
+        function saveDoc() { localStorage.setItem('word_doc', editor.innerHTML); showToast('Saved!', 'success'); }
+        function downloadDoc() { const blob = new Blob([editor.innerHTML], {type:'text/html'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'document.docx'; a.click(); }
+        function formatCmd(cmd, val) { document.execCommand(cmd, false, val || null); editor.focus(); }
 
-        function saveDocument() {
-            localStorage.setItem('kairos_word_doc', editor.innerHTML);
-            showToast('Document saved!', 'success');
-        }
-
-        function downloadDocument() {
-            const content = editor.innerHTML;
-            const blob = new Blob([content], { type: 'text/html' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'document.html';
-            a.click();
-            showToast('Document downloaded!', 'success');
-        }
-
-        function formatText(command) {
-            document.execCommand(command, false, null);
-            editor.focus();
-        }
-
-        function changeFontFamily(font) {
-            document.execCommand('fontName', false, font);
-            editor.focus();
-        }
-
-        function changeFontSize(size) {
-            document.execCommand('fontSize', false, size);
-            editor.focus();
-        }
-
-        function changeTextColor(color) {
-            document.execCommand('foreColor', false, color);
-            editor.focus();
-        }
-
-        function changeBackgroundColor(color) {
-            document.execCommand('hiliteColor', false, color);
-            editor.focus();
-        }
-
-        function applyStyle(style) {
-            const selection = window.getSelection().toString();
-            if (!selection) return;
-
-            document.execCommand('removeFormat', false, null);
-            
-            switch(style) {
-                case 'heading':
-                    document.execCommand('formatBlock', false, '<h2>');
-                    document.execCommand('fontSize', false, '18');
-                    break;
-                case 'subheading':
-                    document.execCommand('formatBlock', false, '<h3>');
-                    document.execCommand('fontSize', false, '14');
-                    break;
-                case 'normal':
-                    document.execCommand('formatBlock', false, '<p>');
-                    document.execCommand('fontSize', false, '12');
-                    break;
-            }
-            editor.focus();
-        }
-
-        function setPageMargins(inches) {
-            const marginPx = inches * 96; // Convert to pixels (96 DPI)
-            editor.style.margin = marginPx + 'px';
-        }
-
-        function updateStats() {
-            const text = editor.innerText;
-            const words = text.trim().split(/\s+/).filter(w => w).length;
-            const chars = text.length;
-            document.getElementById('wordCount').textContent = words;
-            document.getElementById('charCount').textContent = chars;
-        }
-
-        editor.addEventListener('input', updateStats);
-        editor.addEventListener('load', () => {
-            const saved = localStorage.getItem('kairos_word_doc');
-            if (saved) editor.innerHTML = saved;
-            updateStats();
-        });
-
-        // Load saved document on load
         window.addEventListener('load', () => {
-            const saved = localStorage.getItem('kairos_word_doc');
+            const saved = localStorage.getItem('word_doc');
             if (saved) editor.innerHTML = saved;
-            updateStats();
         });
     </script>
 </body>

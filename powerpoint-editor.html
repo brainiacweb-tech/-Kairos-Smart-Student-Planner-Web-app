@@ -3,267 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kairos - PowerPoint Presentation Editor</title>
+    <title>Kairos - PowerPoint Presentation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/pages/dashboard.css">
     <style>
-        .ppt-container { display: flex; height: 100vh; flex-direction: column; }
-        .ppt-toolbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: var(--spacing-md); display: flex; gap: var(--spacing-md); flex-wrap: wrap; }
-        .ppt-toolbar button { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--card-bg); color: var(--text); cursor: pointer; font-size: 0.9rem; transition: all var(--transition-fast); }
-        .ppt-toolbar button:hover { border-color: var(--primary); background: var(--primary); color: white; }
-        .ppt-content { display: flex; flex: 1; gap: var(--spacing-md); padding: var(--spacing-md); background: #f5f5f5; overflow: hidden; }
-        .slides-panel { width: 200px; background: white; border-radius: var(--radius-lg); border: 1px solid var(--border); overflow-y: auto; padding: var(--spacing-sm); }
-        .slide-thumbnail { cursor: pointer; margin-bottom: var(--spacing-md); border: 2px solid transparent; border-radius: var(--radius-md); overflow: hidden; transition: all var(--transition-fast); }
-        .slide-thumbnail:hover { border-color: var(--primary); }
-        .slide-thumbnail.active { border-color: var(--primary); box-shadow: var(--shadow-md); }
-        .slide-thumbnail img { width: 100%; height: auto; background: white; }
-        .slide-number { text-align: center; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
-        .main-editor { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .slide { width: 960px; height: 540px; background: white; box-shadow: var(--shadow-lg); border-radius: var(--radius-lg); padding: var(--spacing-xl); display: flex; flex-direction: column; justify-content: center; position: relative; font-family: 'Poppins', sans-serif; }
-        .slide-title { font-size: 3rem; font-weight: 700; margin-bottom: var(--spacing-lg); outline: none; }
-        .slide-content { font-size: 1.3rem; color: #555; outline: none; line-height: 1.8; }
-        .slide-title:focus, .slide-content:focus { background: rgba(108, 99, 255, 0.1); }
-        .properties-panel { width: 250px; background: white; border-radius: var(--radius-lg); border: 1px solid var(--border); padding: var(--spacing-lg); overflow-y: auto; }
-        .property-group { margin-bottom: var(--spacing-lg); }
-        .property-label { font-weight: 600; font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: var(--spacing-sm); }
-        .property-input { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); }
-        .color-palette { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .color-btn { width: 100%; aspect-ratio: 1; border-radius: var(--radius-sm); border: 2px solid transparent; cursor: pointer; transition: all var(--transition-fast); }
-        .color-btn:hover { transform: scale(1.1); border-color: #333; }
-        .theme-option { padding: 12px; border: 2px solid var(--border); border-radius: var(--radius-md); cursor: pointer; margin-bottom: var(--spacing-sm); text-align: center; font-size: 0.9rem; transition: all var(--transition-fast); }
-        .theme-option:hover { border-color: var(--primary); }
-        .theme-option.active { border-color: var(--primary); background: rgba(108, 99, 255, 0.1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { height: 100vh; display: flex; background: #222; color: white; }
+        .sidebar { width: 200px; background: #1a1a1a; border-right: 1px solid #333; overflow-y: auto; padding-top: 12px; }
+        .slide-thumb { width: 160px; height: 90px; margin: 8px; background: white; border: 2px solid #555; border-radius: 4px; cursor: pointer; overflow: hidden; font-size: 12px; color: #333; display: flex; align-items: center; justify-content: center; padding: 4px; text-align: center; }
+        .slide-thumb.active { border-color: #4CAF50; }
+        .main { flex: 1; display: flex; flex-direction: column; }
+        .toolbar { background: #2a2a2a; border-bottom: 1px solid #333; padding: 12px 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .toolbar button { padding: 8px 12px; border: 1px solid #444; background: #333; color: white; cursor: pointer; border-radius: 4px; font-size: 14px; transition: all 0.2s; }
+        .toolbar button:hover { background: #444; border-color: #666; }
+        .separator { width: 1px; height: 24px; background: #444; margin: 0 4px; }
+        .editor-area { flex: 1; display: flex; align-items: center; justify-content: center; overflow: auto; }
+        .slide { width: 800px; height: 600px; background: white; color: #333; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); padding: 40px; display: flex; flex-direction: column; justify-content: space-between; }
+        .slide h1 { font-size: 48px; font-weight: 700; margin-bottom: 20px; }
+        .slide p { font-size: 24px; line-height: 1.6; }
+        input { background: transparent; border: 1px solid #999; padding: 10px; border-radius: 4px; font-size: 16px; color: inherit; }
+        input:focus { outline: 2px solid #4CAF50; background: #f9f9f9; }
+        .slide input { color: #333; background: white; }
     </style>
 </head>
-<body class="light-mode">
-    <div class="ppt-container">
-        <!-- TOOLBAR -->
-        <div class="ppt-toolbar">
-            <button onclick="goBack()" title="Back to Dashboard"><i class="fas fa-arrow-left"></i> Back</button>
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <button onclick="newPresentation()" title="New Presentation"><i class="fas fa-file"></i> New</button>
-            <button onclick="savePresentation()" title="Save Presentation"><i class="fas fa-save"></i> Save</button>
-            <button onclick="downloadPresentation()" title="Download as HTML"><i class="fas fa-download"></i> Download</button>
-            
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <button onclick="addSlide()" title="Add New Slide"><i class="fas fa-plus"></i> New Slide</button>
-            <button onclick="deleteSlide()" title="Delete Current Slide"><i class="fas fa-trash"></i> Delete</button>
-            <button onclick="duplicateSlide()" title="Duplicate Slide"><i class="fas fa-clone"></i> Duplicate</button>
-            
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <button onclick="startSlideshow()" title="Start Slideshow"><i class="fas fa-play"></i> Slideshow</button>
+<body>
+    <!-- SLIDE THUMBNAILS PANEL -->
+    <div class="sidebar">
+        <div style="padding: 12px 8px; border-bottom: 1px solid #333; margin-bottom: 8px; font-size: 12px; font-weight: 600;">Slides</div>
+        <div id="slideList"></div>
+    </div>
+
+    <!-- MAIN EDITOR -->
+    <div class="main">
+        <div class="toolbar">
+            <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
+            <div class="separator"></div>
+            <button onclick="newPresentation()" title="New"><i class="fas fa-file"></i></button>
+            <button onclick="savePresentation()" title="Save"><i class="fas fa-save"></i></button>
+            <button onclick="downloadPresentation()" title="Download"><i class="fas fa-download"></i></button>
+            <div class="separator"></div>
+            <button onclick="addSlide()" title="Add Slide"><i class="fas fa-plus"></i> Slide</button>
+            <button onclick="deleteSlide()" title="Delete"><i class="fas fa-trash"></i></button>
         </div>
 
-        <!-- EDITOR AREA -->
-        <div class="ppt-content">
-            <!-- Slides Panel -->
-            <div class="slides-panel" id="slidesPanel">
-                <!-- Generated by JS -->
-            </div>
-
-            <!-- Main Editor -->
-            <div class="main-editor">
-                <div class="slide" id="currentSlide">
-                    <div class="slide-title" id="slideTitle" contenteditable="true">Presentation Title</div>
-                    <div class="slide-content" id="slideContent" contenteditable="true">Click to add text</div>
-                </div>
-            </div>
-
-            <!-- Properties Panel -->
-            <div class="properties-panel">
-                <div class="property-group">
-                    <div class="property-label">Themes</div>
-                    <div class="theme-option active" onclick="setTheme('default')">Default</div>
-                    <div class="theme-option" onclick="setTheme('blue')">Blue</div>
-                    <div class="theme-option" onclick="setTheme('dark')">Dark</div>
-                    <div class="theme-option" onclick="setTheme('minimalist')">Minimalist</div>
-                </div>
-
-                <div class="property-group">
-                    <div class="property-label">Background Color</div>
-                    <div class="color-palette" id="bgColorPalette">
-                        <div class="color-btn" style="background: white;" onclick="setSlideBackground('white')"></div>
-                        <div class="color-btn" style="background: #f0f0f0;" onclick="setSlideBackground('#f0f0f0')"></div>
-                        <div class="color-btn" style="background: #2196F3;" onclick="setSlideBackground('#2196F3')"></div>
-                        <div class="color-btn" style="background: #FF6B35;" onclick="setSlideBackground('#FF6B35')"></div>
-                        <div class="color-btn" style="background: #4CAF50;" onclick="setSlideBackground('#4CAF50')"></div>
-                        <div class="color-btn" style="background: #9C27B0;" onclick="setSlideBackground('#9C27B0')"></div>
-                        <div class="color-btn" style="background: #FF5722;" onclick="setSlideBackground('#FF5722')"></div>
-                        <div class="color-btn" style="background: #00BCD4;" onclick="setSlideBackground('#00BCD4')"></div>
-                    </div>
-                </div>
-
-                <div class="property-group">
-                    <div class="property-label">Text Color</div>
-                    <input type="color" class="property-input" id="textColor" value="#000000" onchange="setTextColor(this.value)">
-                </div>
-
-                <div class="property-group">
-                    <div class="property-label">Slide Info</div>
-                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
-                        <div>Total Slides: <strong id="totalSlides">1</strong></div>
-                        <div>Current: <strong id="currentSlideNum">1</strong></div>
-                    </div>
-                </div>
+        <div class="editor-area">
+            <div class="slide">
+                <input type="text" id="slideTitle" placeholder="Slide Title">
+                <textarea id="slideContent" placeholder="Slide content..." style="flex: 1; resize: none; padding: 16px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; font-family: inherit;"></textarea>
             </div>
         </div>
     </div>
 
-    <div class="toast-container" id="toastContainer"></div>
     <script src="js/app.js"></script>
     <script>
-        let slides = [{ title: 'Presentation Title', content: 'Click to add text', bg: 'white' }];
-        let currentSlideIndex = 0;
+        let slides = [];
+        let currentSlide = 0;
 
-        function renderSlidesPanel() {
-            const panel = document.getElementById('slidesPanel');
-            panel.innerHTML = '';
-            slides.forEach((slide, idx) => {
+        function init() {
+            slides = [{ title: 'Slide 1', content: 'Enter your content...' }];
+            renderSlides();
+            loadSlide(0);
+        }
+
+        function renderSlides() {
+            const list = document.getElementById('slideList');
+            list.innerHTML = '';
+            slides.forEach((s, i) => {
                 const div = document.createElement('div');
-                div.className = `slide-thumbnail ${idx === currentSlideIndex ? 'active' : ''}`;
-                div.innerHTML = `
-                    <div style="background: ${slide.bg}; color: #333; padding: 10px; min-height: 80px; text-align: center; overflow: hidden;">
-                        <div style="font-size: 0.7rem; font-weight: 600; margin-bottom: 4px;">${slide.title.substring(0, 20)}</div>
-                        <div style="font-size: 0.65rem;">${slide.content.substring(0, 20)}</div>
-                    </div>
-                    <div class="slide-number">Slide ${idx + 1}</div>
-                `;
-                div.onclick = () => selectSlide(idx);
-                panel.appendChild(div);
+                div.className = 'slide-thumb' + (i === currentSlide ? ' active' : '');
+                div.textContent = s.title || `Slide ${i + 1}`;
+                div.onclick = () => { saveSlide(); loadSlide(i); };
+                list.appendChild(div);
             });
-            updateStats();
         }
 
-        function selectSlide(idx) {
-            currentSlideIndex = idx;
-            const slide = slides[idx];
-            document.getElementById('slideTitle').textContent = slide.title;
-            document.getElementById('slideContent').textContent = slide.content;
-            document.getElementById('currentSlide').style.background = slide.bg;
-            renderSlidesPanel();
+        function loadSlide(i) {
+            currentSlide = i;
+            document.getElementById('slideTitle').value = slides[i].title;
+            document.getElementById('slideContent').value = slides[i].content;
+            renderSlides();
         }
 
-        function updateCurrentSlide() {
-            slides[currentSlideIndex].title = document.getElementById('slideTitle').innerText || '';
-            slides[currentSlideIndex].content = document.getElementById('slideContent').innerText || '';
+        function saveSlide() {
+            slides[currentSlide] = {
+                title: document.getElementById('slideTitle').value,
+                content: document.getElementById('slideContent').value
+            };
         }
 
         function goBack() { window.location.href = 'dashboard.html'; }
-
-        function newPresentation() {
-            if (confirm('Create new presentation? All slides will be cleared.')) {
-                slides = [{ title: 'Presentation Title', content: 'Click to add text', bg: 'white' }];
-                currentSlideIndex = 0;
-                selectSlide(0);
-            }
-        }
-
-        function savePresentation() {
-            updateCurrentSlide();
-            localStorage.setItem('kairos_ppt_presentation', JSON.stringify(slides));
-            showToast('Presentation saved!', 'success');
-        }
-
-        function downloadPresentation() {
-            updateCurrentSlide();
-            let html = `<html><head><style>
-                body { font-family: Poppins, sans-serif; margin: 0; }
-                .slide { width: 960px; height: 540px; page-break-after: always; padding: 60px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; }
-                .slide-title { font-size: 3rem; font-weight: 700; margin-bottom: 20px; }
-                .slide-content { font-size: 1.3rem; }
-            </style></head><body>`;
-            slides.forEach(slide => {
-                html += `<div class="slide" style="background: ${slide.bg};">
-                    <div class="slide-title">${slide.title}</div>
-                    <div class="slide-content">${slide.content}</div>
-                </div>`;
-            });
-            html += '</body></html>';
-            const blob = new Blob([html], { type: 'text/html' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'presentation.html';
-            a.click();
-            showToast('Presentation downloaded!', 'success');
-        }
-
-        function addSlide() {
-            updateCurrentSlide();
-            slides.push({ title: 'New Slide', content: 'Click to add text', bg: 'white' });
-            selectSlide(slides.length - 1);
-            showToast('Slide added!', 'success');
-        }
-
+        function newPresentation() { if (confirm('Create new presentation?')) { init(); } }
+        function addSlide() { saveSlide(); slides.push({ title: `Slide ${slides.length + 1}`, content: '' }); loadSlide(slides.length - 1); }
         function deleteSlide() {
-            if (slides.length > 1 && confirm('Delete this slide?')) {
-                slides.splice(currentSlideIndex, 1);
-                currentSlideIndex = Math.min(currentSlideIndex, slides.length - 1);
-                selectSlide(currentSlideIndex);
-                showToast('Slide deleted!', 'info');
+            if (slides.length > 1) {
+                slides.splice(currentSlide, 1);
+                loadSlide(Math.min(currentSlide, slides.length - 1));
             }
         }
-
-        function duplicateSlide() {
-            updateCurrentSlide();
-            const slide = slides[currentSlideIndex];
-            slides.splice(currentSlideIndex + 1, 0, JSON.parse(JSON.stringify(slide)));
-            selectSlide(currentSlideIndex + 1);
-            showToast('Slide duplicated!', 'success');
-        }
-
-        function startSlideshow() {
-            updateCurrentSlide();
-            alert('Full screen slideshow coming soon! For now, use browser's presentation mode (F11)');
-        }
-
-        function setTheme(theme) {
-            document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-
-        function setSlideBackground(color) {
-            slides[currentSlideIndex].bg = color;
-            document.getElementById('currentSlide').style.background = color;
-            renderSlidesPanel();
-        }
-
-        function setTextColor(color) {
-            document.getElementById('slideTitle').style.color = color;
-            document.getElementById('slideContent').style.color = color;
-        }
-
-        function updateStats() {
-            document.getElementById('totalSlides').textContent = slides.length;
-            document.getElementById('currentSlideNum').textContent = currentSlideIndex + 1;
+        function savePresentation() { localStorage.setItem('ppt_presentation', JSON.stringify(slides)); showToast('Saved!', 'success'); }
+        function downloadPresentation() {
+            const text = slides.map((s, i) => `SLIDE ${i+1}\n${s.title}\n${s.content}\n\n---\n\n`).join('');
+            const blob = new Blob([text], {type:'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'presentation.txt';
+            a.click();
         }
 
         window.addEventListener('load', () => {
-            const saved = localStorage.getItem('kairos_ppt_presentation');
+            const saved = localStorage.getItem('ppt_presentation');
             if (saved) {
                 try {
                     slides = JSON.parse(saved);
-                    selectSlide(0);
+                    renderSlides();
+                    loadSlide(0);
                 } catch (e) {
-                    renderSlidesPanel();
+                    init();
                 }
             } else {
-                renderSlidesPanel();
+                init();
             }
-        });
-
-        // Auto-save on input
-        document.addEventListener('input', () => {
-            updateCurrentSlide();
-            savePresentation();
         });
     </script>
 </body>

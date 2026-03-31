@@ -3,124 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kairos - Excel Spreadsheet Editor</title>
+    <title>Kairos - Excel Sheet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/pages/dashboard.css">
     <style>
-        .excel-container { display: flex; flex-direction: column; height: 100vh; }
-        .excel-toolbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: var(--spacing-md); display: flex; gap: var(--spacing-md); flex-wrap: wrap; }
-        .excel-toolbar button { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--card-bg); color: var(--text); cursor: pointer; font-size: 0.9rem; transition: all var(--transition-fast); }
-        .excel-toolbar button:hover { border-color: var(--primary); background: var(--primary); color: white; }
-        .excel-content { flex: 1; overflow: auto; background: #f5f5f5; }
-        .spreadsheet { display: inline-block; background: white; }
-        .spreadsheet table { border-collapse: collapse; }
-        .spreadsheet th, .spreadsheet td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; font-size: 0.9rem; }
-        .spreadsheet th { background: #4CAF50; color: white; font-weight: 600; }
-        .spreadsheet td { background: white; }
-        .spreadsheet input { width: 100%; border: none; padding: 0; font-size: 0.9rem; }
-        .spreadsheet input:focus { outline: 2px solid #4CAF50; background: #fff9c4; }
-        .row-header { background: #f0f0f0; font-weight: 600; text-align: center; color: #666; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { height: 100vh; display: flex; flex-direction: column; background: #f5f5f5; }
+        .toolbar { background: white; border-bottom: 1px solid #ddd; padding: 12px 16px; display: flex; gap: 8px; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); flex-wrap: wrap; }
+        .toolbar button { padding: 8px 12px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 4px; font-size: 14px; transition: all 0.2s; }
+        .toolbar button:hover { background: #f0f0f0; }
+        .separator { width: 1px; height: 24px; background: #ddd; margin: 0 4px; }
+        .content { flex: 1; overflow: auto; }
+        .spreadsheet { display: inline-block; background: white; margin: 16px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        table { border-collapse: collapse; font-family: 'Segoe UI', sans-serif; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #4CAF50; color: white; font-weight: 600; }
+        td { background: white; }
+        input { width: 100%; border: none; padding: 0; font-size: 13px; }
+        input:focus { outline: 2px solid #4CAF50; background: #fff9c4; }
+        .row-header { background: #f0f0f0; font-weight: 600; text-align: center; }
     </style>
 </head>
-<body class="light-mode">
-    <div class="excel-container">
-        <!-- TOOLBAR -->
-        <div class="excel-toolbar">
-            <button onclick="goBack()" title="Back to Dashboard"><i class="fas fa-arrow-left"></i> Back</button>
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <button onclick="newSpreadsheet()" title="New Spreadsheet"><i class="fas fa-file"></i> New</button>
-            <button onclick="saveSpreadsheet()" title="Save Spreadsheet"><i class="fas fa-save"></i> Save</button>
-            <button onclick="downloadSpreadsheet()" title="Download as CSV"><i class="fas fa-download"></i> Download</button>
-            
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <button onclick="addRow()" title="Insert Row"><i class="fas fa-plus"></i> Add Row</button>
-            <button onclick="addColumn()" title="Insert Column"><i class="fas fa-plus"></i> Add Column</button>
-            <button onclick="deleteRow()" title="Delete Row"><i class="fas fa-trash"></i> Delete Row</button>
-            
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-            
-            <button onclick="insertFormula()" title="Insert Formula"><i class="fas fa-function"></i> Formula</button>
-            <button onclick="insertChart()" title="Insert Chart"><i class="fas fa-chart-bar"></i> Chart</button>
-
-            <div style="border-right: 1px solid var(--border); padding: 0 var(--spacing-sm);"></div>
-
-            <input type="text" id="formulaBar" placeholder="Enter formula (e.g., =SUM(A1:A5))" style="padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); width: 250px;">
-            <button onclick="applyFormula()" title="Apply Formula"><i class="fas fa-check"></i> Apply</button>
-        </div>
-
-        <!-- SPREADSHEET -->
-        <div class="excel-content">
-            <div class="spreadsheet">
-                <table id="spreadsheetTable">
-                    <!-- Generated by JS -->
-                </table>
-            </div>
+<body>
+    <div class="toolbar">
+        <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
+        <div class="separator"></div>
+        <button onclick="newSheet()" title="New"><i class="fas fa-file"></i></button>
+        <button onclick="saveSheet()" title="Save"><i class="fas fa-save"></i></button>
+        <button onclick="downloadSheet()" title="Download CSV"><i class="fas fa-download"></i></button>
+        <div class="separator"></div>
+        <button onclick="addRow()" title="Add Row"><i class="fas fa-plus"></i> Row</button>
+        <button onclick="addColumn()" title="Add Column"><i class="fas fa-plus"></i> Column</button>
+    </div>
+    
+    <div class="content">
+        <div class="spreadsheet">
+            <table id="sheet"></table>
         </div>
     </div>
 
-    <div class="toast-container" id="toastContainer"></div>
     <script src="js/app.js"></script>
     <script>
-        const ROWS = 20;
-        const COLS = 15;
-        let spreadsheetData = [];
-        let selectedCell = null;
+        const ROWS = 15, COLS = 10;
+        let data = [];
 
-        function initSpreadsheet() {
-            // Initialize data
+        function init() {
             for (let i = 0; i < ROWS; i++) {
-                spreadsheetData[i] = [];
-                for (let j = 0; j < COLS; j++) {
-                    spreadsheetData[i][j] = '';
-                }
+                data[i] = new Array(COLS).fill('');
             }
-            renderSpreadsheet();
+            render();
         }
 
-        function renderSpreadsheet() {
-            const table = document.getElementById('spreadsheetTable');
+        function render() {
+            const table = document.getElementById('sheet');
             table.innerHTML = '';
-
-            // Header row
-            const headerRow = document.createElement('tr');
-            const emptyHeader = document.createElement('th');
-            emptyHeader.textContent = '';
-            emptyHeader.style.width = '30px';
-            headerRow.appendChild(emptyHeader);
-
-            for (let col = 0; col < COLS; col++) {
+            
+            // Headers
+            const header = document.createElement('tr');
+            header.appendChild(document.createElement('th')).textContent = '';
+            for (let i = 0; i < COLS; i++) {
                 const th = document.createElement('th');
-                th.textContent = String.fromCharCode(65 + col); // A, B, C...
-                th.style.width = '120px';
-                headerRow.appendChild(th);
+                th.textContent = String.fromCharCode(65 + i);
+                header.appendChild(th);
             }
-            table.appendChild(headerRow);
-
-            // Data rows
-            for (let row = 0; row < ROWS; row++) {
+            table.appendChild(header);
+            
+            // Rows
+            for (let r = 0; r < data.length; r++) {
                 const tr = document.createElement('tr');
+                const rh = document.createElement('td');
+                rh.className = 'row-header';
+                rh.textContent = r + 1;
+                tr.appendChild(rh);
                 
-                // Row number
-                const rowHeader = document.createElement('td');
-                rowHeader.className = 'row-header';
-                rowHeader.textContent = row + 1;
-                rowHeader.style.width = '30px';
-                tr.appendChild(rowHeader);
-
-                for (let col = 0; col < COLS; col++) {
+                for (let c = 0; c < COLS; c++) {
                     const td = document.createElement('td');
                     const input = document.createElement('input');
-                    input.value = spreadsheetData[row][col];
-                    input.id = `cell_${row}_${col}`;
-                    input.onchange = () => { spreadsheetData[row][col] = input.value; };
-                    input.onclick = () => { selectedCell = { row, col, input }; };
+                    input.value = data[r][c];
+                    input.onchange = () => { data[r][c] = input.value; };
                     td.appendChild(input);
                     tr.appendChild(td);
                 }
@@ -129,88 +93,31 @@
         }
 
         function goBack() { window.location.href = 'dashboard.html'; }
-
-        function newSpreadsheet() {
-            if (confirm('Create a new spreadsheet? Your current data will be cleared.')) {
-                initSpreadsheet();
-            }
-        }
-
-        function saveSpreadsheet() {
-            localStorage.setItem('kairos_excel_sheet', JSON.stringify(spreadsheetData));
-            showToast('Spreadsheet saved!', 'success');
-        }
-
-        function downloadSpreadsheet() {
-            let csv = '';
-            for (let row = 0; row < ROWS; row++) {
-                csv += spreadsheetData[row].map(cell => `"${cell}"`).join(',') + '\n';
-            }
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
+        function newSheet() { if (confirm('Create new sheet?')) { init(); } }
+        function saveSheet() { localStorage.setItem('excel_sheet', JSON.stringify(data)); showToast('Saved!', 'success'); }
+        function downloadSheet() {
+            let csv = data.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+            const blob = new Blob([csv], {type:'text/csv'});
             const a = document.createElement('a');
-            a.href = url;
-            a.download = 'spreadsheet.csv';
+            a.href = URL.createObjectURL(blob);
+            a.download = 'sheet.csv';
             a.click();
-            showToast('Spreadsheet downloaded!', 'success');
         }
-
-        function addRow() {
-            spreadsheetData.push(new Array(COLS).fill(''));
-            renderSpreadsheet();
-            showToast('Row added!', 'success');
-        }
-
-        function addColumn() {
-            COLS++;
-            for (let i = 0; i < spreadsheetData.length; i++) {
-                spreadsheetData[i].push('');
-            }
-            renderSpreadsheet();
-            showToast('Column added!', 'success');
-        }
-
-        function deleteRow() {
-            if (selectedCell && selectedCell.row > 0) {
-                spreadsheetData.splice(selectedCell.row, 1);
-                renderSpreadsheet();
-                showToast('Row deleted!', 'info');
-            }
-        }
-
-        function insertFormula() {
-            const formula = prompt('Enter formula (e.g., =SUM(A1:A5)):');
-            if (formula && selectedCell) {
-                selectedCell.input.value = formula;
-                spreadsheetData[selectedCell.row][selectedCell.col] = formula;
-            }
-        }
-
-        function applyFormula() {
-            const formulaBar = document.getElementById('formulaBar').value;
-            if (formulaBar && selectedCell) {
-                selectedCell.input.value = formulaBar;
-                spreadsheetData[selectedCell.row][selectedCell.col] = formulaBar;
-                document.getElementById('formulaBar').value = '';
-            }
-        }
-
-        function insertChart() {
-            showToast('Chart feature coming soon!', 'info');
-        }
+        function addRow() { data.push(new Array(COLS).fill('')); render(); }
+        function addColumn() { data.forEach(row => row.push('')); render(); }
 
         window.addEventListener('load', () => {
-            const saved = localStorage.getItem('kairos_excel_sheet');
+            const saved = localStorage.getItem('excel_sheet');
             if (saved) {
                 try {
-                    spreadsheetData = JSON.parse(saved);
-                    renderSpreadsheet();
+                    data = JSON.parse(saved);
                 } catch (e) {
-                    initSpreadsheet();
+                    init();
                 }
             } else {
-                initSpreadsheet();
+                init();
             }
+            render();
         });
     </script>
 </body>
