@@ -135,35 +135,39 @@ function renderHeatmap() {
     const heatmap = document.getElementById('heatmapGrid');
     const assignments = KairosStorage.getAssignments();
     
-    // Create 30-day heatmap
-    for (let i = 1; i <= 30; i++) {
+    // Use 2026 dates to match assignment data
+    const today = new Date(2026, 2, 31); // March 31, 2026
+    const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    heatmap.innerHTML = '';
+    
+    // Create heatmap for 60 days to cover current and upcoming assignments
+    for (let i = 0; i < 60; i++) {
         const cell = document.createElement('div');
         cell.className = 'heatmap-cell';
         
-        const today = new Date();
-        const date = new Date(today.getFullYear(), today.getMonth(), i);
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + i);
         
-        if (i <= new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()) {
-            const assignCount = assignments.filter(a => {
-                const dueDate = new Date(a.dueDate);
-                return dueDate.getDate() === i && dueDate.getMonth() === today.getMonth();
-            }).length;
-            
-            if (assignCount === 0) {
-                cell.classList.add('light');
-            } else if (assignCount === 1) {
-                cell.classList.add('medium');
-            } else if (assignCount === 2) {
-                cell.classList.add('heavy');
-            } else {
-                cell.classList.add('very-heavy');
-            }
-            
-            cell.textContent = i;
-            if (i <= new Date(today).getDate()) {
-                cell.style.opacity = '0.7';
-            }
+        // Count assignments for this exact date
+        const assignCount = assignments.filter(a => {
+            const dueDate = new Date(a.dueDate);
+            return dueDate.toDateString() === date.toDateString();
+        }).length;
+        
+        // Set intensity based on assignment count
+        if (assignCount === 0) {
+            cell.classList.add('light');
+        } else if (assignCount === 1) {
+            cell.classList.add('medium');
+        } else if (assignCount === 2) {
+            cell.classList.add('heavy');
+        } else {
+            cell.classList.add('very-heavy');
         }
+        
+        cell.textContent = date.getDate();
+        cell.title = formatDate(date) + ` (${assignCount} assignment${assignCount !== 1 ? 's' : ''})`;
         
         heatmap.appendChild(cell);
     }
@@ -171,22 +175,26 @@ function renderHeatmap() {
 
 function renderGantt() {
     const assignments = KairosStorage.getAssignments()
-        .filter(a => a.status !== 'completed')
-        .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-        .slice(0, 5);
+        .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
     
     const timeline = document.getElementById('ganttTimeline');
-    timeline.innerHTML = assignments.map((a, idx) => {
-        const now = new Date();
+    
+    if (assignments.length === 0) {
+        timeline.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No assignments to display</div>';
+        return;
+    }
+    
+    const now = new Date(2026, 2, 31); // March 31, 2026
+    timeline.innerHTML = assignments.slice(0, 8).map((a) => {
         const dueDate = new Date(a.dueDate);
         const daysDiff = Math.max(1, Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24)));
-        const width = Math.min(100, daysDiff * 5);
+        const width = Math.min(100, Math.max(5, daysDiff * 2));
         
         return `
             <div class="gantt-bar">
                 <div class="gantt-bar-label">${a.course}</div>
                 <div class="gantt-bar-container">
-                    <div class="gantt-bar-fill" style="width: ${width}%">${a.title.substring(0, 15)}</div>
+                    <div class="gantt-bar-fill ${a.status}" style="width: ${width}%">${a.title.substring(0, 20)}</div>
                 </div>
                 <div class="gantt-bar-date">${formatDate(a.dueDate)}</div>
             </div>
