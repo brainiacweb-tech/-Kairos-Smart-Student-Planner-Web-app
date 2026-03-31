@@ -15,7 +15,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #6c63ff 0%, #2ed573 100%);
+            background: white;
             font-family: 'Poppins', sans-serif;
             overflow: hidden;
         }
@@ -27,19 +27,19 @@
             height: 100%;
             top: 0;
             left: 0;
-            opacity: 0.1;
+            opacity: 0.08;
             z-index: 0;
         }
 
         .doodle-shape {
             position: absolute;
-            opacity: 0.15;
+            opacity: 0.12;
         }
 
         .doodle-circle {
             width: 300px;
             height: 300px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid #6c63ff;
             border-radius: 50%;
             top: 5%;
             right: 10%;
@@ -48,7 +48,7 @@
         .doodle-square {
             width: 150px;
             height: 150px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid #2ed573;
             bottom: 15%;
             left: 5%;
             transform: rotate(45deg);
@@ -57,7 +57,7 @@
         .doodle-line {
             width: 400px;
             height: 3px;
-            background: rgba(255, 255, 255, 0.2);
+            background: #6c63ff;
             top: 30%;
             left: -50px;
             transform: rotate(-25deg);
@@ -74,8 +74,8 @@
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: #2ed573;
+            border: 2px solid #6c63ff;
         }
 
         .doodle-triangle {
@@ -83,7 +83,7 @@
             height: 0;
             border-left: 75px solid transparent;
             border-right: 75px solid transparent;
-            border-bottom: 130px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 130px solid #6c63ff;
             top: 60%;
             right: 5%;
         }
@@ -129,7 +129,7 @@
 
         /* Loading Text */
         .loading-text {
-            color: white;
+            color: #333;
             font-size: 1.2rem;
             font-weight: 600;
             text-align: center;
@@ -144,6 +144,7 @@
 
         .loading-dots span {
             animation: blink 1.4s infinite;
+            color: #6c63ff;
         }
 
         .loading-dots span:nth-child(2) {
@@ -156,7 +157,7 @@
 
         /* Tagline */
         .loading-tagline {
-            color: rgba(255, 255, 255, 0.8);
+            color: #666;
             font-size: 0.95rem;
             font-style: italic;
             margin-top: 15px;
@@ -238,28 +239,48 @@
     </div>
 
     <script>
+        // Get target from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const target = urlParams.get('target') || 'dashboard';
+
         // Auto-redirect after 2.5 seconds
         setTimeout(() => {
-            // Check if user is logged in (stored in localStorage)
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const userName = localStorage.getItem('userName');
-            
-            if (isLoggedIn && userName) {
-                window.location.href = 'dashboard.html';
-            } else {
+            if (target === 'login') {
                 window.location.href = 'index.html';
+            } else if (target === 'signup') {
+                window.location.href = 'signup.html';
+            } else if (target === 'signin') {
+                window.location.href = 'signin.html';
+            } else {
+                // Check if user is logged in
+                const isLoggedIn = localStorage.getItem('isLoggedIn');
+                const userName = localStorage.getItem('userName');
+                
+                if (isLoggedIn && userName) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
             }
         }, 2500);
 
         // Allow user to skip loading by clicking
         document.addEventListener('click', () => {
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const userName = localStorage.getItem('userName');
-            
-            if (isLoggedIn && userName) {
-                window.location.href = 'dashboard.html';
-            } else {
+            if (target === 'login') {
                 window.location.href = 'index.html';
+            } else if (target === 'signup') {
+                window.location.href = 'signup.html';
+            } else if (target === 'signin') {
+                window.location.href = 'signin.html';
+            } else {
+                const isLoggedIn = localStorage.getItem('isLoggedIn');
+                const userName = localStorage.getItem('userName');
+                
+                if (isLoggedIn && userName) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
             }
         });
     </script>

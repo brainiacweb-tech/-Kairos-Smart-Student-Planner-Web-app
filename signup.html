@@ -11,6 +11,12 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/pages/auth.css">
+    <script>
+        if (!sessionStorage.getItem('loadingShown')) {
+            sessionStorage.setItem('loadingShown', 'true');
+            window.location.href = 'loading.html?target=signup';
+        }
+    </script>
 </head>
 <body class="light-mode">
     <div class="auth-container">
