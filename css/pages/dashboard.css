@@ -834,6 +834,19 @@ body.focus-mode .page-title {
   .deadlines-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
+
+  /* Calendar tablet styles */
+  .calendar-grid {
+    gap: 8px;
+  }
+
+  .calendar-dates {
+    gap: 8px;
+  }
+
+  .calendar-dates div {
+    min-height: 45px;
+  }
 }
 
 @media (max-width: 767px) {
@@ -938,6 +951,27 @@ body.focus-mode .page-title {
   .progress-section {
     margin-bottom: var(--spacing-lg);
   }
+
+  /* Calendar mobile styles - tablet */
+  .calendar-grid {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+
+  .calendar-day-header {
+    font-size: 0.75rem;
+    padding: 8px 0;
+  }
+
+  .calendar-dates {
+    gap: 6px;
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  .calendar-dates div {
+    min-height: 40px;
+    font-size: 0.9rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -971,6 +1005,36 @@ body.focus-mode .page-title {
   .main-content {
     padding: var(--spacing-sm);
     margin-top: 80px;
+  }
+
+  /* Calendar mobile styles - small phones */
+  .calendar {
+    max-width: 100%;
+  }
+
+  .calendar-grid {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .calendar-day-header {
+    font-size: 0.65rem;
+    padding: 6px 0;
+  }
+
+  .calendar-dates {
+    gap: 4px;
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  .calendar-dates div {
+    min-height: 36px;
+    font-size: 0.8rem;
+    padding: 2px;
+  }
+
+  .calendar-dates div:not(:empty) {
+    border: 0.5px solid #ddd;
   }
 }
 
