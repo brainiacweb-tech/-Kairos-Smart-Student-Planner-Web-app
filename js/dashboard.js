@@ -45,48 +45,31 @@ function renderDeadlines() {
 
     assignments.forEach(assignment => {
         const daysUntil = getDaysUntil(assignment.dueDate);
-        let categoryClass = 'later';
-        let icon = '🟢';
+        let statusClass = 'normal';
+        let statusText = 'UPCOMING';
 
         if (daysUntil < 0) {
-            categoryClass = 'overdue';
-            icon = '🔴';
+            statusClass = 'urgent';
+            statusText = 'OVERDUE';
         } else if (daysUntil === 0) {
-            categoryClass = 'due-today';
-            icon = '🟠';
-        } else if (daysUntil <= 7) {
-            categoryClass = 'this-week';
-            icon = '🟡';
+            statusClass = 'urgent';
+            statusText = 'DUE TODAY';
+        } else if (daysUntil <= 3) {
+            statusClass = 'urgent';
+            statusText = 'URGENT';
         }
 
         grid.innerHTML += `
-            <div class="deadline-card ${categoryClass}">
-                <div class="deadline-header">
-                    <div>
-                        <div class="deadline-title">${assignment.title}</div>
-                        <div class="deadline-badge ${assignment.priority}">${assignment.priority}</div>
-                    </div>
+            <div class="deadline-card">
+                <div class="deadline-card-status ${statusClass}">${statusText}</div>
+                <div class="deadline-card-title">${assignment.title}</div>
+                <div class="deadline-card-subject">${assignment.course}</div>
+                <div class="deadline-card-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    ${formatDate(assignment.dueDate)}
                 </div>
-
-                <div class="deadline-meta">
-                    <span><i class="fas fa-book"></i> ${assignment.course}</span>
-                    <span><i class="fas fa-clock"></i> ${formatDate(assignment.dueDate)}</span>
-                </div>
-
-                <div class="deadline-progress">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${assignment.completed}%"></div>
-                    </div>
-                    <div class="progress-percent">${assignment.completed}%</div>
-                </div>
-
-                <div class="deadline-actions">
-                    <button class="btn-icon" onclick="markAssignmentDone(${assignment.id})" title="Mark as done">
-                        <i class="fas fa-check"></i>
-                    </button>
-                    <button class="btn-icon" onclick="editAssignment(${assignment.id})" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </button>
+                <div class="deadline-card-description">
+                    Priority: <strong>${assignment.priority}</strong> | Progress: <strong>${assignment.completed}%</strong>
                 </div>
             </div>
         `;

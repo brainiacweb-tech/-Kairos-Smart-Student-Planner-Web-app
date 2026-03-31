@@ -483,11 +483,67 @@
   border-radius: var(--radius-lg);
   padding: var(--spacing-md);
   transition: all var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
 .deadline-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+.deadline-card-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.deadline-card-subject {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.deadline-card-date {
+  font-size: 0.9rem;
+  color: var(--primary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.deadline-card-date i {
+  font-size: 0.8rem;
+}
+
+.deadline-card-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.deadline-card-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.deadline-card-status.urgent {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.deadline-card-status.normal {
+  background-color: #e3f2fd;
+  color: #1565c0;
 }
 
 /* ===========================
