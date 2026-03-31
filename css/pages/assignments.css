@@ -5,12 +5,14 @@
 .assignments-container {
   display: flex;
   gap: var(--spacing-lg);
-  min-height: 100vh;
+  min-height: auto;
+  padding-top: 0;
 }
 
 .assignments-content {
   flex: 1;
   padding: var(--spacing-lg);
+  width: 100%;
 }
 
 /* ===========================
@@ -576,17 +578,32 @@
 }
 
 @media (max-width: 480px) {
+  .assignments-container {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .assignments-content {
+    padding: var(--spacing-md);
+  }
+
   .assignments-header {
     gap: var(--spacing-sm);
+    flex-direction: column;
   }
 
   .assignments-title {
     font-size: 1.1rem;
   }
 
+  .add-assignment-btn {
+    width: 100%;
+  }
+
   .filter-bar {
     padding: var(--spacing-sm);
     gap: var(--spacing-xs);
+    flex-direction: column;
   }
 
   .filter-group {
@@ -596,6 +613,21 @@
   .filter-group label {
     font-size: 0.85rem;
   }
+
+  .view-toggle {
+    width: 100%;
+  }
+
+  .view-toggle button {
+    flex: 1;
+    font-size: 0.8rem;
+  }
+
+  .assignment-item,
+  .assignment-card {
+    width: 100%;
+  }
+}
 
   .filter-group input,
   .filter-group select {
@@ -635,6 +667,22 @@
 
   .detail-value {
     font-size: 0.9rem;
+  }
+}
+
+/* ===========================
+   SIDEBAR OPEN STATE (Mobile)
+   =========================== */
+
+@media (max-width: 767px) {
+  body.sidebar-open {
+    overflow: hidden;
+  }
+
+  body.sidebar-open .assignments-container,
+  body.sidebar-open .main-content {
+    position: relative;
+    z-index: 0;
   }
 }
 

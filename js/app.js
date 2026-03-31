@@ -187,12 +187,14 @@ function setupSidebarToggle() {
     if (toggleBtn && sidebar) {
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('active');
+            document.body.classList.toggle('sidebar-open');
         });
         
         // Close sidebar when clicking outside
         document.addEventListener('click', (e) => {
             if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
                 sidebar.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
             }
         });
     }
