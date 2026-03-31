@@ -350,7 +350,72 @@
   border-color: var(--primary);
 }
 
+/* ===========================
+   INSIGHTS SECTION
+   =========================== */
 
+.insights-section {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.insights-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: var(--spacing-lg);
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.insight-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  transition: all var(--transition-fast);
+}
+
+.insight-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.insight-icon {
+  font-size: 2rem;
+  min-width: 50px;
+  text-align: center;
+}
+
+.insight-content {
+  flex: 1;
+}
+
+.insight-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-xs);
+}
+
+.insight-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  word-break: break-word;
+}
 
 /* ===========================
    RESPONSIVE
@@ -469,6 +534,14 @@
 
   .stats-overview {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .insights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .insight-card {
+    padding: var(--spacing-md);
   }
 
   .export-section {

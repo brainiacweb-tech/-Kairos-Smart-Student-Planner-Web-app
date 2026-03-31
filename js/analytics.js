@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCharts();
         renderHeatmap();
         renderGantt();
+        renderInsights();
     }, 100);
 });
 
@@ -242,4 +243,60 @@ function exportCSV() {
     a.click();
     
     showToast('CSV exported successfully!', 'success');
+}
+
+function renderInsights() {
+    const assignments = KairosStorage.getAssignments();
+    const stats = KairosStorage.getStats();
+    
+    // Calculate busiest week
+    const now = new Date(2026, 2, 31); // March 31, 2026
+    const weekAssignments = assignments.filter(a => {
+        const dueDate = new Date(a.dueDate);
+        const daysDiff = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
+        return daysDiff >= 0 && daysDiff <= 7;
+    });
+    
+    const busiestWeekEl = document.getElementById('busiestWeek');
+    if (busiestWeekEl) {
+        if (weekAssignments.length === 0) {
+            busiestWeekEl.textContent = 'Next Week';
+        } else if (weekAssignments.length === 1) {
+            busiestWeekEl.textContent = '1 assignment';
+        } else {
+            busiestWeekEl.textContent = weekAssignments.length + ' assignments';
+        }
+    }
+    
+    // Calculate total study time
+    const totalHours = assignments.reduce((sum, a) => sum + a.estimatedHours, 0);
+    const totalStudyTimeEl = document.getElementById('totalStudyTime');
+    if (totalStudyTimeEl) {
+        totalStudyTimeEl.textContent = totalHours + 'h total';
+    }
+    
+    // Most urgent course (course with most pending)
+    const courses = KairosStorage.getCourses();
+    const mostUrgentCourse = courses.reduce((max, c) => 
+        (c.total - c.completed) > (max.total - max.completed) ? c : max, courses[0] || {});
+    
+    const mostUrgentEl = document.getElementById('mostUrgentCourse');
+    if (mostUrgentEl) {
+        mostUrgentEl.textContent = mostUrgentCourse.code || 'N/A';
+    }
+    
+    // Study recommendation
+    const completionRate = assignments.length > 0 ? (stats.completed / assignments.length) * 100 : 0;
+    const recommendationEl = document.getElementById('studyRecommendation');
+    if (recommendationEl) {
+        if (completionRate > 80) {
+            recommendationEl.textContent = 'Great pace! 🎉';
+        } else if (completionRate > 50) {
+            recommendationEl.textContent = 'Keep going! 💪';
+        } else if (completionRate > 0) {
+            recommendationEl.textContent = 'Focus needed! ⚡';
+        } else {
+            recommendationEl.textContent = 'Get started! 🚀';
+        }
+    }
 }
