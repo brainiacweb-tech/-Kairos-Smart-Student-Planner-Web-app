@@ -131,10 +131,19 @@ function renderCalendar() {
 
     datesContainer.innerHTML = "";
 
-    // Empty cells for days before month starts (align with correct day)
+    // Day headers
+    const dayHeaders = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    dayHeaders.forEach(day => {
+        const header = document.createElement("div");
+        header.className = "calendar-day-header";
+        header.textContent = day;
+        datesContainer.appendChild(header);
+    });
+
+    // Empty cells before month starts
     for (let i = 0; i < firstDay; i++) {
         const emptyDiv = document.createElement("div");
-        emptyDiv.style.display = "";
+        emptyDiv.className = "calendar-empty";
         datesContainer.appendChild(emptyDiv);
     }
 

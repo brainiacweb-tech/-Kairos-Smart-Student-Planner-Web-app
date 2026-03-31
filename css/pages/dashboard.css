@@ -622,42 +622,27 @@
   grid-column: auto;
 }
 
-/* Calendar dates grid */
-.calendar-dates {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+/* Calendar empty cells for alignment */
+.calendar-empty {
+  visibility: hidden;
 }
 
-.calendar-dates div {
+/* Calendar date cells */
+.calendar-date {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 50px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
   border-radius: 6px;
   font-weight: 500;
   font-size: 1rem;
   transition: all 0.2s ease;
   aspect-ratio: 1;
   padding: 0;
-}
-
-.calendar-dates div.calendar-date {
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-  color: #333;
-}
-
-.calendar-dates div:not(:empty) {
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-  color: #333;
   cursor: pointer;
-}
-
-.calendar-dates div:empty {
-  visibility: hidden;
 }
 
 /* ===========================
@@ -969,38 +954,13 @@ body.focus-mode .page-title {
     font-size: 0.8rem;
     padding: 8px 2px;
     font-weight: 700;
-    height: auto;
-    text-transform: uppercase;
   }
 
-  .calendar-dates {
-    grid-column: 1 / -1;
-    display: grid;
-    gap: 3px;
-    grid-template-columns: repeat(7, 1fr);
-  }
-
-  .calendar-dates div {
+  .calendar-date {
     min-height: 40px;
     aspect-ratio: 1;
     font-size: 0.95rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    overflow: visible;
     border-radius: 4px;
-  }
-
-  .calendar-dates div:not(:empty) {
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
-    cursor: pointer;
-  }
-
-  .calendar-dates div:empty {
-    visibility: hidden;
   }
 }
 
@@ -1056,38 +1016,13 @@ body.focus-mode .page-title {
     font-size: 0.75rem;
     padding: 6px 2px;
     font-weight: 700;
-    height: auto;
-    text-transform: uppercase;
   }
 
-  .calendar-dates {
-    grid-column: 1 / -1;
-    display: grid;
-    gap: 2px;
-    grid-template-columns: repeat(7, 1fr);
-  }
-
-  .calendar-dates div {
+  .calendar-date {
     min-height: 32px;
     aspect-ratio: 1;
     font-size: 0.85rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    overflow: visible;
     border-radius: 4px;
-  }
-
-  .calendar-dates div:not(:empty) {
-    border: 0.5px solid #ddd;
-    background-color: #f9f9f9;
-    cursor: pointer;
-  }
-
-  .calendar-dates div:empty {
-    visibility: hidden;
   }
 
   .calendar-dates div:not(:empty) {
