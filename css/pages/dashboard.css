@@ -260,6 +260,7 @@
 .sidebar-header {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-xl);
   cursor: pointer;
@@ -287,12 +288,6 @@
   height: 100%;
   object-fit: contain;
   background: transparent;
-}
-
-.sidebar-logo-text {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--text);
 }
 
 .sidebar-nav {
@@ -743,10 +738,6 @@ body.focus-mode .page-title {
   .sidebar-header {
     flex-direction: column;
     text-align: center;
-  }
-
-  .sidebar-logo-text {
-    display: none;
   }
 
   .nav-label {
