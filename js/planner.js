@@ -92,3 +92,116 @@ function addTimeSlot() {
 function showEventDetails(event) {
     showToast(`${event.title} scheduled`, 'info');
 }
+
+/* ===========================
+   PLANNER SAVE/LOAD FUNCTIONS
+   =========================== */
+
+function savePlannerModal() {
+    document.getElementById('plannerName').value = '';
+    document.getElementById('plannerDescription').value = '';
+    openDrawer('savePlannerDrawer');
+}
+
+function handleSavePlanner(event) {
+    event.preventDefault();
+    
+    const plannerName = document.getElementById('plannerName').value.trim();
+    const plannerDescription = document.getElementById('plannerDescription').value.trim();
+    
+    if (!plannerName) {
+        showToast('Please enter a planner name', 'warning');
+        return;
+    }
+    
+    const events = KairosStorage.getCalendarEvents();
+    const planner = {
+        id: 'planner_' + Date.now(),
+        name: plannerName,
+        description: plannerDescription,
+        events: JSON.parse(JSON.stringify(events)),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    let planners = JSON.parse(localStorage.getItem('kairos_planners') || '[]');
+    planners.push(planner);
+    localStorage.setItem('kairos_planners', JSON.stringify(planners));
+    
+    showToast(`Planner "${plannerName}" saved successfully!`, 'success');
+    closeDrawer('savePlannerDrawer');
+}
+
+function openSavedPlanners() {
+    const planners = JSON.parse(localStorage.getItem('kairos_planners') || '[]');
+    const plannersList = document.getElementById('savedPlannersList');
+    
+    if (planners.length === 0) {
+        plannersList.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No saved planners yet. Create one to get started!</div>';
+    } else {
+        plannersList.innerHTML = '<div class="saved-planners-grid">' + 
+            planners.map(planner => `
+                <div class="planner-card">
+                    <div class="planner-card-header">
+                        <h3 class="planner-card-title">${planner.name}</h3>
+                        <button class="btn-icon" onclick="deletePlanner('${planner.id}')" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="planner-card-description">${planner.description || 'No description'}</div>
+                    <div class="planner-card-meta">
+                        <small>${planner.events ? planner.events.length : 0} events</small>
+                        <small>${new Date(planner.createdAt).toLocaleDateString()}</small>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="loadPlanner('${planner.id}')">
+                        <i class="fas fa-download"></i> Load
+                    </button>
+                </div>
+            `).join('') + 
+            '</div>';
+    }
+    
+    openDrawer('loadPlannerDrawer');
+}
+
+function loadPlanner(plannerId) {
+    const planners = JSON.parse(localStorage.getItem('kairos_planners') || '[]');
+    const planner = planners.find(p => p.id === plannerId);
+    
+    if (!planner) {
+        showToast('Planner not found', 'error');
+        return;
+    }
+    
+    localStorage.setItem('kairos_calendar_events', JSON.stringify(planner.events || []));
+    
+    showToast(`Planner "${planner.name}" loaded!`, 'success');
+    closeDrawer('loadPlannerDrawer');
+    
+    renderTimetable();
+}
+
+function deletePlanner(plannerId) {
+    if (confirm('Are you sure you want to delete this planner?')) {
+        let planners = JSON.parse(localStorage.getItem('kairos_planners') || '[]');
+        planners = planners.filter(p => p.id !== plannerId);
+        localStorage.setItem('kairos_planners', JSON.stringify(planners));
+        
+        showToast('Planner deleted', 'info');
+        openSavedPlanners();
+    }
+}
+
+function openDrawer(drawerId) {
+    const drawer = document.getElementById(drawerId);
+    if (drawer) {
+        drawer.classList.add('active');
+    }
+}
+
+function closeDrawer(drawerId) {
+    const drawer = document.getElementById(drawerId);
+    if (drawer) {
+        drawer.classList.remove('active');
+    }
+}
