@@ -965,6 +965,8 @@ body.focus-mode .page-title {
   }
 
   .calendar-dates {
+    grid-column: 1 / -1;
+    display: grid;
     gap: 5px;
     grid-template-columns: repeat(7, 1fr);
   }
@@ -977,9 +979,17 @@ body.focus-mode .page-title {
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow: visible;
+  }
+
+  .calendar-dates div:not(:empty) {
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    cursor: pointer;
+  }
+
+  .calendar-dates div:empty {
+    visibility: hidden;
   }
 }
 
@@ -1042,6 +1052,8 @@ body.focus-mode .page-title {
   }
 
   .calendar-dates {
+    grid-column: 1 / -1;
+    display: grid;
     gap: 1px;
     grid-template-columns: repeat(7, 1fr);
   }
@@ -1060,6 +1072,12 @@ body.focus-mode .page-title {
 
   .calendar-dates div:not(:empty) {
     border: 0.5px solid #ddd;
+    background-color: #f9f9f9;
+    cursor: pointer;
+  }
+
+  .calendar-dates div:empty {
+    visibility: hidden;
   }
 }
 
