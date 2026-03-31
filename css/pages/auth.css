@@ -367,9 +367,45 @@
    RESPONSIVE
    =========================== */
 
+@media (max-width: 1024px) {
+  .auth-logo-icon {
+    height: 70px;
+  }
+
+  .auth-logo-icon img {
+    width: 70px;
+    height: 70px;
+  }
+}
+
 @media (max-width: 767px) {
   .auth-card {
     padding: var(--spacing-xl);
+    width: 95%;
+  }
+
+  .auth-header {
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .auth-logo {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .auth-logo-icon {
+    height: 55px;
+  }
+
+  .auth-logo-icon img {
+    width: 55px;
+    height: 55px;
+  }
+
+  .auth-logo-text {
+    font-size: 1.25rem;
   }
 
   .auth-title {
@@ -394,6 +430,47 @@
   }
 
   .motivational-quote p {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: var(--spacing-lg);
+    width: 95%;
+  }
+
+  .auth-logo {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .auth-logo-icon {
+    height: 45px;
+  }
+
+  .auth-logo-icon img {
+    width: 45px;
+    height: 45px;
+  }
+
+  .auth-logo-text {
+    font-size: 1.1rem;
+  }
+
+  .auth-title {
+    font-size: 1.3rem;
+  }
+
+  .auth-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .auth-form-group input {
+    padding: var(--spacing-sm) var(--spacing-sm);
+    font-size: 0.9rem;
+  }
+
+  .auth-form-group label {
     font-size: 0.85rem;
   }
 }

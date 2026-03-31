@@ -738,6 +738,18 @@ body.focus-mode .page-title {
   .sidebar-header {
     flex-direction: column;
     text-align: center;
+    justify-content: center;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .sidebar-logo-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .sidebar-logo-icon svg {
+    max-width: 56px;
+    max-height: 56px;
   }
 
   .nav-label {
@@ -763,6 +775,40 @@ body.focus-mode .page-title {
     flex-direction: column;
   }
 
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 240px;
+    max-width: 240px;
+    transform: translateX(-100%);
+    transition: transform var(--transition-smooth);
+    z-index: 150;
+    padding: var(--spacing-lg);
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
+
+  .sidebar-header {
+    flex-direction: row;
+    justify-content: flex-start;
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .sidebar-logo-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+  }
+
+  .sidebar-logo-icon svg {
+    max-width: 40px;
+    max-height: 40px;
+  }
+
   .navbar {
     position: fixed;
     top: 0;
@@ -780,34 +826,15 @@ body.focus-mode .page-title {
     display: none;
   }
 
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 100%;
-    max-width: 280px;
-    transform: translateX(-100%);
-    transition: transform var(--transition-smooth);
-    z-index: 150;
-  }
-
-  .sidebar.active {
-    transform: translateX(0);
-  }
-
   .main-content {
     margin-top: 70px;
     padding: var(--spacing-md);
+    width: 100%;
   }
 
   .page-title {
     font-size: 1.3rem;
     margin-bottom: var(--spacing-md);
-  }
-
-  .navbar-title {
-    font-size: 1rem;
   }
 
   .stats-grid {
@@ -837,13 +864,38 @@ body.focus-mode .page-title {
     gap: var(--spacing-sm);
   }
 
-  .main-content {
-    padding: var(--spacing-md);
-  }
-
   .mini-calendar,
   .progress-section {
     margin-bottom: var(--spacing-lg);
   }
 }
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .sidebar-logo-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .main-content {
+    padding: var(--spacing-sm);
+    margin-top: 60px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-title {
+    font-size: 1.1rem;
+  }
+
+  .card {
+    padding: var(--spacing-md);
+  }
+}}
 
