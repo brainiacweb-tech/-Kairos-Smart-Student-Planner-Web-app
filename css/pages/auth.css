@@ -85,13 +85,13 @@
   align-items: center;
   justify-content: center;
   width: auto;
-  height: 140px;
+  height: 220px;
   background: transparent;
 }
 
 .auth-logo-icon img {
-  width: 140px;
-  height: 140px;
+  width: 220px;
+  height: 220px;
   object-fit: contain;
   background: transparent;
 }
