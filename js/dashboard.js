@@ -143,18 +143,8 @@ function renderCalendar() {
     for (let i = 1; i <= lastDate; i++) {
         let div = document.createElement("div");
         div.textContent = i;
-        div.style.display = "flex";
-        div.style.alignItems = "center";
-        div.style.justifyContent = "center";
-        div.style.minHeight = "42px";
-        div.style.aspectRatio = "1";
-        div.style.borderRadius = "6px";
+        div.className = "calendar-date";
         div.style.cursor = "pointer";
-        div.style.fontSize = "1rem";
-        div.style.fontWeight = "500";
-        div.style.border = "1px solid #ddd";
-        div.style.backgroundColor = "#f9f9f9";
-        div.style.color = "#333";
         div.style.transition = "all 0.2s ease";
 
         // Hover effect
@@ -167,9 +157,9 @@ function renderCalendar() {
         });
         div.addEventListener("mouseleave", () => {
             if (!div.classList.contains("today")) {
-                div.style.backgroundColor = "#f9f9f9";
-                div.style.color = "#333";
-                div.style.borderColor = "#ddd";
+                div.style.backgroundColor = "";
+                div.style.color = "";
+                div.style.borderColor = "";
             }
         });
 

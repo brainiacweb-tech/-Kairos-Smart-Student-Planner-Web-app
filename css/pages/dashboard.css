@@ -643,6 +643,12 @@
   padding: 0;
 }
 
+.calendar-dates div.calendar-date {
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
 .calendar-dates div:not(:empty) {
   border: 1px solid #ddd;
   background-color: #f9f9f9;
