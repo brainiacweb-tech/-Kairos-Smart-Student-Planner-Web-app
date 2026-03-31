@@ -58,10 +58,13 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  min-height: 280px;
 }
 
 .chart-container canvas {
-  max-height: 300px;
+  width: 100% !important;
+  height: auto !important;
+  max-height: 350px;
 }
 
 /* ===========================

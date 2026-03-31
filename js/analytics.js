@@ -26,11 +26,15 @@ function updateStats() {
     const stats = KairosStorage.getStats();
     const assignments = KairosStorage.getAssignments();
     
-    document.getElementById('totalCompleted').textContent = stats.completed;
-    document.getElementById('completionRate').textContent = assignments.length > 0 ? 
-        Math.round((stats.completed / assignments.length) * 100) + '%' : '0%';
-    document.getElementById('onTimeRate').textContent = '92%';
-    document.getElementById('avgHours').textContent = Math.round(assignments.reduce((sum, a) => sum + a.estimatedHours, 0) / 4) + 'h';
+    try {
+        document.getElementById('totalCompleted').textContent = stats.completed;
+        document.getElementById('completionRate').textContent = assignments.length > 0 ? 
+            Math.round((stats.completed / assignments.length) * 100) + '%' : '0%';
+        document.getElementById('onTimeRate').textContent = '92%';
+        document.getElementById('avgHours').textContent = Math.round(assignments.reduce((sum, a) => sum + a.estimatedHours, 0) / 4) + 'h';
+    } catch(e) {
+        console.error('Error updating stats:', e);
+    }
 }
 
 function renderCharts() {
@@ -51,104 +55,143 @@ function renderCharts() {
     const textColor = isDark ? '#E0E0E0' : '#1A1A2E';
     const gridColor = isDark ? '#2A2A3E' : '#E5E7EB';
     
+    // Destroy existing charts
+    Object.keys(charts).forEach(key => {
+        if (charts[key]) {
+            charts[key].destroy();
+        }
+    });
+    charts = {};
+    
     // Status Distribution (Doughnut)
     const statusCtx = document.getElementById('statusChart');
     if (statusCtx) {
-        charts.status = new Chart(statusCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Completed', 'In Progress', 'Pending'],
-                datasets: [{
-                    data: [stats.completed, stats.inProgress, stats.pending],
-                    backgroundColor: ['#2ED573', '#6C63FF', '#FFA502'],
-                    borderColor: isDark ? '#1A1A2E' : '#FFFFFF',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        labels: { color: textColor }
+        try {
+            charts.status = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'In Progress', 'Pending'],
+                    datasets: [{
+                        data: [stats.completed, stats.inProgress, stats.pending],
+                        backgroundColor: ['#2ED573', '#6C63FF', '#FFA502'],
+                        borderColor: isDark ? '#1A1A2E' : '#FFFFFF',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                color: textColor,
+                                font: { size: 13 },
+                                padding: 15
+                            }
+                        }
                     }
                 }
-            }
-        });
+            });
+        } catch(e) {
+            console.error('Error creating status chart:', e);
+        }
     }
     
     // Workload by Course (Bar)
     const workloadCtx = document.getElementById('workloadChart');
     if (workloadCtx) {
-        charts.workload = new Chart(workloadCtx, {
-            type: 'bar',
-            data: {
-                labels: courses.map(c => c.code),
-                datasets: [{
-                    label: 'Assignments',
-                    data: courses.map(c => c.total),
-                    backgroundColor: '#6C63FF',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: { labels: { color: textColor } }
+        try {
+            charts.workload = new Chart(workloadCtx, {
+                type: 'bar',
+                data: {
+                    labels: courses.map(c => c.code),
+                    datasets: [{
+                        label: 'Assignments',
+                        data: courses.map(c => c.total),
+                        backgroundColor: '#6C63FF',
+                        borderRadius: 4,
+                        borderSkipped: false
+                    }]
                 },
-                scales: {
-                    y: {
-                        ticks: { color: textColor },
-                        grid: { color: gridColor }
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { 
+                            labels: { color: textColor }
+                        }
                     },
-                    x: {
-                        ticks: { color: textColor },
-                        grid: { display: false }
+                    scales: {
+                        y: {
+                            ticks: { color: textColor },
+                            grid: { display: false }
+                        },
+                        x: {
+                            ticks: { color: textColor },
+                            grid: { color: gridColor }
+                        }
                     }
                 }
-            }
-        });
+            });
+        } catch(e) {
+            console.error('Error creating workload chart:', e);
+        }
     }
     
     // Weekly Trend (Line)
     const trendCtx = document.getElementById('trendChart');
     if (trendCtx) {
-        const weekData = [2, 4, 3, 5, 6, 7, 8];
-        charts.trend = new Chart(trendCtx, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Completed',
-                    data: weekData,
-                    borderColor: '#6C63FF',
-                    backgroundColor: 'rgba(108, 99, 255, 0.1)',
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#6C63FF',
-                    pointBorderColor: '#FFFFFF',
-                    pointBorderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: { labels: { color: textColor } }
+        try {
+            const weekData = [2, 4, 3, 5, 6, 7, 8];
+            charts.trend = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Completed',
+                        data: weekData,
+                        borderColor: '#6C63FF',
+                        backgroundColor: 'rgba(108, 99, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#6C63FF',
+                        pointBorderColor: '#FFFFFF',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
                 },
-                scales: {
-                    y: {
-                        ticks: { color: textColor },
-                        grid: { color: gridColor }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
                     },
-                    x: {
-                        ticks: { color: textColor },
-                        grid: { color: gridColor }
+                    plugins: {
+                        legend: { 
+                            labels: { color: textColor, font: { size: 13 } }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: { color: textColor },
+                            grid: { color: gridColor }
+                        },
+                        x: {
+                            ticks: { color: textColor },
+                            grid: { color: gridColor }
+                        }
                     }
                 }
-            }
-        });
+            });
+        } catch(e) {
+            console.error('Error creating trend chart:', e);
+        }
     }
 }
 
