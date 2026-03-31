@@ -955,22 +955,31 @@ body.focus-mode .page-title {
   /* Calendar mobile styles - tablet */
   .calendar-grid {
     grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
+    gap: 5px;
   }
 
   .calendar-day-header {
-    font-size: 0.75rem;
-    padding: 8px 0;
+    font-size: 0.8rem;
+    padding: 8px 2px;
+    font-weight: 600;
   }
 
   .calendar-dates {
-    gap: 6px;
+    gap: 5px;
     grid-template-columns: repeat(7, 1fr);
   }
 
   .calendar-dates div {
-    min-height: 40px;
-    font-size: 0.9rem;
+    min-height: 42px;
+    height: 42px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
@@ -1014,23 +1023,32 @@ body.focus-mode .page-title {
 
   .calendar-grid {
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: 3px;
   }
 
   .calendar-day-header {
-    font-size: 0.65rem;
-    padding: 6px 0;
+    font-size: 0.75rem;
+    padding: 8px 2px;
+    font-weight: 600;
   }
 
   .calendar-dates {
-    gap: 4px;
+    gap: 3px;
     grid-template-columns: repeat(7, 1fr);
   }
 
   .calendar-dates div {
-    min-height: 36px;
-    font-size: 0.8rem;
-    padding: 2px;
+    min-height: 40px;
+    height: 40px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .calendar-dates div:not(:empty) {
