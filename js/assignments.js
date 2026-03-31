@@ -56,7 +56,7 @@ function populateFilters() {
     
     courseFilter.innerHTML = '<option value="">All Courses</option>';
     courses.forEach(course => {
-        courseFilter.innerHTML += `<option value="${course.code}">${course.code}</option>`;
+        courseFilter.innerHTML += `<option value="${course.code}">${KairosStorage.getCourseDisplay(course.code)}</option>`;
     });
 }
 
@@ -128,7 +128,7 @@ function renderListCard(assignment) {
                 <div class="assignment-card-info">
                     <div class="assignment-card-title">${assignment.title}</div>
                     <div class="assignment-meta">
-                        <span><i class="fas fa-book"></i> ${assignment.course}</span>
+                        <span><i class="fas fa-book"></i> ${KairosStorage.getCourseDisplay(assignment.course)}</span>
                         <span><i class="fas fa-clock"></i> ${formatDate(assignment.dueDate)}</span>
                         <span><i class="fas fa-hourglass-half"></i> ${assignment.estimatedHours}h</span>
                     </div>
@@ -179,7 +179,7 @@ function renderGridCard(assignment) {
                     <button class="btn-icon" onclick="deleteAssignmentItem(${assignment.id})" style="color: var(--danger);"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
-            <div style="font-size: 0.85rem; color: var(--text-secondary);">${assignment.course}</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary);">${KairosStorage.getCourseDisplay(assignment.course)}</div>
             <div style="font-size: 0.85rem; color: var(--text-secondary);"><i class="fas fa-calendar"></i> ${formatDate(assignment.dueDate)}</div>
             <div style="margin: var(--spacing-md) 0;">
                 <div class="progress-bar">

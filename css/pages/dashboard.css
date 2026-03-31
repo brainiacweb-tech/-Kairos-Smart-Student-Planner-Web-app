@@ -267,8 +267,8 @@
 }
 
 .sidebar-logo-icon {
-  width: 5rem;
-  height: 5rem;
+  width: 6.5rem;
+  height: 6.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -288,6 +288,11 @@
   height: 100%;
   object-fit: contain;
   background: transparent;
+}
+
+/* Hide hamburger on assignments page */
+body.assignments-page .navbar-toggle {
+  display: none !important;
 }
 
 .sidebar-nav {
@@ -743,8 +748,8 @@ body.focus-mode .page-title {
   }
 
   .sidebar-logo-icon {
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 4rem;
+    height: 4rem;
   }
 
   .sidebar-logo-icon svg {
