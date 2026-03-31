@@ -372,7 +372,7 @@ class KairosStorage {
                 id: 1,
                 title: 'Financial Statements Analysis',
                 course: 'ACC301',
-                dueDate: new Date(Date.now() + 2*24*60*60*1000).toISOString(),
+                dueDate: new Date(2026, 3, 2).toISOString(),
                 priority: 'high',
                 status: 'in-progress',
                 estimatedHours: 5,
@@ -383,7 +383,7 @@ class KairosStorage {
                 id: 2,
                 title: 'Strategic Management Project',
                 course: 'BUS401',
-                dueDate: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
+                dueDate: new Date(2026, 3, 7).toISOString(),
                 priority: 'medium',
                 status: 'pending',
                 estimatedHours: 8,
@@ -394,7 +394,7 @@ class KairosStorage {
                 id: 3,
                 title: 'Marketing Campaign Presentation',
                 course: 'MKT201',
-                dueDate: new Date(Date.now() + 4*24*60*60*1000).toISOString(),
+                dueDate: new Date(2026, 3, 4).toISOString(),
                 priority: 'high',
                 status: 'pending',
                 estimatedHours: 4,
@@ -405,7 +405,7 @@ class KairosStorage {
                 id: 4,
                 title: 'Human Resource Policies Case Study',
                 course: 'HRM301',
-                dueDate: new Date(Date.now() - 1*24*60*60*1000).toISOString(),
+                dueDate: new Date(2026, 3, 15).toISOString(),
                 priority: 'high',
                 status: 'pending',
                 estimatedHours: 3,
@@ -417,17 +417,17 @@ class KairosStorage {
         const mockEvents = [
             {
                 id: 1,
-                title: 'ACF255 - Financial Accounting Lecture',
+                title: 'ACC301 - Financial Accounting Lecture',
                 type: 'class',
-                date: new Date().toISOString(),
+                date: new Date(2026, 2, 31).toISOString(),
                 startTime: '09:00',
                 endTime: '10:30'
             },
             {
                 id: 2,
-                title: 'Study Session - Business Research Methods',
+                title: 'Study Session - ACC301',
                 type: 'study',
-                date: new Date(Date.now() + 1*24*60*60*1000).toISOString(),
+                date: new Date(2026, 3, 1).toISOString(),
                 startTime: '14:00',
                 endTime: '16:00'
             }

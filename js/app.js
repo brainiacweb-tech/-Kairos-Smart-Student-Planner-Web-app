@@ -245,7 +245,7 @@ function formatDate(date) {
         date = new Date(date);
     }
     
-    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
     return date.toLocaleDateString('en-US', options);
 }
 
