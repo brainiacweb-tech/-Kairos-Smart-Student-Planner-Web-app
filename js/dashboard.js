@@ -134,7 +134,7 @@ function renderCalendar() {
     // Empty cells for days before month starts (align with correct day)
     for (let i = 0; i < firstDay; i++) {
         const emptyDiv = document.createElement("div");
-        emptyDiv.style.visibility = "collapse";
+        emptyDiv.style.display = "";
         datesContainer.appendChild(emptyDiv);
     }
 

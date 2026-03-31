@@ -619,6 +619,7 @@
   color: var(--text-secondary);
   font-size: 0.85rem;
   text-transform: uppercase;
+  grid-column: auto;
 }
 
 /* Calendar dates grid */
@@ -633,19 +634,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
+  min-height: 45px;
   border-radius: 6px;
   font-weight: 500;
   font-size: 1rem;
   transition: all 0.2s ease;
-  aspect-ratio: 1 / 1;
-  cursor: pointer;
+  aspect-ratio: 1;
 }
 
 .calendar-dates div:not(:empty) {
   border: 1px solid #ddd;
   background-color: #f9f9f9;
   color: #333;
+  cursor: pointer;
+}
+
+.calendar-dates div:empty {
+  visibility: hidden;
 }
 
 /* ===========================
