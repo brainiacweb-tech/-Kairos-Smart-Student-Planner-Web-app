@@ -615,11 +615,17 @@
 .calendar-day-header {
   font-weight: 700;
   text-align: center;
-  padding: 8px 2px;
+  padding: 12px 4px;
   color: var(--text-secondary);
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
   grid-column: auto;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
 }
 
 /* Calendar empty cells for alignment */
@@ -941,8 +947,11 @@ body.focus-mode .page-title {
 
   .calendar-day-header {
     font-size: 0.8rem;
-    padding: 8px 2px;
+    padding: 10px 3px;
     font-weight: 700;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    min-height: 28px;
   }
 
   .calendar-date {
@@ -1005,6 +1014,9 @@ body.focus-mode .page-title {
     font-size: 0.75rem;
     padding: 6px 2px;
     font-weight: 700;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    min-height: 20px;
   }
 
   .calendar-date {
