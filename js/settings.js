@@ -78,7 +78,7 @@ function changeAccentColor(color) {
 }
 
 function startNewSemester() {
-    const semester = prompt('Enter semester name (e.g., Fall 2024):');
+    const semester = prompt('Enter semester name (e.g., First Semester or Second Semester):');
     if (semester) {
         KairosStorage.addSemester({
             name: semester,
