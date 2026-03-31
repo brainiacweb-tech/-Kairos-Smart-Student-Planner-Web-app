@@ -131,13 +131,10 @@ function renderCalendar() {
 
     datesContainer.innerHTML = "";
 
-    // Empty cells for days before month starts
+    // Empty cells for days before month starts (align with correct day)
     for (let i = 0; i < firstDay; i++) {
         const emptyDiv = document.createElement("div");
-        emptyDiv.style.visibility = "hidden";
-        emptyDiv.style.display = "flex";
-        emptyDiv.style.alignItems = "center";
-        emptyDiv.style.justifyContent = "center";
+        emptyDiv.style.visibility = "collapse";
         datesContainer.appendChild(emptyDiv);
     }
 
@@ -149,8 +146,7 @@ function renderCalendar() {
         div.style.display = "flex";
         div.style.alignItems = "center";
         div.style.justifyContent = "center";
-        div.style.padding = "8px";
-        div.style.minHeight = "45px";
+        div.style.minHeight = "42px";
         div.style.aspectRatio = "1";
         div.style.borderRadius = "6px";
         div.style.cursor = "pointer";
@@ -166,17 +162,18 @@ function renderCalendar() {
             if (!div.classList.contains("today")) {
                 div.style.backgroundColor = "#007bff";
                 div.style.color = "white";
-                div.style.border = "1px solid #0056b3";
+                div.style.borderColor = "#0056b3";
             }
         });
         div.addEventListener("mouseleave", () => {
             if (!div.classList.contains("today")) {
                 div.style.backgroundColor = "#f9f9f9";
                 div.style.color = "#333";
-                div.style.border = "1px solid #ddd";
+                div.style.borderColor = "#ddd";
             }
         });
 
+        // Highlight today
         if (
             i === today.getDate() &&
             month === today.getMonth() &&
@@ -186,7 +183,7 @@ function renderCalendar() {
             div.style.backgroundColor = "#007bff";
             div.style.color = "white";
             div.style.fontWeight = "bold";
-            div.style.border = "2px solid #0056b3";
+            div.style.borderColor = "#0056b3";
         }
 
         datesContainer.appendChild(div);

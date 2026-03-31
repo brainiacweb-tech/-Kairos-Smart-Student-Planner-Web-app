@@ -185,30 +185,23 @@
                 </div>
 
                 <!-- CALENDAR SECTION -->
-                <div class="calendar card" style="margin-top: var(--spacing-2xl); max-width: 450px;">
+                <div class="calendar card" style="margin-top: var(--spacing-2xl); width: 100%; max-width: 400px;">
                     <div style="padding: var(--spacing-lg);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
-                            <div>
-                                <button onclick="prevMonth()" style="background: var(--primary); border: none; color: white; padding: 8px 12px; cursor: pointer; border-radius: 6px; font-size: 1rem;">◀</button>
-                            </div>
+                            <button onclick="prevMonth()" style="background: var(--primary); border: none; color: white; padding: 8px 12px; cursor: pointer; border-radius: 6px; font-size: 1rem;">◀</button>
                             <h2 id="monthYear" style="margin: 0; font-size: 1.3rem; font-weight: 600;"></h2>
-                            <div>
-                                <button onclick="nextMonth()" style="background: var(--primary); border: none; color: white; padding: 8px 12px; cursor: pointer; border-radius: 6px; font-size: 1rem;">▶</button>
-                            </div>
+                            <button onclick="nextMonth()" style="background: var(--primary); border: none; color: white; padding: 8px 12px; cursor: pointer; border-radius: 6px; font-size: 1rem;">▶</button>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;">
-                            <!-- Day headers -->
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Sun</div>
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Mon</div>
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Tue</div>
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Wed</div>
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Thu</div>
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Fri</div>
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Sat</div>
-                            
-                            <!-- Calendar dates -->
-                            <div class="calendar-dates" id="dates" style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;"></div>
+                        <div class="calendar-grid">
+                            <div class="calendar-day-header">Sun</div>
+                            <div class="calendar-day-header">Mon</div>
+                            <div class="calendar-day-header">Tue</div>
+                            <div class="calendar-day-header">Wed</div>
+                            <div class="calendar-day-header">Thu</div>
+                            <div class="calendar-day-header">Fri</div>
+                            <div class="calendar-day-header">Sat</div>
+                            <div class="calendar-dates" id="dates"></div>
                         </div>
                     </div>
                 </div>

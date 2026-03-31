@@ -605,21 +605,47 @@
   opacity: 0.5;
 }
 
+/* Calendar Grid Layout */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendar-day-header {
+  font-weight: 700;
+  text-align: center;
+  padding: 10px 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
 /* Calendar dates grid */
+.calendar-dates {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
 .calendar-dates div {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 45px;
+  min-height: 42px;
   border-radius: 6px;
   font-weight: 500;
   font-size: 1rem;
   transition: all 0.2s ease;
-  aspect-ratio: 1;
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
 }
 
 .calendar-dates div:not(:empty) {
-  cursor: pointer;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
 }
 
 /* ===========================
