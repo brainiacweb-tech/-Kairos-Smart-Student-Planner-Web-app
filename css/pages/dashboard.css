@@ -609,15 +609,15 @@
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: 3px;
 }
 
 .calendar-day-header {
   font-weight: 700;
   text-align: center;
-  padding: 10px 0;
+  padding: 8px 2px;
   color: var(--text-secondary);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   grid-column: auto;
 }
@@ -632,13 +632,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 50px;
+  min-height: 40px;
   border: 1px solid #ddd;
   background-color: #f9f9f9;
   color: #333;
   border-radius: 6px;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: all 0.2s ease;
   aspect-ratio: 1;
   padding: 0;
