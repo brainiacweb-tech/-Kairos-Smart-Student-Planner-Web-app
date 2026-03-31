@@ -170,7 +170,52 @@ function getCurrentPage() {
     return path.split('/').pop().replace('.html', '') || 'dashboard';
 }
 
-// Sidebar functionality removed (toggle button removed)
+// Sidebar toggle for mobile
+function setupSidebarToggle() {
+    const toggleBtn = document.querySelector('.navbar-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            document.body.classList.toggle('sidebar-open');
+        });
+        
+        // Close sidebar when clicking on nav links and navigate after animation
+        const navLinks = document.querySelectorAll('.sidebar-nav .nav-item');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href) {
+                    e.preventDefault();
+                    sidebar.classList.remove('active');
+                    document.body.classList.remove('sidebar-open');
+                    // Navigate after sidebar animation completes
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 300);
+                }
+            });
+        });
+        
+        // Close sidebar on logout button (doesn't navigate)
+        const logoutBtn = document.querySelector('.sidebar-footer .nav-item');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
+            });
+        }
+        
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                sidebar.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
+            }
+        });
+    }
+}
 
 // Authentication Check
 function checkAuth() {
@@ -302,6 +347,7 @@ function updateNotificationBadge() {
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     setupNavigation();
+    setupSidebarToggle();
     updateUserInfo();
     updateNotificationBadge();
     setupTabs();

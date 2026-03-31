@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadNotesFromStorage();
     loadRecordingsFromStorage();
     updateStats();
+    initializeSidebar();
     loadPasswordSetting();
 });
 
@@ -489,4 +490,25 @@ function updateStats() {
 
     document.getElementById('totalNotes').textContent = notes.length;
     document.getElementById('totalRecordings').textContent = recordings.length;
+}
+
+// ========== SIDEBAR TOGGLE ==========
+
+function initializeSidebar() {
+    const sidebarToggle = document.querySelector('.navbar-toggle');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('mobile-open');
+        });
+    }
+
+    // Close sidebar when clicking a link on mobile
+    const navItems = document.querySelectorAll('.sidebar-nav a');
+    navItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.remove('mobile-open');
+        });
+    });
 }

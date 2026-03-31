@@ -33,6 +33,15 @@
   flex: 1;
 }
 
+.navbar-toggle {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: none;
+}
+
 .navbar-title {
   font-weight: 600;
   font-size: 1.1rem;
@@ -903,6 +912,10 @@ body.focus-mode .page-title {
     z-index: 200;
     height: auto;
     min-height: 70px;
+  }
+
+  .navbar-toggle {
+    display: block;
   }
 
   .navbar-title {
