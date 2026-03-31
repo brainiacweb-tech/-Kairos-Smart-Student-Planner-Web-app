@@ -101,27 +101,6 @@ class KairosStorage {
         return stats;
     }
 
-    static getCourses() {
-        const assignments = this.getAssignments();
-        const courses = {};
-        
-        assignments.forEach(a => {
-            if (!courses[a.course]) {
-                courses[a.course] = {
-                    code: a.course,
-                    total: 0,
-                    completed: 0
-                };
-            }
-            courses[a.course].total++;
-            if (a.status === 'completed') {
-                courses[a.course].completed++;
-            }
-        });
-        
-        return Object.values(courses);
-    }
-
     // CALENDAR EVENTS (for planner)
     static getCalendarEvents() {
         return JSON.parse(localStorage.getItem('kairos_events') || '[]');
@@ -267,8 +246,32 @@ class KairosStorage {
         return updated;
     }
 
-    // COURSES - KNUST Business School Curriculum
+    // COURSES - Get courses from assignments (for filters) or from full curriculum database
     static getCourses(filter = {}) {
+        // First priority: Get courses from existing assignments
+        const assignments = this.getAssignments();
+        const assignmentCourses = {};
+        
+        assignments.forEach(a => {
+            if (!assignmentCourses[a.course]) {
+                assignmentCourses[a.course] = {
+                    code: a.course,
+                    total: 0,
+                    completed: 0
+                };
+            }
+            assignmentCourses[a.course].total++;
+            if (a.status === 'completed') {
+                assignmentCourses[a.course].completed++;
+            }
+        });
+        
+        // If we have assignments with courses, return those
+        if (Object.keys(assignmentCourses).length > 0) {
+            return Object.values(assignmentCourses);
+        }
+        
+        // Otherwise fall back to full curriculum
         const allCourses = this.getAllCourses();
         
         if (filter.year) {
@@ -282,7 +285,7 @@ class KairosStorage {
         }
         
         return allCourses;
-    }
+    
 
     static getAllCourses() {
         return [
@@ -367,58 +370,47 @@ class KairosStorage {
         const mockAssignments = [
             {
                 id: 1,
-                title: 'Financial Accounting Assignment',
-                course: 'ACF255',
+                title: 'Financial Statements Analysis',
+                course: 'ACC301',
                 dueDate: new Date(Date.now() + 2*24*60*60*1000).toISOString(),
                 priority: 'high',
                 status: 'in-progress',
                 estimatedHours: 5,
                 completed: 40,
-                notes: 'Financial Accounting I - Journal entries and financial statements'
+                notes: 'Focus on IFRS standards and audit procedures'
             },
             {
                 id: 2,
-                title: 'Business Research Methods Project',
-                course: 'ISD353',
+                title: 'Strategic Management Project',
+                course: 'BUS401',
                 dueDate: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
                 priority: 'medium',
                 status: 'pending',
                 estimatedHours: 8,
                 completed: 0,
-                notes: 'Business Research Methods - Design research proposal'
+                notes: 'Study competitive analysis frameworks'
             },
             {
                 id: 3,
-                title: 'Marketing Strategy Case Study',
-                course: 'MCS272',
+                title: 'Marketing Campaign Presentation',
+                course: 'MKT201',
                 dueDate: new Date(Date.now() + 4*24*60*60*1000).toISOString(),
                 priority: 'high',
                 status: 'pending',
                 estimatedHours: 4,
                 completed: 0,
-                notes: 'Principles of Marketing - Analyze market trends'
+                notes: 'Develop integrated marketing strategy'
             },
             {
                 id: 4,
-                title: 'Systems Analysis & Design Project',
-                course: 'ISD463',
+                title: 'Human Resource Policies Case Study',
+                course: 'HRM301',
                 dueDate: new Date(Date.now() - 1*24*60*60*1000).toISOString(),
                 priority: 'high',
                 status: 'pending',
                 estimatedHours: 3,
                 completed: 0,
-                notes: 'Systems Analysis and Design - Project submission overdue'
-            },
-            {
-                id: 5,
-                title: 'HRM Policy Development',
-                course: 'MAS263',
-                dueDate: new Date(Date.now() + 10*24*60*60*1000).toISOString(),
-                priority: 'low',
-                status: 'completed',
-                estimatedHours: 2,
-                completed: 100,
-                notes: 'Introduction to HRM - HR policy framework completed'
+                notes: 'Analyze HR case study and propose solutions'
             }
         ];
 
