@@ -17,17 +17,50 @@
         .slide-thumb { width: 160px; height: 90px; margin: 8px; background: white; border: 2px solid #555; border-radius: 4px; cursor: pointer; overflow: hidden; font-size: 12px; color: #333; display: flex; align-items: center; justify-content: center; padding: 4px; text-align: center; }
         .slide-thumb.active { border-color: #4CAF50; }
         .main { flex: 1; display: flex; flex-direction: column; }
-        .toolbar { background: #2a2a2a; border-bottom: 1px solid #333; padding: 12px 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .toolbar button { padding: 8px 12px; border: 1px solid #444; background: #333; color: white; cursor: pointer; border-radius: 4px; font-size: 14px; transition: all 0.2s; }
+        .toolbar { background: #2a2a2a; border-bottom: 1px solid #333; padding: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .toolbar button { padding: 8px 12px; border: 1px solid #444; background: #333; color: white; cursor: pointer; border-radius: 4px; font-size: 14px; transition: all 0.2s; white-space: nowrap; }
         .toolbar button:hover { background: #444; border-color: #666; }
-        .separator { width: 1px; height: 24px; background: #444; margin: 0 4px; }
-        .editor-area { flex: 1; display: flex; align-items: center; justify-content: center; overflow: auto; }
+        .separator { width: 1px; height: 24px; background: #444; margin: 0 4px; display: none; }
+        .toolbar-menu { display: none; position: absolute; top: 50px; left: 12px; background: #333; border: 1px solid #444; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 1000; min-width: 180px; }
+        .toolbar-menu.open { display: block; }
+        .toolbar-menu button { display: block; width: 100%; text-align: left; padding: 10px 16px; border: none; background: none; color: white; cursor: pointer; font-size: 14px; }
+        .toolbar-menu button:hover { background: #444; }
+        .toolbar-menu .sep { border-top: 1px solid #555; margin: 4px 0; }
+        .hamburger { display: none; background: none; border: none; font-size: 18px; cursor: pointer; color: white; }
+        .editor-area { flex: 1; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 10px; }
         .slide { width: 800px; height: 600px; background: white; color: #333; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); padding: 40px; display: flex; flex-direction: column; justify-content: space-between; }
-        .slide h1 { font-size: 48px; font-weight: 700; margin-bottom: 20px; }
-        .slide p { font-size: 24px; line-height: 1.6; }
-        input { background: transparent; border: 1px solid #999; padding: 10px; border-radius: 4px; font-size: 16px; color: inherit; }
-        input:focus { outline: 2px solid #4CAF50; background: #f9f9f9; }
-        .slide input { color: #333; background: white; }
+        #slideTitle { color: #333; background: white; border: 1px solid #999; padding: 10px; }
+        #slideContent { color: #333; background: white; }
+        @media (max-width: 1024px) {
+            .sidebar { width: 150px; }
+            .slide-thumb { width: 130px; height: 80px; margin: 6px; font-size: 10px; }
+            .slide { width: 600px; height: 450px; padding: 30px; font-size: 14px; }
+            #slideTitle { font-size: 30px; }
+        }
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #333; padding: 8px; display: flex; gap: 8px; overflow-x: auto; }
+            .slide-thumb { width: 120px; height: 70px; margin: 0; flex-shrink: 0; }
+            .toolbar { padding: 10px; }
+            .toolbar button { padding: 6px 10px; font-size: 12px; }
+            .toolbar button span { display: none; }
+            .separator { display: none; }
+            .hamburger { display: block; }
+            .editor-area { padding: 8px; }
+            .slide { width: 100%; height: auto; max-width: 500px; min-height: 300px; padding: 20px; }
+            #slideTitle { font-size: 20px; }
+            #slideContent { font-size: 14px; }
+        }
+        @media (max-width: 480px) {
+            .sidebar { width: 100%; }
+            .slide-thumb { width: 100px; height: 60px; }
+            .toolbar { padding: 8px; }
+            .toolbar button { padding: 6px 8px; font-size: 11px; }
+            .editor-area { padding: 4px; }
+            .slide { width: 100%; max-width: 100%; min-height: 250px; padding: 12px; }
+            #slideTitle { font-size: 16px; }
+            #slideContent { font-size: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -40,14 +73,26 @@
     <!-- MAIN EDITOR -->
     <div class="main">
         <div class="toolbar">
-            <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
+            <button class="hamburger" onclick="toggleToolMenu()"><i class="fas fa-bars"></i></button>
+            <button onclick="goBack()"><i class="fas fa-arrow-left"></i></button>
             <div class="separator"></div>
             <button onclick="newPresentation()" title="New"><i class="fas fa-file"></i></button>
             <button onclick="savePresentation()" title="Save"><i class="fas fa-save"></i></button>
             <button onclick="downloadPresentation()" title="Download"><i class="fas fa-download"></i></button>
             <div class="separator"></div>
-            <button onclick="addSlide()" title="Add Slide"><i class="fas fa-plus"></i> Slide</button>
+            <button onclick="addSlide()" title="Add Slide"><i class="fas fa-plus"></i></button>
             <button onclick="deleteSlide()" title="Delete"><i class="fas fa-trash"></i></button>
+            <div id="toolMenu" class="toolbar-menu">
+                <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
+                <button onclick="newPresentation()"><i class="fas fa-file"></i> New</button>
+                <button onclick="savePresentation()"><i class="fas fa-save"></i> Save</button>
+                <button onclick="downloadPresentation()"><i class="fas fa-download"></i> Download</button>
+                <div class="sep"></div>
+                <button onclick="addSlide()"><i class="fas fa-plus"></i> Add Slide</button>
+                <button onclick="deleteSlide()"><i class="fas fa-trash"></i> Delete Slide</button>
+                <div class="sep"></div>
+                <button onclick="toggleToolMenu()"><i class="fas fa-times"></i> Close</button>
+            </div>
         </div>
 
         <div class="editor-area">
@@ -62,6 +107,10 @@
     <script>
         let slides = [];
         let currentSlide = 0;
+
+        function toggleToolMenu() { 
+            document.getElementById('toolMenu').classList.toggle('open'); 
+        }
 
         function init() {
             slides = [{ title: 'Slide 1', content: 'Enter your content...' }];
@@ -96,15 +145,16 @@
         }
 
         function goBack() { window.location.href = 'dashboard.html'; }
-        function newPresentation() { if (confirm('Create new presentation?')) { init(); } }
-        function addSlide() { saveSlide(); slides.push({ title: `Slide ${slides.length + 1}`, content: '' }); loadSlide(slides.length - 1); }
+        function newPresentation() { if (confirm('Create new presentation?')) { init(); toggleToolMenu(); } }
+        function addSlide() { saveSlide(); slides.push({ title: `Slide ${slides.length + 1}`, content: '' }); loadSlide(slides.length - 1); toggleToolMenu(); }
         function deleteSlide() {
             if (slides.length > 1) {
                 slides.splice(currentSlide, 1);
                 loadSlide(Math.min(currentSlide, slides.length - 1));
             }
+            toggleToolMenu();
         }
-        function savePresentation() { localStorage.setItem('ppt_presentation', JSON.stringify(slides)); showToast('Saved!', 'success'); }
+        function savePresentation() { localStorage.setItem('ppt_presentation', JSON.stringify(slides)); showToast('Saved!', 'success'); toggleToolMenu(); }
         function downloadPresentation() {
             const text = slides.map((s, i) => `SLIDE ${i+1}\n${s.title}\n${s.content}\n\n---\n\n`).join('');
             const blob = new Blob([text], {type:'text/plain'});
@@ -112,6 +162,7 @@
             a.href = URL.createObjectURL(blob);
             a.download = 'presentation.txt';
             a.click();
+            toggleToolMenu();
         }
 
         window.addEventListener('load', () => {
@@ -126,6 +177,14 @@
                 }
             } else {
                 init();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('toolMenu');
+            const hamburger = document.querySelector('.hamburger');
+            if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
+                menu.classList.remove('open');
             }
         });
     </script>

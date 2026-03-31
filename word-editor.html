@@ -13,19 +13,43 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { height: 100vh; display: flex; flex-direction: column; background: #f5f5f5; }
-        .editor-toolbar { background: white; border-bottom: 1px solid #ddd; padding: 12px 16px; display: flex; gap: 8px; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .toolbar-btn { padding: 8px 12px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 4px; font-size: 14px; transition: all 0.2s; }
+        .editor-toolbar { background: white; border-bottom: 1px solid #ddd; padding: 12px; display: flex; gap: 8px; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); flex-wrap: wrap; }
+        .toolbar-btn { padding: 8px 12px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 4px; font-size: 14px; transition: all 0.2s; white-space: nowrap; }
         .toolbar-btn:hover { background: #f0f0f0; }
-        .separator { width: 1px; height: 24px; background: #ddd; margin: 0 4px; }
+        .separator { width: 1px; height: 24px; background: #ddd; margin: 0 4px; display: none; }
+        .toolbar-menu { display: none; position: absolute; top: 50px; left: 12px; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; min-width: 200px; }
+        .toolbar-menu.open { display: block; }
+        .toolbar-menu button { display: block; width: 100%; text-align: left; padding: 10px 16px; border: none; background: none; cursor: pointer; font-size: 14px; }
+        .toolbar-menu button:hover { background: #f5f5f5; }
+        .toolbar-menu .sep { border-top: 1px solid #eee; margin: 4px 0; } 
+        .hamburger { display: none; background: none; border: none; font-size: 18px; cursor: pointer; color: #333; }
         .editor-content { flex: 1; overflow: hidden; display: flex; }
-        .editor-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .page { background: white; width: 100%; max-width: 900px; height: 1200px; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow-y: auto; border-radius: 2px; }
-        #editor { width: 100%; height: 100%; border: none; outline: none; font-family: 'Calibri', serif; font-size: 14px; line-height: 1.6; color: #333; resize: none; }
+        .editor-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; overflow-y: auto; }
+        .page { background: white; width: 100%; max-width: 900px; min-height: 800px; padding: 30px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-y: auto; border-radius: 2px; }
+        #editor { width: 100%; border: none; outline: none; font-family: 'Calibri', serif; font-size: 14px; line-height: 1.6; color: #333; resize: none; }
+        @media (max-width: 768px) {
+            .editor-toolbar { padding: 10px; }
+            .toolbar-btn { padding: 6px 10px; font-size: 12px; }
+            .toolbar-btn span { display: none; }
+            .toolbar-text { display: none; }
+            .separator { display: none; }
+            .hamburger { display: block; }
+            .page { padding: 16px 12px; min-height: 600px; }
+            #editor { font-size: 13px; }
+        }
+        @media (max-width: 480px) {
+            body { height: 100vh; }
+            .editor-toolbar { padding: 8px; }
+            .toolbar-btn { padding: 6px 8px; font-size: 11px; }
+            .page { padding: 12px; min-height: 400px; }
+            #editor { font-size: 13px; line-height: 1.5; }
+        }
     </style>
 </head>
 <body>
     <div class="editor-toolbar">
-        <button class="toolbar-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
+        <button class="hamburger" onclick="toggleToolMenu()"><i class="fas fa-bars"></i></button>
+        <button class="toolbar-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i><span class="toolbar-text"> Dashboard</span></button>
         <div class="separator"></div>
         <button class="toolbar-btn" onclick="newDoc()" title="New"><i class="fas fa-file"></i></button>
         <button class="toolbar-btn" onclick="saveDoc()" title="Save"><i class="fas fa-save"></i></button>
@@ -35,12 +59,24 @@
         <button class="toolbar-btn" onclick="formatCmd('italic')" title="Italic"><em>I</em></button>
         <button class="toolbar-btn" onclick="formatCmd('underline')" title="Underline"><u>U</u></button>
         <div class="separator"></div>
-        <select class="toolbar-btn" onchange="formatCmd('formatBlock', this.value); this.value='';">
+        <select class="toolbar-btn" onchange="formatCmd('formatBlock', this.value); this.value='';" title="Styles">
             <option value="">Paragraph</option>
             <option value="h1">Heading 1</option>
             <option value="h2">Heading 2</option>
             <option value="h3">Heading 3</option>
         </select>
+        <div id="toolMenu" class="toolbar-menu">
+            <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
+            <button onclick="newDoc()"><i class="fas fa-file"></i> New</button>
+            <button onclick="saveDoc()"><i class="fas fa-save"></i> Save</button>
+            <button onclick="downloadDoc()"><i class="fas fa-download"></i> Download</button>
+            <div class="sep"></div>
+            <button onclick="formatCmd('bold')"><strong>B</strong> Bold</button>
+            <button onclick="formatCmd('italic')"><em>I</em> Italic</button>
+            <button onclick="formatCmd('underline')"><u>U</u> Underline</button>
+            <div class="sep"></div>
+            <button onclick="toggleToolMenu()"><i class="fas fa-times"></i> Close</button>
+        </div>
     </div>
     
     <div class="editor-content">
@@ -55,15 +91,27 @@
     <script>
         const editor = document.getElementById('editor');
 
+        function toggleToolMenu() { 
+            document.getElementById('toolMenu').classList.toggle('open'); 
+        }
+
         function goBack() { window.location.href = 'dashboard.html'; }
-        function newDoc() { if(confirm('Create new document?')) { editor.innerHTML = ''; } }
-        function saveDoc() { localStorage.setItem('word_doc', editor.innerHTML); showToast('Saved!', 'success'); }
-        function downloadDoc() { const blob = new Blob([editor.innerHTML], {type:'text/html'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'document.docx'; a.click(); }
-        function formatCmd(cmd, val) { document.execCommand(cmd, false, val || null); editor.focus(); }
+        function newDoc() { if(confirm('Create new document?')) { editor.innerHTML = ''; toggleToolMenu(); } }
+        function saveDoc() { localStorage.setItem('word_doc', editor.innerHTML); showToast('Saved!', 'success'); toggleToolMenu(); }
+        function downloadDoc() { const blob = new Blob([editor.innerHTML], {type:'text/html'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'document.docx'; a.click(); toggleToolMenu(); }
+        function formatCmd(cmd, val) { document.execCommand(cmd, false, val || null); editor.focus(); toggleToolMenu(); }
 
         window.addEventListener('load', () => {
             const saved = localStorage.getItem('word_doc');
             if (saved) editor.innerHTML = saved;
+        });
+
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('toolMenu');
+            const hamburger = document.querySelector('.hamburger');
+            if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
+                menu.classList.remove('open');
+            }
         });
     </script>
 </body>
