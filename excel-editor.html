@@ -12,22 +12,25 @@
     <link rel="stylesheet" href="css/components.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { height: 100vh; display: flex; flex-direction: column; background: #f5f5f5; }
-        .toolbar { background: white; border-bottom: 1px solid #ddd; padding: 12px; display: flex; gap: 8px; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); flex-wrap: wrap; }
-        .toolbar button { padding: 8px 12px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 4px; font-size: 14px; transition: all 0.2s; white-space: nowrap; }
-        .toolbar button:hover { background: #f0f0f0; }
-        .separator { width: 1px; height: 24px; background: #ddd; margin: 0 4px; display: none; }
-        .toolbar-menu { display: none; position: absolute; top: 50px; left: 12px; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; min-width: 180px; }
+        body { height: 100vh; display: flex; flex-direction: column; background: white; }
+        .toolbar { background: white; border-bottom: 1px solid #ddd; padding: 8px 12px; display: flex; gap: 6px; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex-wrap: wrap; }
+        .toolbar button { padding: 6px 10px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 3px; font-size: 13px; transition: all 0.2s; white-space: nowrap; }
+        .toolbar button:hover { background: #f5f5f5; border-color: #999; }
+        .separator { width: 1px; height: 20px; background: #ddd; margin: 0 3px; display: none; }
+        .toolbar-menu { display: none; position: absolute; top: 45px; left: 12px; background: white; border: 1px solid #ddd; border-radius: 3px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 1000; min-width: 160px; }
         .toolbar-menu.open { display: block; }
-        .toolbar-menu button { display: block; width: 100%; text-align: left; padding: 10px 16px; border: none; background: none; cursor: pointer; font-size: 14px; }
+        .toolbar-menu button { display: block; width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; cursor: pointer; font-size: 13px; }
         .toolbar-menu button:hover { background: #f5f5f5; }
-        .toolbar-menu .sep { border-top: 1px solid #eee; margin: 4px 0; }
-        .hamburger { display: none; background: none; border: none; font-size: 18px; cursor: pointer; color: #333; }
-        .content { flex: 1; overflow: auto; }
-        .spreadsheet { display: inline-block; background: white; margin: 12px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .toolbar-menu .sep { border-top: 1px solid #eee; margin: 3px 0; }
+        .hamburger { display: none; background: none; border: none; font-size: 16px; cursor: pointer; color: #333; }
+        .content { flex: 1; overflow: auto; background: white; }
+        .spreadsheet { display: inline-block; background: white; margin: 0; border-radius: 0; box-shadow: none; }
         table { border-collapse: collapse; font-family: 'Segoe UI', sans-serif; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 13px; }
-        th { background: #4CAF50; color: white; font-weight: 600; }
+        th, td { border: 1px solid #ddd; padding: 6px; text-align: left; font-size: 12px; }
+        th { background: #f5f5f5; color: #333; font-weight: 600; }
+        td { background: white; }
+        input { width: 100%; border: none; padding: 2px; font-size: 12px; font-family: inherit; }
+        input:focus { outline: 2px solid #4CAF50; background: #fff9c4; }
         td { background: white; }
         input { width: 100%; border: none; padding: 0; font-size: 12px; }
         input:focus { outline: 2px solid #4CAF50; background: #fff9c4; }
