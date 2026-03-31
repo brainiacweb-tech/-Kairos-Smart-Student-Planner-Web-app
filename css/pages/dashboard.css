@@ -829,7 +829,7 @@ body.focus-mode .page-title {
   }
 
   .main-content {
-    margin-top: 75px;
+    margin-top: 80px;
     padding: var(--spacing-md);
     width: 100%;
     position: relative;
@@ -901,5 +901,10 @@ body.focus-mode .page-title {
   .card {
     padding: var(--spacing-md);
   }
-}}
+
+  .main-content {
+    padding: var(--spacing-sm);
+    margin-top: 80px;
+  }
+}
 
