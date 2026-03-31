@@ -628,22 +628,6 @@ textarea {
   margin: 0;
 }
 
-.navbar-toggle {
-  display: none;
-  background: transparent;
-  border: none;
-  color: var(--text);
-  font-size: 1.3rem;
-  cursor: pointer;
-  padding: var(--spacing-sm);
-  border-radius: var(--radius-md);
-  transition: background-color var(--transition-fast);
-}
-
-.navbar-toggle:hover {
-  background-color: var(--surface);
-}
-
 .navbar-right {
   display: flex;
   align-items: center;
@@ -743,10 +727,6 @@ textarea {
 
 /* Mobile sidebar toggle */
 @media (max-width: 767px) {
-  .navbar-toggle {
-    display: block;
-  }
-
   .sidebar {
     transform: translateX(-100%);
     width: 100%;
