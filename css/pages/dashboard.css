@@ -266,19 +266,27 @@
 }
 
 .sidebar-logo-icon {
-  width: 2rem;
-  height: 2rem;
+  width: 3.5rem;
+  height: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--primary);
+  background: transparent;
 }
 
 .sidebar-logo-icon svg {
   width: 100%;
   height: 100%;
-  max-width: 40px;
-  max-height: 40px;
+  max-width: 56px;
+  max-height: 56px;
+}
+
+.sidebar-logo-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: transparent;
 }
 
 .sidebar-logo-text {
