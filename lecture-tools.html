@@ -438,6 +438,70 @@
             .notes-list {
                 max-height: 300px;
             }
+        @media (max-width: 480px) {
+            .lecture-tools-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+
+            .lecture-tool-card {
+                padding: var(--spacing-sm);
+            }
+
+            .lecture-tool-header {
+                gap: var(--spacing-sm);
+                margin-bottom: var(--spacing-md);
+                flex-wrap: wrap;
+            }
+
+            .lecture-tool-icon {
+                font-size: 1.2rem;
+                width: 35px;
+                height: 35px;
+            }
+
+            .lecture-tool-title {
+                font-size: 1rem;
+            }
+
+            .note-input {
+                min-height: 80px;
+                font-size: 16px;
+            }
+
+            .password-input {
+                font-size: 16px;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-sm);
+            }
+
+            .stat-mini {
+                padding: var(--spacing-sm);
+            }
+
+            .stat-mini-value {
+                font-size: 1.25rem;
+            }
+
+            .stat-mini-label {
+                font-size: 0.8rem;
+            }
+
+            .notes-list {
+                max-height: 250px;
+            }
+
+            .recording-controls {
+                flex-wrap: wrap;
+            }
+
+            .recording-controls button {
+                flex: 1;
+                min-width: 120px;
+            }
         }
     </style>
 </head>
@@ -587,10 +651,10 @@
                         </div>
 
                         <div style="border-top: 1px solid var(--border); padding-top: var(--spacing-md); margin-top: var(--spacing-md); margin-bottom: var(--spacing-md);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--spacing-md); flex-wrap: wrap; gap: var(--spacing-md);">
                                 <h3 style="margin: 0; font-size: 0.95rem;">Settings</h3>
                                 <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
-                                    <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer; font-size: 0.9rem;">
+                                    <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer; font-size: 0.9rem; white-space: nowrap;">
                                         <input type="checkbox" id="passwordProtectToggle" onchange="togglePasswordProtect()">
                                         <i class="fas fa-lock"></i> Password Protect
                                     </label>

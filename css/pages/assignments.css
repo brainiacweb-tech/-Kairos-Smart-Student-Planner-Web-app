@@ -491,6 +491,22 @@
 }
 
 @media (max-width: 767px) {
+  .assignments-header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: stretch;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .assignments-title {
+    font-size: 1.25rem;
+  }
+
+  .add-assignment-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .filter-bar {
     padding: var(--spacing-md);
     gap: var(--spacing-sm);
@@ -504,6 +520,14 @@
   .filter-group select {
     font-size: 16px;
     min-height: 44px;
+  }
+
+  .view-toggle {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .view-toggle button {
+    flex: 1;
   }
 
   .assignment-card-body {
@@ -550,4 +574,68 @@
     width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .assignments-header {
+    gap: var(--spacing-sm);
+  }
+
+  .assignments-title {
+    font-size: 1.1rem;
+  }
+
+  .filter-bar {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-xs);
+  }
+
+  .filter-group {
+    min-width: 100%;
+  }
+
+  .filter-group label {
+    font-size: 0.85rem;
+  }
+
+  .filter-group input,
+  .filter-group select {
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  .view-toggle button {
+    font-size: 0.85rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .assignment-card-header {
+    padding: var(--spacing-md);
+  }
+
+  .assignment-card-body {
+    padding: var(--spacing-sm);
+  }
+
+  .assignment-card-footer {
+    padding: var(--spacing-sm);
+  }
+
+  .assignment-card-title {
+    font-size: 1rem;
+  }
+
+  .assignment-meta {
+    gap: var(--spacing-md);
+    font-size: 0.85rem;
+  }
+
+  .detail-label {
+    font-size: 0.8rem;
+  }
+
+  .detail-value {
+    font-size: 0.9rem;
+  }
+}
+
 

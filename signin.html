@@ -36,8 +36,13 @@
 
             <form class="auth-form" id="signinForm">
                 <div class="auth-form-group">
-                    <label for="email">Email Address or Username</label>
-                    <input type="text" id="email" name="email" placeholder="Enter your email or username" required>
+                    <label for="fullname">Full Name</label>
+                    <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="auth-form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
                 </div>
 
                 <div class="auth-form-group">
@@ -116,18 +121,19 @@
     <script>
         document.getElementById('signinForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            const fullname = document.getElementById('fullname').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
-            if (!email || !password) {
-                showToast('Please enter both email and password', 'error');
+            if (!fullname || !email || !password) {
+                showToast('Please fill in all fields', 'error');
                 return;
             }
 
             // Store user in localStorage
             localStorage.setItem('kairos_user', JSON.stringify({
                 email: email,
-                name: email.split('@')[0],
+                name: fullname,
                 logged_in: true,
                 signin_time: new Date().toISOString()
             }));
