@@ -6,7 +6,6 @@
 function initTheme() {
     const savedTheme = localStorage.getItem('kairos_theme') || 'light-mode';
     document.body.className = savedTheme;
-    updateThemeToggle(savedTheme === 'dark-mode');
 }
 
 function toggleTheme() {
@@ -17,14 +16,6 @@ function toggleTheme() {
     document.body.classList.add(newTheme);
     
     localStorage.setItem('kairos_theme', newTheme);
-    updateThemeToggle(!isDark);
-}
-
-function updateThemeToggle(isDark) {
-    const toggles = document.querySelectorAll('.theme-toggle');
-    toggles.forEach(toggle => {
-        toggle.classList.toggle('dark', isDark);
-    });
 }
 
 // Toast Notifications
@@ -316,12 +307,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupTabs();
     initMotivationalQuote();
     setupOAuthHandlers();
-    
-    // Setup theme toggle handlers
-    const themeToggles = document.querySelectorAll('.theme-toggle');
-    themeToggles.forEach(toggle => {
-        toggle.addEventListener('click', toggleTheme);
-    });
     
     // Setup logout
     const logoutBtn = document.querySelector('[data-action="logout"]');
