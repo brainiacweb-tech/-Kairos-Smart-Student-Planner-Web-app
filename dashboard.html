@@ -185,7 +185,7 @@
                 </div>
 
                 <!-- CALENDAR SECTION -->
-                <div class="calendar card" style="margin-top: var(--spacing-2xl); max-width: 400px;">
+                <div class="calendar card" style="margin-top: var(--spacing-2xl); max-width: 450px;">
                     <div style="padding: var(--spacing-lg);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
                             <div>
@@ -197,17 +197,19 @@
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; margin-bottom: var(--spacing-md);">
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Sun</div>
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Mon</div>
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Tue</div>
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Wed</div>
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Thu</div>
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Fri</div>
-                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary);">Sat</div>
+                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;">
+                            <!-- Day headers -->
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Sun</div>
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Mon</div>
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Tue</div>
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Wed</div>
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Thu</div>
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Fri</div>
+                            <div style="font-weight: bold; padding: 8px 0; color: var(--text-secondary); text-align: center; font-size: 0.85rem;">Sat</div>
+                            
+                            <!-- Calendar dates -->
+                            <div class="calendar-dates" id="dates" style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;"></div>
                         </div>
-
-                        <div class="calendar-dates" id="dates" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;"></div>
                     </div>
                 </div>
 

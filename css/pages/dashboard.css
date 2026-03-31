@@ -610,11 +610,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 40px;
+  min-height: 45px;
   border-radius: 6px;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 1rem;
   transition: all 0.2s ease;
+  aspect-ratio: 1;
 }
 
 .calendar-dates div:not(:empty) {

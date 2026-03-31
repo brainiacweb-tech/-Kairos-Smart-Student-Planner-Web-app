@@ -135,6 +135,9 @@ function renderCalendar() {
     for (let i = 0; i < firstDay; i++) {
         const emptyDiv = document.createElement("div");
         emptyDiv.style.visibility = "hidden";
+        emptyDiv.style.display = "flex";
+        emptyDiv.style.alignItems = "center";
+        emptyDiv.style.justifyContent = "center";
         datesContainer.appendChild(emptyDiv);
     }
 
@@ -146,8 +149,9 @@ function renderCalendar() {
         div.style.display = "flex";
         div.style.alignItems = "center";
         div.style.justifyContent = "center";
-        div.style.padding = "10px";
+        div.style.padding = "8px";
         div.style.minHeight = "45px";
+        div.style.aspectRatio = "1";
         div.style.borderRadius = "6px";
         div.style.cursor = "pointer";
         div.style.fontSize = "1rem";
@@ -159,9 +163,11 @@ function renderCalendar() {
 
         // Hover effect
         div.addEventListener("mouseenter", () => {
-            div.style.backgroundColor = "#007bff";
-            div.style.color = "white";
-            div.style.border = "1px solid #0056b3";
+            if (!div.classList.contains("today")) {
+                div.style.backgroundColor = "#007bff";
+                div.style.color = "white";
+                div.style.border = "1px solid #0056b3";
+            }
         });
         div.addEventListener("mouseleave", () => {
             if (!div.classList.contains("today")) {
