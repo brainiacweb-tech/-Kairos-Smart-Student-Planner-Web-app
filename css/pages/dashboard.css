@@ -266,8 +266,8 @@
 }
 
 .sidebar-logo-icon {
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 5rem;
+  height: 5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -278,8 +278,8 @@
 .sidebar-logo-icon svg {
   width: 100%;
   height: 100%;
-  max-width: 56px;
-  max-height: 56px;
+  max-width: 80px;
+  max-height: 80px;
 }
 
 .sidebar-logo-icon img {
