@@ -7,6 +7,7 @@ let filteredAssignments = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
+    setupSidebarToggle();
     populateFilters();
     applyFilters();
 });

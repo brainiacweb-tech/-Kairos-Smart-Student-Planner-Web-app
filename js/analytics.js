@@ -6,6 +6,7 @@ let charts = {};
 
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
+    setupSidebarToggle();
     
     // Ensure mock data is initialized
     if (!localStorage.getItem('kairos_assignments')) {

@@ -675,6 +675,7 @@ class TimetableManager {
 let timetableManager;
 
 document.addEventListener('DOMContentLoaded', () => {
+    setupSidebarToggle();
     timetableManager = new TimetableManager();
 });
 

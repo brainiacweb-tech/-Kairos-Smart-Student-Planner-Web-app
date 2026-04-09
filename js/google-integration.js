@@ -369,6 +369,7 @@ function loadGoogleIntegrationSettings() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    setupSidebarToggle();
     // Only initialize if Google API script is loaded
     if (typeof gapi !== 'undefined') {
         initGoogleAPI();
