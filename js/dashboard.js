@@ -406,48 +406,6 @@ function getNewTip() {
 }
 
 /* ===========================
-   NEW FEATURES - GPA / CWA TOGGLE
-   =========================== */
-
-let calcMode = 'gpa'; // 'gpa' or 'cwa'
-
-function toggleGPACWA() {
-    calcMode = calcMode === 'gpa' ? 'cwa' : 'gpa';
-    updateCalcDisplay();
-    showToast(`Switched to ${calcMode.toUpperCase()} view`, 'info');
-}
-
-function updateCalcDisplay() {
-    const calcTitle = document.getElementById('calcTitle');
-    const switchLabel = document.getElementById('switchLabel');
-    const currentValue = document.getElementById('currentValue');
-    const currentLabel = document.getElementById('currentLabel');
-    const targetValue = document.getElementById('targetValue');
-    const targetLabel = document.getElementById('targetLabel');
-    const configBtn = document.getElementById('configBtn');
-    
-    if (calcMode === 'cwa') {
-        calcTitle.textContent = 'Quick CWA';
-        switchLabel.textContent = 'GPA';
-        currentLabel.textContent = 'Current CWA';
-        targetLabel.textContent = 'Target CWA';
-        currentValue.textContent = '74.5';
-        targetValue.textContent = '80.0';
-        configBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> CWA→GPA Converter';
-        configBtn.onclick = () => window.location.href = 'cwa-to-gpa.html';
-    } else {
-        calcTitle.textContent = 'Quick GPA';
-        switchLabel.textContent = 'CWA';
-        currentLabel.textContent = 'Current GPA';
-        targetLabel.textContent = 'Target GPA';
-        currentValue.textContent = '3.8';
-        targetValue.textContent = '4.0';
-        configBtn.innerHTML = '<i class="fas fa-cog"></i> Configure';
-        configBtn.onclick = () => openGPACalculator();
-    }
-}
-
-/* ===========================
    NEW FEATURES - GPA CALCULATOR
    =========================== */
 
