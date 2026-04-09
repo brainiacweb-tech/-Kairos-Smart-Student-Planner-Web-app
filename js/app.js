@@ -179,7 +179,15 @@ function setupSidebarToggle() {
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('active');
             document.body.classList.toggle('sidebar-open');
+            toggleBtn.classList.toggle('active');
         });
+        
+        // Function to close sidebar and reset hamburger
+        function closeSidebarAndReset() {
+            sidebar.classList.remove('active');
+            document.body.classList.remove('sidebar-open');
+            toggleBtn.classList.remove('active');
+        }
         
         // Close sidebar when clicking on nav links and navigate after animation
         const navLinks = document.querySelectorAll('.sidebar-nav .nav-item');
@@ -188,8 +196,7 @@ function setupSidebarToggle() {
                 const href = link.getAttribute('href');
                 if (href) {
                     e.preventDefault();
-                    sidebar.classList.remove('active');
-                    document.body.classList.remove('sidebar-open');
+                    closeSidebarAndReset();
                     // Navigate after sidebar animation completes
                     setTimeout(() => {
                         window.location.href = href;
@@ -202,16 +209,14 @@ function setupSidebarToggle() {
         const logoutBtn = document.querySelector('.sidebar-footer .nav-item');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
-                sidebar.classList.remove('active');
-                document.body.classList.remove('sidebar-open');
+                closeSidebarAndReset();
             });
         }
         
-        // Close sidebar when clicking outside
+        // Close sidebar and reset hamburger when clicking outside
         document.addEventListener('click', (e) => {
             if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
-                sidebar.classList.remove('active');
-                document.body.classList.remove('sidebar-open');
+                closeSidebarAndReset();
             }
         });
     }

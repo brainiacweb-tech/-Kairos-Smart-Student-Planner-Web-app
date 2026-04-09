@@ -40,6 +40,25 @@
   font-size: 1.5rem;
   cursor: pointer;
   display: none;
+  transition: all var(--transition-fast);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-toggle:hover {
+  background: var(--surface);
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+.navbar-toggle.active {
+  background: var(--primary);
+  color: white;
 }
 
 .navbar-title {
