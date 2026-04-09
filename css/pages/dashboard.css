@@ -45,7 +45,6 @@
   border-radius: var(--radius-md);
   width: 40px;
   height: 40px;
-  display: flex;
   align-items: center;
   justify-content: center;
 }
@@ -917,7 +916,7 @@ body.focus-mode .page-title {
   }
 
   .navbar-toggle {
-    display: block;
+    display: flex;
   }
 
   .navbar-title {
