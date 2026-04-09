@@ -7,7 +7,6 @@ let currentDate = new Date();
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
-    setupSidebarToggle();
     updateStats();
     renderDeadlines();
     renderCalendar();

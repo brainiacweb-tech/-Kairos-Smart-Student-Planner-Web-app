@@ -4,7 +4,6 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
-    setupSidebarToggle();
     loadProfile();
 });
 

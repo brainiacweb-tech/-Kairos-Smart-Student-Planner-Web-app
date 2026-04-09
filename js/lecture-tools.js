@@ -12,7 +12,6 @@ let isPasswordProtected = false;
 
 // Initialize Lecture Tools
 document.addEventListener('DOMContentLoaded', function() {
-    setupSidebarToggle();
     loadNotesFromStorage();
     loadRecordingsFromStorage();
     updateStats();

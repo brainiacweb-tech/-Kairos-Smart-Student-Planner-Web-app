@@ -6,7 +6,6 @@ let processedFiles = JSON.parse(localStorage.getItem('kairos_pdf_history') || '[
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    setupSidebarToggle();
     checkAuth();
 });
 

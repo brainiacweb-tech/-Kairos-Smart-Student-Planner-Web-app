@@ -52,7 +52,6 @@ function getClassification(fgpa) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    setupSidebarToggle();
     checkAuth();
     document.getElementById('targetGPA').value = targetCWA;
     renderCourses();
