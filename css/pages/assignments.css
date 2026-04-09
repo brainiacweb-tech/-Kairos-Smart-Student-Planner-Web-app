@@ -11,7 +11,7 @@
 
 .assignments-content {
   flex: 1;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   width: 100%;
 }
 
@@ -23,10 +23,11 @@
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
   display: flex;
-  gap: var(--spacing-md);
+  flex-direction: column;
+  gap: var(--spacing-sm);
   align-items: flex-end;
   flex-wrap: wrap;
 }
@@ -36,7 +37,8 @@
   flex-direction: column;
   gap: var(--spacing-sm);
   flex: 1;
-  min-width: 200px;
+  width: 100%;
+  min-width: auto;
 }
 
 .filter-group label {
@@ -48,11 +50,15 @@
 .filter-group input,
 .filter-group select {
   width: 100%;
+  font-size: 16px;
+  min-height: 44px;
 }
 
 .filter-actions {
   display: flex;
   gap: var(--spacing-sm);
+  width: 100%;
+  justify-content: flex-end;
 }
 
 .btn-reset {
@@ -77,8 +83,7 @@
 
 .view-toggle {
   display: flex;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-lg);
+  width: 100%;
 }
 
 .view-toggle button {
@@ -91,6 +96,9 @@
   transition: all var(--transition-fast);
   font-weight: 600;
   font-family: var(--font-primary);
+  flex: 1-fast);
+  font-weight: 600;
+  font-family: var(--font-primary);
 }
 
 .view-toggle button.active {
@@ -101,21 +109,24 @@
 
 /* ===========================
    HEADER ROW
-   =========================== */
-
-.assignments-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  align-items: stretch;
   margin-bottom: var(--spacing-lg);
 }
 
 .assignments-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text);
 }
 
+.add-assignment-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  justify-content: center
 .add-assignment-btn {
   display: flex;
   align-items: center;
@@ -146,7 +157,7 @@
 }
 
 .assignment-card-header {
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
@@ -182,10 +193,10 @@
 
 .assignment-badges {
   display: flex;
-  gap: var(--spacing-sm);
-  flex-wrap: wrap;
-}
-
+  gap: var(--spacing-sm);md);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-sm
 .assignment-card-body {
   padding: var(--spacing-lg);
   display: grid;
@@ -222,14 +233,10 @@
   border-radius: var(--radius-md);
   border-left: 3px solid var(--primary);
   font-size: 0.9rem;
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
-.assignment-card-footer {
-  padding: var(--spacing-lg);
+  color: var(--text-seconmd);
   border-top: 1px solid var(--border);
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
   gap: var(--spacing-md);
@@ -239,10 +246,18 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+  width: 100%
+
+.assignment-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
 }
 
 .assignment-checkbox {
   width: 24px;
+  width: 100%;
+  justify-content: space-around;
   height: 24px;
   cursor: pointer;
 }
@@ -256,8 +271,8 @@
   width: 2rem;
   height: 2rem;
 }
-
-/* ===========================
+1fr;
+  gap: var(--spacing-md=======
    ASSIGNMENT GRID VIEW
    =========================== */
 
@@ -271,7 +286,7 @@
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
@@ -407,8 +422,13 @@
   color: var(--success);
   font-size: 0.85rem;
   margin-top: var(--spacing-xs);
+}flex-direction: column-reverse;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
 }
 
+.modal-footer button {
+  width: 100%
 .modal-footer {
   display: flex;
   gap: var(--spacing-md);
@@ -451,36 +471,9 @@
   left: 15px;
   width: 40px;
   height: 40px;
-  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><g opacity="0.08"><circle cx="10" cy="10" r="2" fill="currentColor"/><circle cx="30" cy="10" r="2" fill="currentColor"/><circle cx="10" cy="30" r="2" fill="currentColor"/><circle cx="30" cy="30" r="2" fill="currentColor"/><line x1="10" y1="20" x2="30" y2="20" stroke="currentColor" stroke-width="1"/></g></svg>');
-  background-size: cover;
-  pointer-events: none;
-}
-
-/* ===========================
-   RESPONSIVE
-   =========================== */
-
-/* Large screens - expand layouts */
+  background: url('keep mobile layout */
 @media (min-width: 1600px) {
-  .assignment-card-body {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-lg);
-  }
-
-  .assignments-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  }
-}
-
-@media (max-width: 1024px) {
-  .filter-bar {
-    flex-direction: column;
-  }
-
-  .filter-group {
-    width: 100%;
-    min-width: auto;
-  }
+  /* Keep mobile-like layout on large screens */
 
   .filter-actions {
     width: 100%;
