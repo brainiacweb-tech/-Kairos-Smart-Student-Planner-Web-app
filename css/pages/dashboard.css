@@ -319,7 +319,7 @@
 .main-content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -328,19 +328,21 @@
 
 .page-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  align-items: stretch;
   margin-bottom: var(--spacing-lg);
 }
 
 .page-title {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--text);
 }
 
 .page-actions {
   display: flex;
+  flex-direction: column;
   gap: var(--spacing-md);
 }
 
@@ -350,7 +352,7 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  grid-template-columns: 1fr;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }
@@ -445,7 +447,7 @@
 
 .deadlines-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: 1fr;
   gap: var(--spacing-md);
 }
 
@@ -799,26 +801,7 @@ body.focus-mode .page-title {
 
 /* Responsive for larger screens */
 @media (min-width: 1600px) {
-  .sidebar {
-    width: 270px;
-  }
-
-  .nav-label {
-    font-size: 1rem;
-  }
-
-  .page-title {
-    font-size: 1.5rem;
-  }
-
-  /* Restore 2-column grids on large screens */
-  [style*="grid-template-columns: 1fr 1fr"] {
-    grid-template-columns: 1fr 1fr !important;
-  }
-
-  [style*="minmax(250px, 1fr)"] {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
-  }
+  /* Keep mobile-like single-column layout on large screens */
 }
 
 @media (max-width: 1024px) {
