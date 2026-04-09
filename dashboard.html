@@ -266,23 +266,28 @@
                         </button>
                     </div>
 
-                    <!-- GPA CALCULATOR -->
+                    <!-- GPA / CWA CALCULATOR -->
                     <div class="card feature-card">
-                        <div class="card-header" style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
-                            <i class="fas fa-calculator" style="color: var(--success); font-size: 1.5rem;"></i>
-                            <h3 style="margin: 0;">Quick GPA</h3>
+                        <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-lg);">
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <i class="fas fa-calculator" style="color: var(--success); font-size: 1.5rem;"></i>
+                                <h3 style="margin: 0;" id="calcTitle">Quick GPA</h3>
+                            </div>
+                            <button class="btn btn-sm btn-ghost" onclick="toggleGPACWA()" title="Switch between GPA and CWA" style="font-size: 0.75rem;">
+                                <i class="fas fa-exchange-alt"></i> <span id="switchLabel">CWA</span>
+                            </button>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
                             <div style="text-align: center; padding: var(--spacing-md); background: rgba(46, 213, 115, 0.1); border-radius: var(--radius-lg);">
-                                <div style="font-size: 2rem; font-weight: 700; color: var(--success);">3.8</div>
-                                <div style="font-size: 0.8rem; color: var(--text-secondary);">Current GPA</div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--success);" id="currentValue">3.8</div>
+                                <div style="font-size: 0.8rem; color: var(--text-secondary);" id="currentLabel">Current GPA</div>
                             </div>
                             <div style="text-align: center; padding: var(--spacing-md); background: rgba(108, 99, 255, 0.1); border-radius: var(--radius-lg);">
-                                <div style="font-size: 2rem; font-weight: 700; color: var(--primary);">4.0</div>
-                                <div style="font-size: 0.8rem; color: var(--text-secondary);">Target GPA</div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--primary);" id="targetValue">4.0</div>
+                                <div style="font-size: 0.8rem; color: var(--text-secondary);" id="targetLabel">Target GPA</div>
                             </div>
                         </div>
-                        <button class="btn btn-outline" style="width: 100%; margin-top: var(--spacing-md);" onclick="openGPACalculator()">
+                        <button class="btn btn-outline" style="width: 100%; margin-top: var(--spacing-md);" id="configBtn" onclick="openGPACalculator()">
                             <i class="fas fa-cog"></i> Configure
                         </button>
                     </div>
