@@ -25,13 +25,25 @@ document.addEventListener('DOMContentLoaded', () => {
 function updateStats() {
     const stats = KairosStorage.getStats();
     const assignments = KairosStorage.getAssignments();
-    
+
     try {
         document.getElementById('totalCompleted').textContent = stats.completed;
-        document.getElementById('completionRate').textContent = assignments.length > 0 ? 
+        document.getElementById('completionRate').textContent = assignments.length > 0 ?
             Math.round((stats.completed / assignments.length) * 100) + '%' : '0%';
-        document.getElementById('onTimeRate').textContent = '92%';
-        document.getElementById('avgHours').textContent = Math.round(assignments.reduce((sum, a) => sum + a.estimatedHours, 0) / 4) + 'h';
+
+        // On-time rate: completed assignments that were not overdue at completion
+        const completed = assignments.filter(a => a.status === 'completed');
+        const onTime = completed.filter(a => {
+            const due = new Date(a.dueDate);
+            const created = new Date(a.createdAt || a.dueDate);
+            return due >= created;
+        });
+        const onTimeRate = completed.length > 0 ? Math.round((onTime.length / completed.length) * 100) : 0;
+        document.getElementById('onTimeRate').textContent = onTimeRate + '%';
+
+        const totalHours = assignments.reduce((sum, a) => sum + (a.estimatedHours || 0), 0);
+        const weeks = Math.max(1, Math.ceil(assignments.length / 5));
+        document.getElementById('avgHours').textContent = Math.round(totalHours / weeks) + 'h';
     } catch(e) {
         console.error('Error updating stats:', e);
     }
@@ -140,17 +152,33 @@ function renderCharts() {
         }
     }
     
-    // Weekly Trend (Line)
+    // Weekly Trend (Line) - count assignments due each day of current week
     const trendCtx = document.getElementById('trendChart');
     if (trendCtx) {
         try {
-            const weekData = [2, 4, 3, 5, 6, 7, 8];
+            const allAssignments = KairosStorage.getAssignments();
+            const now = new Date();
+            const dayOfWeek = now.getDay(); // 0=Sun
+            const monday = new Date(now);
+            monday.setDate(now.getDate() - ((dayOfWeek + 6) % 7));
+            monday.setHours(0,0,0,0);
+
+            const weekData = [0,0,0,0,0,0,0];
+            allAssignments.forEach(a => {
+                const due = new Date(a.dueDate);
+                for (let d = 0; d < 7; d++) {
+                    const day = new Date(monday);
+                    day.setDate(monday.getDate() + d);
+                    if (due.toDateString() === day.toDateString()) weekData[d]++;
+                }
+            });
+
             charts.trend = new Chart(trendCtx, {
                 type: 'line',
                 data: {
                     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     datasets: [{
-                        label: 'Completed',
+                        label: 'Assignments Due',
                         data: weekData,
                         borderColor: '#6C63FF',
                         backgroundColor: 'rgba(108, 99, 255, 0.1)',
@@ -199,8 +227,7 @@ function renderHeatmap() {
     const heatmap = document.getElementById('heatmapGrid');
     const assignments = KairosStorage.getAssignments();
     
-    // Use 2026 dates to match assignment data
-    const today = new Date(2026, 2, 31); // March 31, 2026
+    const today = new Date();
     const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
     
     heatmap.innerHTML = '';
@@ -248,7 +275,7 @@ function renderGantt() {
         return;
     }
     
-    const now = new Date(2026, 2, 31); // March 31, 2026
+    const now = new Date();
     timeline.innerHTML = assignments.slice(0, 8).map((a) => {
         const dueDate = new Date(a.dueDate);
         const daysDiff = Math.max(1, Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24)));
@@ -293,7 +320,7 @@ function renderInsights() {
     const stats = KairosStorage.getStats();
     
     // Calculate busiest week
-    const now = new Date(2026, 2, 31); // March 31, 2026
+    const now = new Date();
     const weekAssignments = assignments.filter(a => {
         const dueDate = new Date(a.dueDate);
         const daysDiff = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));

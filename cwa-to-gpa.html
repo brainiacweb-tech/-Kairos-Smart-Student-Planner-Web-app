@@ -327,16 +327,16 @@
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(76, 175, 80, 0.1);">
                                     <td style="padding: var(--spacing-md);">70.00 – 100.00</td>
                                     <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #4CAF50;">4.00</td>
-                                    <td style="padding: var(--spacing-md);">First Class (Excellent)</td>
+                                    <td style="padding: var(--spacing-md);">First Class</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(52, 168, 224, 0.1);">
                                     <td style="padding: var(--spacing-md);">65.00 – 69.99</td>
-                                    <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #34A8E0;">3.50 – 3.99</td>
+                                    <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #34A8E0;">3.50</td>
                                     <td style="padding: var(--spacing-md);">Second Class (Upper)</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(52, 168, 224, 0.05);">
                                     <td style="padding: var(--spacing-md);">60.00 – 64.99</td>
-                                    <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #34A8E0;">3.00 – 3.49</td>
+                                    <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #34A8E0;">3.00</td>
                                     <td style="padding: var(--spacing-md);">Second Class (Upper)</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(255, 152, 0, 0.1);">
@@ -346,13 +346,13 @@
                                 </tr>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(255, 152, 0, 0.05);">
                                     <td style="padding: var(--spacing-md);">50.00 – 54.99</td>
-                                    <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #FF9800;">1.00</td>
-                                    <td style="padding: var(--spacing-md);">Third Class</td>
+                                    <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #FF9800;">2.00</td>
+                                    <td style="padding: var(--spacing-md);">Second Class (Lower)</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(255, 193, 7, 0.1);">
                                     <td style="padding: var(--spacing-md);">45.00 – 49.99</td>
                                     <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #FFC107;">1.50</td>
-                                    <td style="padding: var(--spacing-md);">Pass</td>
+                                    <td style="padding: var(--spacing-md);">Third Class</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(255, 193, 7, 0.05);">
                                     <td style="padding: var(--spacing-md);">40.00 – 44.99</td>
@@ -424,41 +424,37 @@
             }
             
             // Convert CWA to GPA using KNUST scale
-            let gpa, gpaRange, degreeClass;
-            
-            if (cwa >= 80) {
+            let gpa, degreeClass;
+
+            if (cwa >= 70) {
                 gpa = 4.00;
-                gpaRange = '4.00 (Excellent)';
                 degreeClass = 'First Class';
-            } else if (cwa >= 75) {
-                gpa = 3.5 + ((cwa - 75) / 5) * 0.49;
-                gpaRange = `${gpa.toFixed(2)} (3.50 – 3.99)`;
-                degreeClass = 'Second Class (Upper)';
-            } else if (cwa >= 70) {
-                gpa = 3.0 + ((cwa - 70) / 5) * 0.49;
-                gpaRange = `${gpa.toFixed(2)} (3.00 – 3.49)`;
-                degreeClass = 'Second Class (Upper)';
             } else if (cwa >= 65) {
-                gpa = 2.5 + ((cwa - 65) / 5) * 0.49;
-                gpaRange = `${gpa.toFixed(2)} (2.50 – 2.99)`;
-                degreeClass = 'Second Class (Lower)';
+                gpa = 3.50;
+                degreeClass = 'Second Class (Upper)';
             } else if (cwa >= 60) {
-                gpa = 2.0 + ((cwa - 60) / 5) * 0.49;
-                gpaRange = `${gpa.toFixed(2)} (2.00 – 2.49)`;
+                gpa = 3.00;
+                degreeClass = 'Second Class (Upper)';
+            } else if (cwa >= 55) {
+                gpa = 2.50;
                 degreeClass = 'Second Class (Lower)';
             } else if (cwa >= 50) {
-                gpa = 1.0 + ((cwa - 50) / 10) * 0.99;
-                gpaRange = `${gpa.toFixed(2)} (1.00 – 1.99)`;
+                gpa = 2.00;
+                degreeClass = 'Second Class (Lower)';
+            } else if (cwa >= 45) {
+                gpa = 1.50;
+                degreeClass = 'Third Class';
+            } else if (cwa >= 40) {
+                gpa = 1.00;
                 degreeClass = 'Pass';
             } else {
-                gpa = 0.0;
-                gpaRange = '0.00 (Fail)';
+                gpa = 0.00;
                 degreeClass = 'Fail';
             }
             
             // Update display
             document.getElementById('gpaResult').textContent = gpa.toFixed(2);
-            document.getElementById('gpaDescription').textContent = gpaRange;
+            document.getElementById('gpaDescription').textContent = `GPA equivalent on the 4.0 scale`;
             document.getElementById('degreeResult').textContent = degreeClass;
             document.getElementById('degreeDescription').textContent = `Your CWA of ${cwa.toFixed(2)}% maps to this classification`;
         }

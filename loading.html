@@ -6,266 +6,275 @@
     <title>Kairos - Loading</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: white;
+            background: #0f0c29;
             font-family: 'Poppins', sans-serif;
             overflow: hidden;
         }
 
-        /* Stationary Doodle Background */
-        .doodle-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            opacity: 0.08;
+        /* Gradient background */
+        .bg-gradient {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
             z-index: 0;
         }
 
-        .doodle-shape {
+        /* Floating orbs */
+        .orb {
             position: absolute;
-            opacity: 0.12;
-        }
-
-        .doodle-circle {
-            width: 300px;
-            height: 300px;
-            border: 3px solid #6c63ff;
             border-radius: 50%;
-            top: 5%;
-            right: 10%;
+            filter: blur(80px);
+            opacity: 0.25;
+            animation: orbFloat var(--dur, 8s) ease-in-out infinite;
+            animation-delay: var(--delay, 0s);
         }
 
-        .doodle-square {
-            width: 150px;
-            height: 150px;
-            border: 3px solid #2ed573;
-            bottom: 15%;
-            left: 5%;
-            transform: rotate(45deg);
-        }
-
-        .doodle-line {
-            width: 400px;
-            height: 3px;
+        .orb-1 {
+            width: 500px; height: 500px;
             background: #6c63ff;
-            top: 30%;
-            left: -50px;
-            transform: rotate(-25deg);
+            top: -150px; left: -150px;
+            --dur: 10s;
         }
 
-        .doodle-dots {
-            display: flex;
-            gap: 15px;
-            bottom: 10%;
-            right: 15%;
-        }
-
-        .dot {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
+        .orb-2 {
+            width: 400px; height: 400px;
             background: #2ed573;
-            border: 2px solid #6c63ff;
+            bottom: -120px; right: -100px;
+            --dur: 12s;
+            --delay: -4s;
         }
 
-        .doodle-triangle {
-            width: 0;
-            height: 0;
-            border-left: 75px solid transparent;
-            border-right: 75px solid transparent;
-            border-bottom: 130px solid #6c63ff;
-            top: 60%;
-            right: 5%;
+        .orb-3 {
+            width: 300px; height: 300px;
+            background: #a855f7;
+            top: 40%; left: 60%;
+            --dur: 9s;
+            --delay: -2s;
         }
 
-        /* Loading Container */
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33%       { transform: translate(30px, -30px) scale(1.05); }
+            66%       { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        /* Subtle grid overlay */
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 1;
+        }
+
+        /* Main container */
         .loading-container {
+            position: relative;
+            z-index: 10;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            z-index: 10;
-            position: relative;
+            gap: 0;
+            animation: fadeIn 0.6s ease forwards;
         }
 
-        /* Logo Animation */
-        .logo-wrapper {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Logo area */
+        .logo-area {
             position: relative;
-            width: 180px;
-            height: 180px;
-            margin-bottom: 40px;
-            animation: float 3s ease-in-out infinite;
+            width: 160px;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 36px;
+        }
+
+        /* Spinning gradient ring */
+        .ring-outer {
+            position: absolute;
+            inset: -14px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #6c63ff, #a855f7, #2ed573, #6c63ff);
+            animation: spin 2.4s linear infinite;
+            padding: 3px;
+        }
+
+        .ring-outer::before {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 50%;
+            background: #1a1738;
+        }
+
+        /* Pulse ring */
+        .ring-pulse {
+            position: absolute;
+            inset: -22px;
+            border-radius: 50%;
+            border: 2px solid rgba(108, 99, 255, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .ring-pulse-2 {
+            position: absolute;
+            inset: -36px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(108, 99, 255, 0.15);
+            animation: pulse 2s ease-in-out infinite 0.4s;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1);   opacity: 0.5; }
+            50%       { transform: scale(1.06); opacity: 1; }
         }
 
         .logo-img {
-            width: 100%;
-            height: 100%;
+            width: 130px;
+            height: 130px;
             object-fit: contain;
-            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.2));
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 0 20px rgba(108, 99, 255, 0.5));
+            animation: logoFloat 4s ease-in-out infinite;
         }
 
-        /* Animated Ring */
-        .loading-ring {
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            border-top: 4px solid rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            animation: spin 2s linear infinite;
-            top: -10px;
-            left: -10px;
-        }
-
-        /* Loading Text */
-        .loading-text {
-            color: #333;
-            font-size: 1.2rem;
-            font-weight: 600;
-            text-align: center;
-            margin-top: 20px;
-            letter-spacing: 2px;
-        }
-
-        .loading-dots {
-            display: inline-block;
-            margin-left: 8px;
-        }
-
-        .loading-dots span {
-            animation: blink 1.4s infinite;
-            color: #6c63ff;
-        }
-
-        .loading-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .loading-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        /* Tagline */
-        .loading-tagline {
-            color: #666;
-            font-size: 0.95rem;
-            font-style: italic;
-            margin-top: 15px;
-            letter-spacing: 0.5px;
-        }
-
-        /* Animations */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes float {
+        @keyframes logoFloat {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+            50%       { transform: translateY(-8px); }
         }
 
-        @keyframes blink {
-            0%, 20%, 50%, 80%, 100% { opacity: 1; }
-            40% { opacity: 0.3; }
-            60% { opacity: 0.3; }
+        /* App name */
+        .app-name {
+            color: #ffffff;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            background: linear-gradient(90deg, #ffffff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .app-tagline {
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 0.78rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 48px;
+        }
+
+        /* Progress bar */
+        .progress-track {
+            width: 220px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 18px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #6c63ff, #2ed573);
+            box-shadow: 0 0 10px rgba(108, 99, 255, 0.6);
+            transition: width 0.1s linear;
+        }
+
+        /* Status text */
+        .status-text {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.7rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            min-height: 18px;
+            transition: opacity 0.3s ease;
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .logo-wrapper {
-                width: 130px;
-                height: 130px;
-            }
-
-            .loading-ring {
-                width: 150px;
-                height: 150px;
-                top: -10px;
-                left: -10px;
-                border: 3px solid rgba(255, 255, 255, 0.2);
-                border-top: 3px solid rgba(255, 255, 255, 0.8);
-            }
-
-            .loading-text {
-                font-size: 1rem;
-            }
-
-            .doodle-circle { width: 200px; height: 200px; }
-            .doodle-square { width: 100px; height: 100px; }
+        @media (max-width: 480px) {
+            .logo-area { width: 120px; height: 120px; }
+            .logo-img  { width: 95px; height: 95px; }
+            .app-name  { font-size: 1.5rem; letter-spacing: 4px; }
+            .progress-track { width: 170px; }
         }
     </style>
 </head>
 <body>
-    <!-- Stationary Doodle Background -->
-    <div class="doodle-bg">
-        <div class="doodle-shape doodle-circle"></div>
-        <div class="doodle-shape doodle-square"></div>
-        <div class="doodle-shape doodle-line"></div>
-        <div class="doodle-shape doodle-triangle"></div>
-        <div class="doodle-shape doodle-dots">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        </div>
-    </div>
+    <div class="bg-gradient"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-overlay"></div>
 
-    <!-- Loading Screen -->
     <div class="loading-container">
-        <div class="logo-wrapper">
-            <div class="loading-ring"></div>
+        <div class="logo-area">
+            <div class="ring-pulse-2"></div>
+            <div class="ring-pulse"></div>
+            <div class="ring-outer"></div>
             <img src="1000669890-Photoroom.png" alt="Kairos Logo" class="logo-img">
         </div>
-        <div class="loading-text">
-            Preparing
-            <span class="loading-dots">
-                <span>.</span>
-                <span>.</span>
-                <span>.</span>
-            </span>
+
+        <div class="app-name">Kairos</div>
+        <div class="app-tagline">Act at the right time</div>
+
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
         </div>
-        <p class="loading-tagline">Act at the right time</p>
+        <div class="status-text" id="statusText">Initializing</div>
     </div>
 
     <script>
-        // Get target from URL parameter
+        const fill       = document.getElementById('progressFill');
+        const statusText = document.getElementById('statusText');
+
+        const steps = [
+            { pct: 20,  label: 'Loading assets'    },
+            { pct: 50,  label: 'Setting up'        },
+            { pct: 75,  label: 'Almost ready'      },
+            { pct: 95,  label: 'Finalizing'        },
+            { pct: 100, label: 'Let\'s go!'        },
+        ];
+
+        let current = 0;
+        const interval = setInterval(() => {
+            if (current >= steps.length) { clearInterval(interval); return; }
+            fill.style.width       = steps[current].pct + '%';
+            statusText.textContent = steps[current].label;
+            current++;
+        }, 420);
+
+        // Redirect logic
         const urlParams = new URLSearchParams(window.location.search);
-        const target = urlParams.get('target') || 'dashboard';
+        const target    = urlParams.get('target') || 'dashboard';
 
-        // Auto-redirect after 2.5 seconds
-        setTimeout(() => {
-            if (target === 'login') {
-                window.location.href = 'index.html';
-            } else if (target === 'signup') {
-                window.location.href = 'signup.html';
-            } else if (target === 'signin') {
-                window.location.href = 'signin.html';
-            } else {
-                // Check if user is logged in
-                const isLoggedIn = localStorage.getItem('isLoggedIn');
-                const userName = localStorage.getItem('userName');
-                
-                if (isLoggedIn && userName) {
-                    window.location.href = 'dashboard.html';
-                } else {
-                    window.location.href = 'index.html';
-                }
-            }
-        }, 2500);
-
-        // Allow user to skip loading by clicking
-        document.addEventListener('click', () => {
+        function redirect() {
             if (target === 'login') {
                 window.location.href = 'index.html';
             } else if (target === 'signup') {
@@ -274,15 +283,13 @@
                 window.location.href = 'signin.html';
             } else {
                 const isLoggedIn = localStorage.getItem('isLoggedIn');
-                const userName = localStorage.getItem('userName');
-                
-                if (isLoggedIn && userName) {
-                    window.location.href = 'dashboard.html';
-                } else {
-                    window.location.href = 'index.html';
-                }
+                const userName   = localStorage.getItem('userName');
+                window.location.href = (isLoggedIn && userName) ? 'dashboard.html' : 'index.html';
             }
-        });
+        }
+
+        setTimeout(redirect, 2500);
+        document.addEventListener('click', redirect);
     </script>
 </body>
 </html>
