@@ -1,237 +1,987 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kairos - PowerPoint Presentation</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/components.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { height: 100vh; display: flex; background: white; color: #333; }
-        .sidebar { width: 160px; background: #f9f9f9; border-right: 1px solid #ddd; overflow-y: auto; padding: 8px; }
-        .slide-thumb { width: 140px; height: 85px; margin: 4px 0; background: white; border: 2px solid #ddd; border-radius: 2px; cursor: pointer; overflow: hidden; font-size: 11px; color: #333; display: flex; align-items: center; justify-content: center; padding: 3px; text-align: center; }
-        .slide-thumb.active { border-color: #4CAF50; }
-        .main { flex: 1; display: flex; flex-direction: column; }
-        .toolbar { background: white; border-bottom: 1px solid #ddd; padding: 8px 12px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .toolbar button { padding: 6px 10px; border: 1px solid #ddd; background: white; color: #333; cursor: pointer; border-radius: 3px; font-size: 13px; transition: all 0.2s; white-space: nowrap; }
-        .toolbar button:hover { background: #f5f5f5; border-color: #aaa; }
-        .toolbar select { padding: 6px 8px; border: 1px solid #ddd; background: white; color: #333; cursor: pointer; border-radius: 3px; font-size: 13px; font-family: inherit; }
-        .toolbar select:hover { background: #f5f5f5; }
-        .color-picker { width: 30px; height: 30px; padding: 2px; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; }
-        .separator { width: 1px; height: 20px; background: #ddd; margin: 0 3px; display: none; }
-        .toolbar-menu { display: none; position: absolute; top: 45px; left: 12px; background: white; border: 1px solid #ddd; border-radius: 3px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 1000; min-width: 160px; }
-        .toolbar-menu.open { display: block; }
-        .toolbar-menu button { display: block; width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; color: #333; cursor: pointer; font-size: 13px; }
-        .toolbar-menu button:hover { background: #f5f5f5; }
-        .toolbar-menu .sep { border-top: 1px solid #eee; margin: 3px 0; }
-        .hamburger { display: none; background: none; border: none; font-size: 16px; cursor: pointer; color: #333; }
-        .editor-area { flex: 1; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 8px; background: white; }
-        .slide { width: 750px; height: 562px; background: white; color: #333; border-radius: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 36px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #ddd; }
-        #slideTitle { color: #333; background: white; border: 1px solid #ccc; padding: 8px; font-size: 28px; font-weight: bold; }
-        #slideContent { color: #333; background: white; font-size: 14px; line-height: 1.5; }
-        @media (max-width: 1024px) {
-            .sidebar { width: 140px; }
-            .slide-thumb { width: 120px; height: 75px; font-size: 10px; }
-            .slide { width: 600px; height: 450px; padding: 30px; font-size: 13px; }
-            #slideTitle { font-size: 24px; }
-        }
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #ddd; padding: 6px; display: flex; gap: 6px; overflow-x: auto; }
-            .slide-thumb { width: 110px; height: 65px; margin: 0; flex-shrink: 0; font-size: 9px; }
-            .toolbar { padding: 8px; }
-            .toolbar button { padding: 5px 8px; font-size: 12px; }
-            .toolbar button span { display: none; }
-            .separator { display: none; }
-            .hamburger { display: block; }
-            .editor-area { padding: 6px; }
-            .slide { width: 100%; height: auto; max-width: 480px; min-height: 290px; padding: 20px; }
-            #slideTitle { font-size: 18px; }
-            #slideContent { font-size: 12px; }
-        }
-        @media (max-width: 480px) {
-            .sidebar { width: 100%; }
-            .slide-thumb { width: 90px; height: 55px; }
-            .toolbar { padding: 6px; }
-            .toolbar button { padding: 4px 6px; font-size: 10px; }
-            .editor-area { padding: 4px; }
-            .slide { width: 100%; max-width: 100%; min-height: 240px; padding: 12px; }
-            #slideTitle { font-size: 16px; }
-            #slideContent { font-size: 12px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presentation1 - PowerPoint</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ppt-red:#C44529;
+  --ppt-red-dark:#a33820;
+  --ppt-orange:#D04500;
+  --ribbon-bg:#fff;
+  --ribbon-border:#d1d1d1;
+  --slide-bg:#f0f0f0;
+  --panel-bg:#2d2d2d;
+  --thumb-border:#555;
+  --thumb-active:#c44529;
+  --text:#333;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex;flex-direction:column;background:#fff;color:var(--text)}
+
+/* ===== TITLE BAR ===== */
+.title-bar{background:var(--ppt-red);color:white;height:36px;display:flex;align-items:center;padding:0 8px;flex-shrink:0;user-select:none;gap:0}
+.title-app-icon{width:28px;height:28px;background:white;color:var(--ppt-red);font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;border-radius:2px;margin-right:8px;font-family:'Times New Roman',serif}
+.qat{display:flex;align-items:center;gap:2px;margin-right:12px}
+.qat-btn{width:26px;height:26px;background:transparent;border:none;color:white;cursor:pointer;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:12px;transition:background .15s}
+.qat-btn:hover{background:rgba(255,255,255,.2)}
+.title-center{flex:1;text-align:center;font-size:13px;font-weight:400;opacity:.95;pointer-events:none}
+.title-right{display:flex;align-items:center;gap:4px}
+.title-right button{background:rgba(255,255,255,.15);border:none;color:white;padding:4px 10px;cursor:pointer;font-size:12px;border-radius:3px;font-weight:500;font-family:inherit;transition:background .15s;display:flex;align-items:center;gap:5px}
+.title-right button:hover{background:rgba(255,255,255,.28)}
+.winctrls{display:flex;gap:0;margin-left:8px}
+.winctrl{width:32px;height:32px;background:transparent;border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:background .15s}
+.winctrl:hover{background:rgba(255,255,255,.2)}
+.winctrl.close:hover{background:#e81123}
+
+/* ===== RIBBON ===== */
+.ribbon{background:var(--ribbon-bg);border-bottom:1px solid var(--ribbon-border);flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.ribbon-tabs-row{display:flex;align-items:flex-end;padding:0 8px;border-bottom:1px solid #e0e0e0}
+.ribbon-tab{padding:8px 14px 7px;background:transparent;border:none;font-size:12px;font-weight:400;color:#555;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;font-family:inherit}
+.ribbon-tab:hover{color:#111}
+.ribbon-tab.active{color:var(--ppt-red);border-bottom-color:var(--ppt-red);font-weight:600}
+.ribbon-tab.file-tab{background:var(--ppt-red);color:white;border-radius:2px 2px 0 0;padding:8px 16px 7px;font-weight:600;margin-right:4px}
+.ribbon-tab.file-tab:hover{background:var(--ppt-red-dark)}
+.ribbon-content{display:none;padding:4px 8px 0;align-items:flex-end;gap:2px;min-height:72px}
+.ribbon-content.active{display:flex}
+.ribbon-group{display:flex;flex-direction:column;align-items:center;border-right:1px solid var(--ribbon-border);padding:2px 6px 0;min-width:0}
+.ribbon-group:last-child{border-right:none}
+.ribbon-group-btns{display:flex;align-items:flex-end;gap:1px;flex-wrap:wrap}
+.ribbon-group-label{font-size:10px;color:#888;padding:3px 0 4px;text-align:center;width:100%}
+.rb{background:transparent;border:1px solid transparent;cursor:pointer;border-radius:2px;transition:all .12s;font-family:inherit;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:3px 5px;min-width:36px;height:58px;font-size:11px}
+.rb:hover{background:#e8e8e8;border-color:#c8c8c8}
+.rb.pressed{background:#fde8e4;border-color:#f0a898}
+.rb i{font-size:18px;color:#444}
+.rb span{font-size:10px;color:#444;white-space:nowrap;line-height:1}
+.rb-sm{background:transparent;border:1px solid transparent;cursor:pointer;border-radius:2px;transition:all .12s;font-family:inherit;color:var(--text);display:flex;align-items:center;justify-content:center;padding:4px 6px;height:24px;min-width:24px;font-size:12px}
+.rb-sm:hover{background:#e8e8e8;border-color:#c8c8c8}
+.rb-sm.pressed{background:#fde8e4;border-color:#f0a898}
+.rb-row{display:flex;align-items:center;gap:1px}
+.rb-col{display:flex;flex-direction:column;gap:1px}
+.font-combo{height:24px;padding:0 4px;border:1px solid #bbb;background:white;font-size:11px;border-radius:2px;cursor:pointer;font-family:inherit;color:var(--text);outline:none}
+.font-combo:hover,.font-combo:focus{border-color:#999}
+#pptFont{width:110px}
+#pptSize{width:44px}
+
+/* ===== MAIN AREA ===== */
+.editor-body{flex:1;display:flex;overflow:hidden}
+
+/* ===== SLIDE PANEL ===== */
+.slide-panel{width:180px;background:#3c3c3c;border-right:2px solid #222;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}
+.slide-panel-header{padding:8px 10px;font-size:11px;color:#aaa;font-weight:600;border-bottom:1px solid #555;display:flex;align-items:center;justify-content:space-between}
+.slide-panel-header button{background:none;border:none;color:#aaa;cursor:pointer;font-size:13px;transition:color .15s}
+.slide-panel-header button:hover{color:white}
+.slide-list{flex:1;padding:8px 8px;display:flex;flex-direction:column;gap:8px}
+.slide-thumb-wrap{position:relative;cursor:pointer}
+.slide-thumb-num{position:absolute;left:-18px;top:50%;transform:translateY(-50%);font-size:10px;color:#888;width:14px;text-align:right}
+.slide-thumb{
+  width:160px;height:90px;
+  border:2px solid var(--thumb-border);
+  border-radius:2px;
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;
+  font-size:9px;color:#555;
+  transition:border-color .15s,box-shadow .15s;
+  position:relative;
+  flex-shrink:0;
+}
+.slide-thumb:hover{border-color:#999;box-shadow:0 0 6px rgba(255,255,255,.1)}
+.slide-thumb.active{border-color:var(--thumb-active);box-shadow:0 0 0 2px rgba(196,69,41,.4)}
+.slide-thumb .thumb-title{font-size:10px;font-weight:700;text-align:center;padding:4px 6px;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#222}
+.slide-thumb .thumb-body{font-size:7.5px;text-align:center;padding:2px 6px;width:100%;overflow:hidden;color:#444;max-height:48px}
+.slide-thumb-actions{display:flex;gap:4px;margin-top:4px;justify-content:center}
+.thumb-action-btn{background:none;border:none;color:#999;cursor:pointer;font-size:11px;padding:2px 4px;border-radius:2px;transition:color .15s}
+.thumb-action-btn:hover{color:white;background:#555}
+
+/* ===== CANVAS AREA ===== */
+.canvas-area{flex:1;background:#555;display:flex;flex-direction:column;overflow:hidden}
+.canvas-toolbar{height:32px;background:#484848;border-bottom:1px solid #333;display:flex;align-items:center;padding:0 12px;gap:6px;flex-shrink:0}
+.canvas-toolbar-btn{background:none;border:1px solid transparent;color:#ccc;cursor:pointer;padding:3px 8px;border-radius:2px;font-size:11px;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:4px}
+.canvas-toolbar-btn:hover{background:#666;border-color:#777;color:white}
+.canvas-toolbar-btn.active{background:#c44529;color:white;border-color:#a33820}
+.canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:20px}
+.slide-canvas{
+  width:800px;height:450px;
+  background:white;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  position:relative;
+  overflow:hidden;
+  flex-shrink:0;
+  border-radius:1px;
+}
+.slide-element{
+  position:absolute;
+  cursor:move;
+  user-select:none;
+}
+.slide-element .el-content{
+  width:100%;height:100%;
+  border:1px solid transparent;
+  padding:6px 10px;
+  outline:none;
+  background:transparent;
+  font-family:inherit;
+  resize:none;
+  overflow:hidden;
+}
+.slide-element:hover .el-content,
+.slide-element.selected .el-content{border-color:#c44529;border-style:dashed}
+.slide-element.selected .el-content{border-style:solid;background:rgba(255,255,255,.5)}
+.slide-element .resize-handle{
+  position:absolute;width:8px;height:8px;
+  background:#c44529;border:1px solid white;
+  border-radius:50%;cursor:se-resize;
+  bottom:-4px;right:-4px;display:none;
+}
+.slide-element.selected .resize-handle{display:block}
+.el-title{font-size:32px;font-weight:700;color:#1a1a1a;text-align:center}
+.el-subtitle{font-size:16px;color:#555;text-align:center}
+.el-body{font-size:14px;color:#333;line-height:1.7}
+.el-shape{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+
+/* ===== NOTES ===== */
+.notes-area{height:110px;background:#fff;border-top:2px solid #ccc;flex-shrink:0;display:flex;flex-direction:column}
+.notes-label{padding:4px 12px;font-size:11px;color:#888;border-bottom:1px solid #eee;background:#f9f9f9;flex-shrink:0}
+.notes-input{flex:1;border:none;padding:8px 12px;font-size:12px;font-family:inherit;color:#333;outline:none;resize:none;background:#fff}
+
+/* ===== STATUS BAR ===== */
+.status-bar{height:24px;background:#f0f0f0;border-top:1px solid #d1d1d1;display:flex;align-items:center;padding:0 12px;gap:12px;font-size:11px;color:#666;flex-shrink:0}
+.status-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.zoom-slider{-webkit-appearance:none;width:80px;height:3px;border-radius:2px;background:#ccc;outline:none;cursor:pointer}
+.zoom-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--ppt-red);cursor:pointer}
+
+/* ===== THEME PICKER ===== */
+.theme-grid{display:flex;flex-wrap:wrap;gap:6px;padding:8px}
+.theme-swatch{width:52px;height:36px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:border-color .15s;display:flex;align-items:flex-end;justify-content:center;padding-bottom:3px;font-size:8px;font-weight:700;color:rgba(0,0,0,.6);overflow:hidden}
+.theme-swatch:hover{border-color:#c44529}
+.theme-swatch.active{border-color:#c44529;box-shadow:0 0 0 2px rgba(196,69,41,.3)}
+
+/* ===== FILE MENU ===== */
+.file-menu-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 16px;border:none;background:none;cursor:pointer;font-size:12px;font-family:inherit;color:#333;text-align:left}
+.file-menu-item:hover{background:#f0f0f0}
+.file-menu-item i{width:16px;color:#666}
+
+/* ===== LAYOUT PICKER ===== */
+.layout-grid{display:flex;flex-wrap:wrap;gap:8px;padding:10px}
+.layout-card{width:90px;height:60px;border:2px solid #ddd;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;font-size:9px;color:#555;transition:all .15s;background:#fafafa;text-align:center;padding:4px}
+.layout-card:hover{border-color:#c44529;background:#fde8e4}
+
+/* ===== MODAL ===== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:2000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:white;border-radius:4px;box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;min-width:320px}
+.modal-header{background:#f3f2f1;padding:12px 16px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:13px}
+.modal-close-btn{background:none;border:none;cursor:pointer;font-size:16px;color:#666}
+
+@media(max-width:900px){
+  .slide-panel{width:130px}
+  .slide-thumb{width:120px;height:68px}
+  .slide-canvas{width:600px;height:337px}
+  #pptFont{width:80px}
+  .rb span{display:none}.rb{min-width:28px}
+}
+@media(max-width:600px){
+  .slide-panel{display:none}
+  .slide-canvas{width:100%;height:auto;min-height:200px}
+}
+</style>
 </head>
 <body>
-    <!-- SLIDE THUMBNAILS PANEL -->
-    <div class="sidebar">
-        <div style="padding: 12px 8px; border-bottom: 1px solid #333; margin-bottom: 8px; font-size: 12px; font-weight: 600;">Slides</div>
-        <div id="slideList"></div>
+
+<!-- TITLE BAR -->
+<div class="title-bar">
+  <div class="title-app-icon">P</div>
+  <div class="qat">
+    <button class="qat-btn" onclick="savePresentation()" title="Save"><i class="fas fa-save"></i></button>
+    <button class="qat-btn" onclick="undoAction()" title="Undo"><i class="fas fa-undo"></i></button>
+    <button class="qat-btn" onclick="redoAction()" title="Redo"><i class="fas fa-redo"></i></button>
+  </div>
+  <div class="title-center"><span id="presNameDisplay">Presentation1</span> — PowerPoint</div>
+  <div class="title-right">
+    <button onclick="startSlideShow()" title="Slide Show"><i class="fas fa-play"></i> Slide Show</button>
+    <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
+  </div>
+  <div class="winctrls">
+    <button class="winctrl">&#x2212;</button>
+    <button class="winctrl">&#x25A1;</button>
+    <button class="winctrl close" onclick="goBack()">&#x2715;</button>
+  </div>
+</div>
+
+<!-- RIBBON -->
+<div class="ribbon">
+  <div class="ribbon-tabs-row">
+    <button class="ribbon-tab file-tab" onclick="toggleFileMenu()">File</button>
+    <button class="ribbon-tab active" onclick="switchTab('home',this)">Home</button>
+    <button class="ribbon-tab" onclick="switchTab('insert',this)">Insert</button>
+    <button class="ribbon-tab" onclick="switchTab('design',this)">Design</button>
+    <button class="ribbon-tab" onclick="switchTab('transitions',this)">Transitions</button>
+    <button class="ribbon-tab" onclick="switchTab('slideshow',this)">Slide Show</button>
+    <button class="ribbon-tab" onclick="switchTab('view3',this)">View</button>
+  </div>
+
+  <!-- HOME TAB -->
+  <div class="ribbon-content active" id="tab-home">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="addSlide()" title="New Slide"><i class="fas fa-plus-square"></i><span>New Slide</span></button>
+        <button class="rb" onclick="openLayoutPicker()" title="Layout"><i class="fas fa-th-large"></i><span>Layout</span></button>
+        <button class="rb" onclick="duplicateSlide()" title="Duplicate"><i class="fas fa-copy"></i><span>Duplicate</span></button>
+        <button class="rb" onclick="deleteSlide()" title="Delete Slide"><i class="fas fa-trash"></i><span>Delete</span></button>
+      </div>
+      <div class="ribbon-group-label">Slides</div>
     </div>
-
-    <!-- MAIN EDITOR -->
-    <div class="main">
-        <div class="toolbar">
-            <button class="hamburger" onclick="toggleToolMenu()"><i class="fas fa-bars"></i></button>
-            <button onclick="goBack()"><i class="fas fa-arrow-left"></i></button>
-            <div class="separator"></div>
-            <button onclick="newPresentation()" title="New"><i class="fas fa-file"></i></button>
-            <button onclick="savePresentation()" title="Save"><i class="fas fa-save"></i></button>
-            <button onclick="downloadPresentation()" title="Download"><i class="fas fa-download"></i></button>
-            <div class="separator"></div>
-            <select id="fontFamily" onchange="setSlideFont()" title="Font Family">
-                <option value="">Font</option>
-                <option value="Arial">Arial</option>
-                <option value="'Times New Roman'">Times New Roman</option>
-                <option value="Georgia">Georgia</option>
-                <option value="Courier New">Courier New</option>
-                <option value="Verdana">Verdana</option>
-                <option value="'Comic Sans MS'">Comic Sans</option>
-            </select>
-            <select id="fontSize" onchange="setSlideFontSize()" title="Font Size">
-                <option value="">Size</option>
-                <option value="14px">14</option>
-                <option value="16px">16</option>
-                <option value="18px">18</option>
-                <option value="20px">20</option>
-                <option value="24px">24</option>
-                <option value="28px">28</option>
-                <option value="32px">32</option>
-            </select>
-            <input type="color" id="fontColor" class="color-picker" title="Font Color" onchange="setSlideFontColor()">
-            <div class="separator"></div>
-            <button onclick="addSlide()" title="Add Slide"><i class="fas fa-plus"></i></button>
-            <button onclick="deleteSlide()" title="Delete"><i class="fas fa-trash"></i></button>
-            <div id="toolMenu" class="toolbar-menu">
-                <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
-                <button onclick="newPresentation()"><i class="fas fa-file"></i> New</button>
-                <button onclick="savePresentation()"><i class="fas fa-save"></i> Save</button>
-                <button onclick="downloadPresentation()"><i class="fas fa-download"></i> Download</button>
-                <div class="sep"></div>
-                <button onclick="addSlide()"><i class="fas fa-plus"></i> Add Slide</button>
-                <button onclick="deleteSlide()"><i class="fas fa-trash"></i> Delete Slide</button>
-                <div class="sep"></div>
-                <button onclick="toggleToolMenu()"><i class="fas fa-times"></i> Close</button>
-            </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns rb-col">
+        <div class="rb-row">
+          <select class="font-combo" id="pptFont" onchange="applyTextStyle('font',this.value)">
+            <option>Calibri</option><option>Arial</option><option>Times New Roman</option>
+            <option>Georgia</option><option>Verdana</option><option>Impact</option>
+            <option>Courier New</option><option>Trebuchet MS</option>
+          </select>
+          <select class="font-combo" id="pptSize" onchange="applyTextStyle('size',this.value)">
+            <option>12</option><option>14</option><option>16</option><option>18</option>
+            <option selected>24</option><option>28</option><option>32</option>
+            <option>36</option><option>40</option><option>48</option><option>60</option><option>72</option>
+          </select>
         </div>
-
-        <div class="editor-area">
-            <div class="slide">
-                <input type="text" id="slideTitle" placeholder="Slide Title">
-                <textarea id="slideContent" placeholder="Slide content..." style="flex: 1; resize: none; padding: 16px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; font-family: inherit;"></textarea>
+        <div class="rb-row">
+          <button class="rb-sm" id="btn-pptB" onclick="applyTextStyle('bold')" title="Bold"><b>B</b></button>
+          <button class="rb-sm" id="btn-pptI" onclick="applyTextStyle('italic')" title="Italic"><i>I</i></button>
+          <button class="rb-sm" id="btn-pptU" onclick="applyTextStyle('underline')" title="Underline"><u>U</u></button>
+          <button class="rb-sm" onclick="applyTextStyle('shadow')" title="Shadow"><i class="fas fa-clone"></i></button>
+          <div class="rb-sm" title="Font Color" style="position:relative">
+            <div style="display:flex;flex-direction:column;align-items:center;padding:2px 4px;cursor:pointer" onclick="pickTextColor()">
+              <span style="font-weight:700;font-size:12px">A</span>
+              <div id="pptFontColorBar" style="width:16px;height:4px;background:#FF0000;border-radius:1px;margin-top:1px"></div>
+              <input type="color" id="pptFontColorPicker" value="#FF0000" style="position:absolute;opacity:0;width:100%;height:100%;cursor:pointer" onchange="applyTextColor()">
             </div>
+          </div>
         </div>
+      </div>
+      <div class="ribbon-group-label">Font</div>
     </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb-sm" onclick="applyTextStyle('alignLeft')" title="Left"><i class="fas fa-align-left"></i></button>
+        <button class="rb-sm" onclick="applyTextStyle('alignCenter')" title="Center"><i class="fas fa-align-center"></i></button>
+        <button class="rb-sm" onclick="applyTextStyle('alignRight')" title="Right"><i class="fas fa-align-right"></i></button>
+        <button class="rb-sm" onclick="applyTextStyle('bullet')" title="Bullets"><i class="fas fa-list-ul"></i></button>
+      </div>
+      <div class="ribbon-group-label">Paragraph</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="addTextBox()" title="Text Box"><i class="fas fa-font"></i><span>Text Box</span></button>
+        <button class="rb" onclick="insertShape('rect')" title="Rectangle"><i class="fas fa-square"></i><span>Rectangle</span></button>
+        <button class="rb" onclick="insertShape('ellipse')" title="Oval"><i class="fas fa-circle"></i><span>Oval</span></button>
+        <button class="rb" onclick="insertShape('arrow')" title="Arrow"><i class="fas fa-arrow-right"></i><span>Arrow</span></button>
+      </div>
+      <div class="ribbon-group-label">Drawing</div>
+    </div>
+  </div>
 
-    <script src="js/app.js"></script>
-    <script>
-        let slides = [];
-        let currentSlide = 0;
+  <!-- INSERT TAB -->
+  <div class="ribbon-content" id="tab-insert">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="addTextBox()"><i class="fas fa-font"></i><span>Text Box</span></button>
+        <button class="rb" onclick="insertShape('rect')"><i class="fas fa-square"></i><span>Rectangle</span></button>
+        <button class="rb" onclick="insertShape('ellipse')"><i class="fas fa-circle"></i><span>Circle</span></button>
+        <button class="rb" onclick="insertShape('triangle')"><i class="fas fa-play" style="transform:rotate(-90deg)"></i><span>Triangle</span></button>
+        <button class="rb" onclick="insertShape('star')"><i class="fas fa-star"></i><span>Star</span></button>
+      </div>
+      <div class="ribbon-group-label">Illustrations</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="insertImagePrompt()"><i class="fas fa-image"></i><span>Image</span></button>
+      </div>
+      <div class="ribbon-group-label">Images</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="insertTable()"><i class="fas fa-table"></i><span>Table</span></button>
+        <button class="rb" onclick="insertDivider()"><i class="fas fa-minus"></i><span>Divider</span></button>
+      </div>
+      <div class="ribbon-group-label">Tables</div>
+    </div>
+  </div>
 
-        function toggleToolMenu() { 
-            document.getElementById('toolMenu').classList.toggle('open'); 
-        }
+  <!-- DESIGN TAB -->
+  <div class="ribbon-content" id="tab-design">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <div id="themeGallery" style="display:flex;gap:5px;flex-wrap:wrap;max-width:380px"></div>
+      </div>
+      <div class="ribbon-group-label">Themes</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:10px;color:#888">Slide Background</label>
+          <input type="color" id="slideBgColor" value="#ffffff" onchange="applySlideBackground()" style="width:60px;height:24px;border:1px solid #bbb;border-radius:2px;cursor:pointer;padding:1px">
+        </div>
+      </div>
+      <div class="ribbon-group-label">Background</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="setAspectRatio('16:9')"><i class="fas fa-desktop"></i><span>16:9</span></button>
+        <button class="rb" onclick="setAspectRatio('4:3')"><i class="fas fa-square"></i><span>4:3</span></button>
+      </div>
+      <div class="ribbon-group-label">Slide Size</div>
+    </div>
+  </div>
 
-        function init() {
-            slides = [{ title: 'Slide 1', content: 'Enter your content...' }];
-            renderSlides();
-            loadSlide(0);
-        }
+  <!-- TRANSITIONS TAB -->
+  <div class="ribbon-content" id="tab-transitions">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb pressed" onclick="setTransition('none')" id="tr-none"><i class="fas fa-ban"></i><span>None</span></button>
+        <button class="rb" onclick="setTransition('fade')" id="tr-fade"><i class="fas fa-adjust"></i><span>Fade</span></button>
+        <button class="rb" onclick="setTransition('slide')" id="tr-slide"><i class="fas fa-arrow-right"></i><span>Push</span></button>
+        <button class="rb" onclick="setTransition('zoom')" id="tr-zoom"><i class="fas fa-expand-alt"></i><span>Zoom</span></button>
+        <button class="rb" onclick="setTransition('flip')" id="tr-flip"><i class="fas fa-sync"></i><span>Flip</span></button>
+      </div>
+      <div class="ribbon-group-label">Transition to This Slide</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="applyTransitionAll()"><i class="fas fa-layer-group"></i><span>Apply to All</span></button>
+      </div>
+      <div class="ribbon-group-label">Timing</div>
+    </div>
+  </div>
 
-        function renderSlides() {
-            const list = document.getElementById('slideList');
-            list.innerHTML = '';
-            slides.forEach((s, i) => {
-                const div = document.createElement('div');
-                div.className = 'slide-thumb' + (i === currentSlide ? ' active' : '');
-                div.textContent = s.title || `Slide ${i + 1}`;
-                div.onclick = () => { saveSlide(); loadSlide(i); };
-                list.appendChild(div);
-            });
-        }
+  <!-- SLIDE SHOW TAB -->
+  <div class="ribbon-content" id="tab-slideshow">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="startSlideShow()"><i class="fas fa-play-circle"></i><span>From Beginning</span></button>
+        <button class="rb" onclick="startSlideShowCurrent()"><i class="fas fa-play"></i><span>From Current</span></button>
+      </div>
+      <div class="ribbon-group-label">Start Slide Show</div>
+    </div>
+  </div>
 
-        function loadSlide(i) {
-            currentSlide = i;
-            document.getElementById('slideTitle').value = slides[i].title;
-            document.getElementById('slideContent').value = slides[i].content;
-            renderSlides();
-        }
+  <!-- VIEW TAB -->
+  <div class="ribbon-content" id="tab-view3">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb pressed" id="btn-normalview" onclick="setView('normal')"><i class="fas fa-columns"></i><span>Normal</span></button>
+        <button class="rb" id="btn-outlineview" onclick="setView('outline')"><i class="fas fa-list"></i><span>Outline</span></button>
+        <button class="rb" id="btn-sorterview" onclick="setView('sorter')"><i class="fas fa-th"></i><span>Slide Sorter</span></button>
+      </div>
+      <div class="ribbon-group-label">Presentation Views</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb-sm" onclick="zoomCanvas(-10)">−</button>
+        <input type="range" class="zoom-slider" id="pptZoom" min="30" max="200" value="100" oninput="zoomCanvas(0,this.value)" style="width:60px">
+        <button class="rb-sm" onclick="zoomCanvas(10)">+</button>
+        <span id="pptZoomLabel" style="font-size:11px;color:#555">100%</span>
+      </div>
+      <div class="ribbon-group-label">Zoom</div>
+    </div>
+  </div>
+</div>
 
-        function saveSlide() {
-            slides[currentSlide] = {
-                title: document.getElementById('slideTitle').value,
-                content: document.getElementById('slideContent').value
-            };
-        }
+<!-- EDITOR BODY -->
+<div class="editor-body" id="editorBody">
 
-        function goBack() { window.location.href = 'dashboard.html'; }
-        function newPresentation() { if (confirm('Create new presentation?')) { init(); toggleToolMenu(); } }
-        function addSlide() { saveSlide(); slides.push({ title: `Slide ${slides.length + 1}`, content: '' }); loadSlide(slides.length - 1); toggleToolMenu(); }
-        function deleteSlide() {
-            if (slides.length > 1) {
-                slides.splice(currentSlide, 1);
-                loadSlide(Math.min(currentSlide, slides.length - 1));
-            }
-            toggleToolMenu();
-        }
-        function savePresentation() { localStorage.setItem('ppt_presentation', JSON.stringify(slides)); showToast('Saved!', 'success'); toggleToolMenu(); }
-        function downloadPresentation() {
-            const text = slides.map((s, i) => `SLIDE ${i+1}\n${s.title}\n${s.content}\n\n---\n\n`).join('');
-            const blob = new Blob([text], {type:'text/plain'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'presentation.txt';
-            a.click();
-            toggleToolMenu();
-        }
-        function setSlideFont() {
-            const font = document.getElementById('fontFamily').value;
-            if(font) {
-                document.getElementById('slideTitle').style.fontFamily = font;
-                document.getElementById('slideContent').style.fontFamily = font;
-            }
-        }
-        function setSlideFontSize() {
-            const size = document.getElementById('fontSize').value;
-            if(size) {
-                document.getElementById('slideTitle').style.fontSize = size;
-                document.getElementById('slideContent').style.fontSize = size;
-            }
-        }
-        function setSlideFontColor() {
-            const color = document.getElementById('fontColor').value;
-            if(color) {
-                document.getElementById('slideTitle').style.color = color;
-                document.getElementById('slideContent').style.color = color;
-            }
-        }
+  <!-- SLIDE PANEL -->
+  <div class="slide-panel" id="slidePanel">
+    <div class="slide-panel-header">
+      Slides <span id="slideCountLabel">1</span>
+      <button onclick="addSlide()" title="Add Slide"><i class="fas fa-plus"></i></button>
+    </div>
+    <div class="slide-list" id="slideList"></div>
+  </div>
 
-        window.addEventListener('load', () => {
-            const saved = localStorage.getItem('ppt_presentation');
-            if (saved) {
-                try {
-                    slides = JSON.parse(saved);
-                    renderSlides();
-                    loadSlide(0);
-                } catch (e) {
-                    init();
-                }
-            } else {
-                init();
-            }
-        });
+  <!-- CANVAS + NOTES -->
+  <div class="canvas-area">
+    <div class="canvas-toolbar">
+      <span style="color:#aaa;font-size:11px;margin-right:6px">Slide <span id="currentSlideNum">1</span> of <span id="totalSlidesNum">1</span></span>
+      <button class="canvas-toolbar-btn" onclick="addSlide()"><i class="fas fa-plus"></i> New Slide</button>
+      <button class="canvas-toolbar-btn" onclick="deleteSlide()"><i class="fas fa-trash"></i> Delete</button>
+      <button class="canvas-toolbar-btn" onclick="addTextBox()"><i class="fas fa-font"></i> Text Box</button>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+        <button class="canvas-toolbar-btn active" onclick="startSlideShow()"><i class="fas fa-play"></i> Slide Show</button>
+      </div>
+    </div>
+    <div class="canvas-wrap" id="canvasWrap">
+      <div class="slide-canvas" id="slideCanvas" onclick="deselectAll()"></div>
+    </div>
+    <div class="notes-area">
+      <div class="notes-label">Click to add notes</div>
+      <textarea class="notes-input" id="notesInput" placeholder="Speaker notes for this slide…" oninput="saveCurrentSlide()"></textarea>
+    </div>
+  </div>
+</div>
 
-        document.addEventListener('click', (e) => {
-            const menu = document.getElementById('toolMenu');
-            const hamburger = document.querySelector('.hamburger');
-            if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
-                menu.classList.remove('open');
-            }
-        });
-    </script>
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <span id="pptStatus">Slide 1 of 1</span>
+  <span id="pptThemeStatus">Theme: Default</span>
+  <div class="status-right">
+    <button class="rb-sm" onclick="zoomCanvas(-10)">−</button>
+    <input type="range" class="zoom-slider" id="pptZoom2" min="30" max="200" value="100" oninput="zoomCanvas(0,this.value)">
+    <button class="rb-sm" onclick="zoomCanvas(10)">+</button>
+    <span id="pptZoomLabel2">100%</span>
+  </div>
+</div>
+
+<!-- FILE MENU -->
+<div id="pptFileMenu" style="display:none;position:fixed;top:36px;left:0;width:240px;background:white;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:3000;border:1px solid #ddd">
+  <div style="background:var(--ppt-red);color:white;padding:12px 16px;font-size:14px;font-weight:600">File</div>
+  <button class="file-menu-item" onclick="newPresentation()"><i class="fas fa-file"></i> New</button>
+  <button class="file-menu-item" onclick="savePresentation()"><i class="fas fa-save"></i> Save</button>
+  <button class="file-menu-item" onclick="renamePresentation()"><i class="fas fa-pencil-alt"></i> Rename</button>
+  <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="downloadPresentation('html')"><i class="fas fa-download"></i> Export as HTML</button>
+  <button class="file-menu-item" onclick="downloadPresentation('txt')"><i class="fas fa-file-alt"></i> Export as Text</button>
+  <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="startSlideShow()"><i class="fas fa-play"></i> Start Slide Show</button>
+  <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+</div>
+
+<!-- LAYOUT PICKER MODAL -->
+<div class="modal-overlay" id="layoutModal">
+  <div class="modal-box">
+    <div class="modal-header">Choose Layout <button class="modal-close-btn" onclick="closeLayoutPicker()">&#x2715;</button></div>
+    <div class="layout-grid" id="layoutGrid"></div>
+  </div>
+</div>
+
+<script>
+function showToast(msg,type){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:24px;right:24px;padding:10px 18px;border-radius:6px;font-size:13px;font-weight:500;color:#fff;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:opacity .4s;';
+  t.style.background=type==='success'?'#C44529':type==='error'?'#c0392b':'#555';
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),400);},2200);
+}
+// ============ STATE ============
+let slides = [];
+let currentSlideIdx = 0;
+let selectedElement = null;
+let presName = 'Presentation1';
+let zoomLvl = 100;
+let currentTransition = 'none';
+let undoStack = [], redoStack = [];
+
+const THEMES = [
+  {name:'Default', bg:'#ffffff', title:'#1a1a1a', body:'#333333', accent:'#C44529'},
+  {name:'Ocean', bg:'linear-gradient(135deg,#0f3460,#16213e)', title:'#ffffff', body:'#a8d8ea', accent:'#00b4d8'},
+  {name:'Forest', bg:'linear-gradient(135deg,#1a472a,#2d6a4f)', title:'#ffffff', body:'#d8f3dc', accent:'#74c69d'},
+  {name:'Sunset', bg:'linear-gradient(135deg,#ff6b6b,#feca57)', title:'#ffffff', body:'#fff', accent:'#ff9ff3'},
+  {name:'Slate', bg:'linear-gradient(135deg,#2c3e50,#4a5568)', title:'#ffffff', body:'#cbd5e0', accent:'#63b3ed'},
+  {name:'Purple', bg:'linear-gradient(135deg,#4c1d95,#7c3aed)', title:'#ffffff', body:'#ede9fe', accent:'#c4b5fd'},
+  {name:'Rose', bg:'linear-gradient(135deg,#881337,#9f1239)', title:'#ffffff', body:'#fecdd3', accent:'#fb7185'},
+  {name:'Mint', bg:'#f0fdf4', title:'#14532d', body:'#166534', accent:'#22c55e'},
+  {name:'Charcoal', bg:'#1a1a2e', title:'#ffffff', body:'#a0a0b0', accent:'#6c63ff'},
+  {name:'Paper', bg:'#fdf8f0', title:'#2d1b00', body:'#5c4a2a', accent:'#d97706'},
+];
+
+const LAYOUTS = [
+  {name:'Title Slide', icon:'<div style="text-align:center"><div style="height:6px;background:#c44529;margin:4px 0;border-radius:1px"></div><div style="height:3px;background:#888;margin:2px 0;border-radius:1px;width:70%;margin-left:15%"></div></div>'},
+  {name:'Title & Content', icon:'<div><div style="height:5px;background:#c44529;margin:2px 0;border-radius:1px"></div><div style="height:20px;background:#f0f0f0;margin:2px 0;border-radius:1px;border:1px solid #ddd"></div></div>'},
+  {name:'Two Content', icon:'<div style="display:flex;gap:2px"><div style="flex:1;height:20px;background:#f0f0f0;border:1px solid #ddd;border-radius:1px"></div><div style="flex:1;height:20px;background:#f0f0f0;border:1px solid #ddd;border-radius:1px"></div></div>'},
+  {name:'Blank', icon:'<div style="height:26px;background:#fafafa;border:1px solid #ddd;border-radius:1px"></div>'},
+  {name:'Title Only', icon:'<div><div style="height:5px;background:#c44529;margin:2px 0;border-radius:1px"></div><div style="height:16px;background:#fafafa;border:1px dashed #ccc;border-radius:1px;margin-top:4px"></div></div>'},
+  {name:'Section Header', icon:'<div style="background:#c44529;height:26px;border-radius:1px;display:flex;align-items:center;justify-content:center"><div style="height:3px;background:rgba(255,255,255,.7);width:60%;border-radius:1px"></div></div>'},
+];
+
+// ============ DATA ============
+function newSlide(layout){
+  layout = layout || 'Title & Content';
+  const elements = [];
+  if(layout === 'Blank'){
+    // nothing
+  } else if(layout === 'Title Slide'){
+    elements.push({id:uid(),type:'title',x:80,y:140,w:640,h:80,text:'Click to add title',fontSize:40,fontWeight:'700',textAlign:'center',color:'#1a1a1a'});
+    elements.push({id:uid(),type:'subtitle',x:150,y:240,w:500,h:50,text:'Click to add subtitle',fontSize:20,fontWeight:'400',textAlign:'center',color:'#555'});
+  } else if(layout === 'Section Header'){
+    elements.push({id:uid(),type:'title',x:80,y:160,w:640,h:70,text:'Section Title',fontSize:36,fontWeight:'700',textAlign:'center',color:'#ffffff'});
+  } else if(layout === 'Two Content'){
+    elements.push({id:uid(),type:'title',x:60,y:30,w:680,h:55,text:'Click to add title',fontSize:28,fontWeight:'700',textAlign:'left',color:'#1a1a1a'});
+    elements.push({id:uid(),type:'body',x:20,y:100,w:365,h:310,text:'• Content here\n• Second point\n• Third point',fontSize:14,fontWeight:'400',textAlign:'left',color:'#333'});
+    elements.push({id:uid(),type:'body',x:415,y:100,w:365,h:310,text:'• Content here\n• Second point\n• Third point',fontSize:14,fontWeight:'400',textAlign:'left',color:'#333'});
+  } else {
+    elements.push({id:uid(),type:'title',x:60,y:30,w:680,h:60,text:'Click to add title',fontSize:30,fontWeight:'700',textAlign:'left',color:'#1a1a1a'});
+    elements.push({id:uid(),type:'body',x:60,y:110,w:680,h:300,text:'• Click to add text\n• Second point\n• Third point',fontSize:14,fontWeight:'400',textAlign:'left',color:'#333'});
+  }
+  return {id:uid(), elements, notes:'', bg:'#ffffff', theme:'Default', transition:'none', layout};
+}
+function uid(){ return '_'+Math.random().toString(36).slice(2,9); }
+
+// ============ RENDER ============
+function renderThumbs(){
+  const list = document.getElementById('slideList');
+  list.innerHTML='';
+  slides.forEach((s,i)=>{
+    const wrap=document.createElement('div');
+    wrap.className='slide-thumb-wrap';
+    const num=document.createElement('div');
+    num.className='slide-thumb-num'; num.textContent=i+1;
+    wrap.appendChild(num);
+    const thumb=document.createElement('div');
+    thumb.className='slide-thumb'+(i===currentSlideIdx?' active':'');
+    thumb.style.background=s.bg||'#fff';
+    // Mini preview of title
+    const titleEl=s.elements.find(e=>e.type==='title');
+    const bodyEl=s.elements.find(e=>e.type==='body'||e.type==='subtitle');
+    const t=document.createElement('div'); t.className='thumb-title';
+    t.style.color=titleEl?titleEl.color:'#222';
+    t.textContent=titleEl?titleEl.text.substring(0,40):'(blank)';
+    thumb.appendChild(t);
+    if(bodyEl){const b=document.createElement('div');b.className='thumb-body';b.style.color=bodyEl.color||'#444';b.textContent=bodyEl.text.substring(0,80);thumb.appendChild(b);}
+    thumb.onclick=()=>{saveCurrentSlide();loadSlide(i);};
+    wrap.appendChild(thumb);
+    const actions=document.createElement('div'); actions.className='slide-thumb-actions';
+    const dupBtn=document.createElement('button'); dupBtn.className='thumb-action-btn'; dupBtn.innerHTML='<i class="fas fa-copy"></i>'; dupBtn.title='Duplicate'; dupBtn.onclick=e=>{e.stopPropagation();duplicateSlideAt(i);};
+    const delBtn=document.createElement('button'); delBtn.className='thumb-action-btn'; delBtn.innerHTML='<i class="fas fa-trash"></i>'; delBtn.title='Delete'; delBtn.onclick=e=>{e.stopPropagation();deleteSlideAt(i);};
+    actions.appendChild(dupBtn); actions.appendChild(delBtn);
+    wrap.appendChild(actions);
+    list.appendChild(wrap);
+  });
+  document.getElementById('slideCountLabel').textContent=slides.length;
+  document.getElementById('currentSlideNum').textContent=currentSlideIdx+1;
+  document.getElementById('totalSlidesNum').textContent=slides.length;
+  document.getElementById('pptStatus').textContent='Slide '+(currentSlideIdx+1)+' of '+slides.length;
+}
+
+function renderCanvas(){
+  const canvas=document.getElementById('slideCanvas');
+  const s=slides[currentSlideIdx];
+  canvas.innerHTML='';
+  canvas.style.background=s.bg||'#ffffff';
+  s.elements.forEach(el=>canvas.appendChild(createDOMElement(el)));
+  document.getElementById('notesInput').value=s.notes||'';
+  document.getElementById('slideBgColor').value=rgbToHex(s.bg)||'#ffffff';
+}
+
+function createDOMElement(el){
+  const wrap=document.createElement('div');
+  wrap.className='slide-element';
+  wrap.id='el-'+el.id;
+  wrap.style.cssText=`left:${el.x}px;top:${el.y}px;width:${el.w}px;height:${el.h}px;`;
+
+  let content;
+  if(el.type==='shape'){
+    content=document.createElement('div');
+    content.className='el-content el-shape';
+    content.style.background=el.fill||'#c44529';
+    content.style.color=el.color||'#fff';
+    if(el.shape==='ellipse') content.style.borderRadius='50%';
+    if(el.shape==='triangle'){content.style.clipPath='polygon(50% 0%,100% 100%,0% 100%)';content.style.borderRadius='0';}
+    if(el.shape==='star'){content.style.clipPath='polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)';}
+    content.contentEditable='true';
+    content.textContent=el.text||'';
+  } else {
+    content=document.createElement('textarea');
+    content.className='el-content el-'+(el.type==='title'?'title':el.type==='subtitle'?'subtitle':'body');
+    content.value=el.text||'';
+    content.rows=1;
+    content.oninput=()=>{ el.text=content.value; saveCurrentSlide(); renderThumbs(); };
+  }
+  content.style.fontSize=(el.fontSize||14)+'px';
+  content.style.fontWeight=el.fontWeight||'400';
+  content.style.fontStyle=el.fontStyle||'normal';
+  content.style.textDecoration=el.textDecoration||'none';
+  content.style.textAlign=el.textAlign||'left';
+  content.style.color=el.color||'#333';
+  if(el.fontFamily) content.style.fontFamily=el.fontFamily;
+
+  wrap.appendChild(content);
+
+  const rh=document.createElement('div'); rh.className='resize-handle';
+  wrap.appendChild(rh);
+
+  makeDraggable(wrap, el);
+  makeResizable(rh, wrap, el);
+
+  wrap.addEventListener('mousedown',e=>{if(e.target!==rh){e.stopPropagation();selectElement(wrap,el);}});
+  return wrap;
+}
+
+function selectElement(wrap, el){
+  deselectAll();
+  wrap.classList.add('selected');
+  selectedElement={wrap,el};
+}
+function deselectAll(){
+  document.querySelectorAll('.slide-element.selected').forEach(e=>e.classList.remove('selected'));
+  selectedElement=null;
+}
+
+// ============ DRAG ============
+function makeDraggable(wrap, el){
+  let dragging=false,sx=0,sy=0,ox=0,oy=0;
+  wrap.addEventListener('mousedown',e=>{
+    if(e.target.classList.contains('resize-handle')) return;
+    if(e.target.tagName==='TEXTAREA'||e.target.contentEditable==='true') return;
+    dragging=true; sx=e.clientX; sy=e.clientY; ox=el.x; oy=el.y;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!dragging) return;
+    el.x=Math.max(0,ox+(e.clientX-sx)); el.y=Math.max(0,oy+(e.clientY-sy));
+    wrap.style.left=el.x+'px'; wrap.style.top=el.y+'px';
+  });
+  document.addEventListener('mouseup',()=>{if(dragging){dragging=false;saveCurrentSlide();}});
+}
+function makeResizable(handle, wrap, el){
+  let resizing=false,sx=0,sy=0,ow=0,oh=0;
+  handle.addEventListener('mousedown',e=>{
+    resizing=true; sx=e.clientX; sy=e.clientY; ow=el.w; oh=el.h;
+    e.stopPropagation(); e.preventDefault();
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!resizing) return;
+    el.w=Math.max(80,ow+(e.clientX-sx)); el.h=Math.max(30,oh+(e.clientY-sy));
+    wrap.style.width=el.w+'px'; wrap.style.height=el.h+'px';
+  });
+  document.addEventListener('mouseup',()=>{if(resizing){resizing=false;saveCurrentSlide();}});
+}
+
+// ============ TEXT STYLES ============
+function applyTextStyle(prop, val){
+  if(!selectedElement) return;
+  const el=selectedElement.el;
+  const content=selectedElement.wrap.querySelector('.el-content');
+  if(prop==='bold'){el.fontWeight=el.fontWeight==='700'?'400':'700';content.style.fontWeight=el.fontWeight;}
+  else if(prop==='italic'){el.fontStyle=el.fontStyle==='italic'?'normal':'italic';content.style.fontStyle=el.fontStyle;}
+  else if(prop==='underline'){el.textDecoration=el.textDecoration==='underline'?'none':'underline';content.style.textDecoration=el.textDecoration;}
+  else if(prop==='shadow'){content.style.textShadow=content.style.textShadow?'':'2px 2px 4px rgba(0,0,0,.4)';}
+  else if(prop==='font'){el.fontFamily=val;content.style.fontFamily=val;}
+  else if(prop==='size'){el.fontSize=parseInt(val);content.style.fontSize=val+'px';}
+  else if(prop==='alignLeft'){el.textAlign='left';content.style.textAlign='left';}
+  else if(prop==='alignCenter'){el.textAlign='center';content.style.textAlign='center';}
+  else if(prop==='alignRight'){el.textAlign='right';content.style.textAlign='right';}
+  else if(prop==='bullet'){if(content.tagName==='TEXTAREA'){const lines=content.value.split('\n').map(l=>l.startsWith('• ')?l:('• '+l));content.value=lines.join('\n');el.text=content.value;}}
+  saveCurrentSlide();
+}
+function applyTextColor(){
+  const color=document.getElementById('pptFontColorPicker').value;
+  document.getElementById('pptFontColorBar').style.background=color;
+  if(selectedElement){
+    selectedElement.el.color=color;
+    selectedElement.wrap.querySelector('.el-content').style.color=color;
+    saveCurrentSlide();
+  }
+}
+function pickTextColor(){ document.getElementById('pptFontColorPicker').click(); }
+
+// ============ SLIDE OPS ============
+function saveCurrentSlide(){
+  if(!slides[currentSlideIdx]) return;
+  slides[currentSlideIdx].notes=document.getElementById('notesInput').value;
+  autoSavePres();
+}
+function loadSlide(i){
+  currentSlideIdx=Math.max(0,Math.min(slides.length-1,i));
+  renderCanvas();
+  renderThumbs();
+}
+function addSlide(layout){
+  pushUndo();
+  slides.splice(currentSlideIdx+1,0,newSlide(layout));
+  loadSlide(currentSlideIdx+1);
+}
+function deleteSlide(){ deleteSlideAt(currentSlideIdx); }
+function deleteSlideAt(i){
+  if(slides.length<=1){alert('Presentation must have at least 1 slide.');return;}
+  pushUndo();
+  slides.splice(i,1);
+  loadSlide(Math.max(0,i-1));
+}
+function duplicateSlide(){ duplicateSlideAt(currentSlideIdx); }
+function duplicateSlideAt(i){
+  pushUndo();
+  const copy=JSON.parse(JSON.stringify(slides[i]));
+  copy.id=uid();
+  copy.elements.forEach(e=>{e.id=uid();});
+  slides.splice(i+1,0,copy);
+  loadSlide(i+1);
+}
+function addTextBox(){
+  pushUndo();
+  const el={id:uid(),type:'body',x:100,y:150,w:300,h:80,text:'Text Box',fontSize:14,fontWeight:'400',textAlign:'left',color:'#333'};
+  slides[currentSlideIdx].elements.push(el);
+  renderCanvas();
+  renderThumbs();
+}
+function insertShape(shape){
+  pushUndo();
+  const fills={rect:'#c44529',ellipse:'#2196F3',triangle:'#4CAF50',arrow:'#FF9800',star:'#9C27B0'};
+  const el={id:uid(),type:'shape',shape,x:200,y:150,w:200,h:120,text:'',fill:fills[shape]||'#c44529',color:'#fff',fontSize:16};
+  slides[currentSlideIdx].elements.push(el);
+  renderCanvas();
+  renderThumbs();
+}
+function insertImagePrompt(){
+  const url=prompt('Image URL (paste a direct image link):');
+  if(url){
+    pushUndo();
+    const el={id:uid(),type:'image',x:100,y:80,w:300,h:200,src:url};
+    slides[currentSlideIdx].elements.push(el);
+    // Render image element directly
+    const canvas=document.getElementById('slideCanvas');
+    const wrap=document.createElement('div');
+    wrap.className='slide-element'; wrap.style.cssText=`left:100px;top:80px;width:300px;height:200px;`;
+    const img=document.createElement('img'); img.src=url; img.style.cssText='width:100%;height:100%;object-fit:contain;pointer-events:none;';
+    wrap.appendChild(img);
+    makeDraggable(wrap,el);
+    canvas.appendChild(wrap);
+    renderThumbs();
+  }
+}
+function insertTable(){
+  pushUndo();
+  let html='<table style="border-collapse:collapse;width:100%">';
+  for(let r=0;r<3;r++){html+='<tr>';for(let c=0;c<3;c++)html+='<td style="border:1px solid #bbb;padding:4px 8px;font-size:12px">'+(r===0?'<b>Header '+(c+1)+'</b>':'Cell')+'</td>';html+='</tr>';}
+  html+='</table>';
+  const el={id:uid(),type:'shape',shape:'rect',x:100,y:100,w:400,h:150,text:'',fill:'transparent',color:'#333'};
+  const wrap=document.createElement('div');
+  wrap.className='slide-element'; wrap.style.cssText=`left:100px;top:100px;width:400px;height:150px;`;
+  const content=document.createElement('div'); content.className='el-content'; content.innerHTML=html;
+  content.contentEditable='true'; wrap.appendChild(content);
+  const rh=document.createElement('div'); rh.className='resize-handle'; wrap.appendChild(rh);
+  makeDraggable(wrap,el);
+  makeResizable(rh,wrap,el);
+  wrap.addEventListener('mousedown',e=>{e.stopPropagation();selectElement(wrap,el);});
+  document.getElementById('slideCanvas').appendChild(wrap);
+  slides[currentSlideIdx].elements.push(el);
+  renderThumbs();
+}
+function insertDivider(){
+  const el={id:uid(),type:'shape',shape:'rect',x:60,y:220,w:680,h:4,text:'',fill:'#c44529',color:'transparent'};
+  slides[currentSlideIdx].elements.push(el);
+  renderCanvas();
+}
+
+// ============ THEMES ============
+function buildThemeGallery(){
+  const gallery=document.getElementById('themeGallery');
+  gallery.innerHTML='';
+  THEMES.forEach((t,i)=>{
+    const sw=document.createElement('div');
+    sw.className='theme-swatch'+(slides[currentSlideIdx]?.theme===t.name?' active':'');
+    sw.style.background=t.bg;
+    sw.style.color=t.title;
+    sw.title=t.name;
+    const label=document.createElement('span'); label.textContent=t.name; label.style.cssText='font-size:8px;text-shadow:0 1px 2px rgba(0,0,0,.5);color:'+t.title;
+    sw.appendChild(label);
+    sw.onclick=()=>applyTheme(t);
+    gallery.appendChild(sw);
+  });
+}
+function applyTheme(theme){
+  pushUndo();
+  const s=slides[currentSlideIdx];
+  s.bg=theme.bg; s.theme=theme.name;
+  s.elements.forEach(el=>{
+    if(el.type==='title') el.color=theme.title;
+    else if(el.type==='body'||el.type==='subtitle') el.color=theme.body;
+  });
+  renderCanvas(); renderThumbs();
+  document.getElementById('pptThemeStatus').textContent='Theme: '+theme.name;
+  buildThemeGallery();
+}
+function applySlideBackground(){
+  const color=document.getElementById('slideBgColor').value;
+  slides[currentSlideIdx].bg=color;
+  document.getElementById('slideCanvas').style.background=color;
+  renderThumbs();
+}
+function rgbToHex(color){
+  if(!color||color.startsWith('linear')||color.startsWith('#')) return color||'#ffffff';
+  return color;
+}
+
+// ============ TRANSITIONS ============
+function setTransition(tr){
+  document.querySelectorAll('[id^="tr-"]').forEach(b=>b.classList.remove('pressed'));
+  document.getElementById('tr-'+tr)?.classList.add('pressed');
+  currentTransition=tr;
+  slides[currentSlideIdx].transition=tr;
+  saveCurrentSlide();
+}
+function applyTransitionAll(){ slides.forEach(s=>s.transition=currentTransition); if(typeof showToast==='function') showToast('Transition applied to all slides','success'); }
+
+// ============ SLIDE SHOW ============
+function startSlideShow(){ launchShow(0); }
+function startSlideShowCurrent(){ launchShow(currentSlideIdx); }
+function launchShow(startIdx){
+  let idx=startIdx;
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;';
+  const slide=document.createElement('div');
+  slide.style.cssText='width:min(90vw,1280px);height:min(90vh,720px);background:white;position:relative;overflow:hidden;';
+  const nav=document.createElement('div');
+  nav.style.cssText='position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:10;';
+  const counter=document.createElement('span');
+  counter.style.cssText='color:white;font-size:14px;margin-top:8px;font-family:Inter,sans-serif;';
+  const prev=document.createElement('button');
+  prev.innerHTML='&#x25C0;'; prev.style.cssText='background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:white;padding:8px 18px;cursor:pointer;border-radius:3px;font-size:16px;';
+  const next=document.createElement('button');
+  next.innerHTML='&#x25B6;'; next.style.cssText=prev.style.cssText;
+  const close=document.createElement('button');
+  close.innerHTML='&#x2715; Exit'; close.style.cssText='background:rgba(196,69,41,.7);border:1px solid rgba(196,69,41,.9);color:white;padding:8px 16px;cursor:pointer;border-radius:3px;font-size:13px;position:absolute;top:12px;right:12px;z-index:20;';
+  nav.appendChild(prev); nav.appendChild(next);
+  overlay.appendChild(slide); overlay.appendChild(nav); overlay.appendChild(counter); overlay.appendChild(close);
+  document.body.appendChild(overlay);
+
+  function showSlide(i){
+    const s=slides[i];
+    slide.style.background=s.bg||'#fff';
+    slide.innerHTML='';
+    const scale=Math.min((window.innerWidth*0.9)/800,(window.innerHeight*0.9)/450);
+    s.elements.forEach(el=>{
+      if(el.type==='image'){
+        const img=document.createElement('img');
+        img.src=el.src; img.style.cssText=`position:absolute;left:${el.x*scale}px;top:${el.y*scale}px;width:${el.w*scale}px;height:${el.h*scale}px;object-fit:contain;`;
+        slide.appendChild(img);
+      } else {
+        const d=document.createElement('div');
+        let txt=el.type==='shape'?el.text:el.text;
+        d.style.cssText=`position:absolute;left:${el.x*scale}px;top:${el.y*scale}px;width:${el.w*scale}px;min-height:${el.h*scale}px;font-size:${(el.fontSize||14)*scale}px;font-weight:${el.fontWeight||'400'};color:${el.color||'#333'};text-align:${el.textAlign||'left'};white-space:pre-wrap;padding:${6*scale}px ${10*scale}px;`;
+        if(el.type==='shape'){d.style.background=el.fill||'#c44529';if(el.shape==='ellipse')d.style.borderRadius='50%';if(el.shape==='triangle')d.style.clipPath='polygon(50% 0%,100% 100%,0% 100%)';}
+        d.textContent=txt;
+        slide.appendChild(d);
+      }
+    });
+    counter.textContent=(i+1)+' / '+slides.length;
+  }
+  prev.onclick=e=>{e.stopPropagation();if(idx>0){idx--;showSlide(idx);}};
+  next.onclick=e=>{e.stopPropagation();if(idx<slides.length-1){idx++;showSlide(idx);}else overlay.remove();};
+  close.onclick=()=>overlay.remove();
+  document.addEventListener('keydown',function handler(e){
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'){if(idx<slides.length-1){idx++;showSlide(idx);}else overlay.remove();}
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp'){if(idx>0){idx--;showSlide(idx);}}
+    if(e.key==='Escape'){overlay.remove();document.removeEventListener('keydown',handler);}
+  });
+  showSlide(idx);
+}
+
+// ============ LAYOUT PICKER ============
+function openLayoutPicker(){
+  document.getElementById('layoutModal').classList.add('open');
+  const grid=document.getElementById('layoutGrid');
+  grid.innerHTML='';
+  LAYOUTS.forEach(l=>{
+    const card=document.createElement('div');
+    card.className='layout-card';
+    card.innerHTML=l.icon+'<span style="font-size:9px;color:#666;margin-top:3px">'+l.name+'</span>';
+    card.onclick=()=>{addSlide(l.name);closeLayoutPicker();};
+    grid.appendChild(card);
+  });
+}
+function closeLayoutPicker(){ document.getElementById('layoutModal').classList.remove('open'); }
+
+// ============ ZOOM ============
+function zoomCanvas(delta, val){
+  if(val!==undefined) zoomLvl=parseInt(val);
+  else zoomLvl=Math.max(30,Math.min(200,zoomLvl+delta));
+  const canvas=document.getElementById('slideCanvas');
+  canvas.style.transform='scale('+zoomLvl/100+')';
+  canvas.style.transformOrigin='center center';
+  document.getElementById('pptZoomLabel').textContent=zoomLvl+'%';
+  document.getElementById('pptZoomLabel2').textContent=zoomLvl+'%';
+  ['pptZoom','pptZoom2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=zoomLvl;});
+}
+
+// ============ VIEWS ============
+function setView(v){
+  const body=document.getElementById('editorBody');
+  const panel=document.getElementById('slidePanel');
+  ['btn-normalview','btn-outlineview','btn-sorterview'].forEach(id=>document.getElementById(id)?.classList.remove('pressed'));
+  if(v==='normal'){panel.style.display='flex';document.getElementById('btn-normalview').classList.add('pressed');}
+  else if(v==='outline'){panel.style.display='none';document.getElementById('btn-outlineview').classList.add('pressed');}
+  else if(v==='sorter'){panel.style.display='none';document.getElementById('btn-sorterview').classList.add('pressed');}
+}
+
+// ============ UNDO/REDO ============
+function pushUndo(){ undoStack.push(JSON.stringify(slides)); redoStack=[]; }
+function undoAction(){ if(!undoStack.length) return; redoStack.push(JSON.stringify(slides)); slides=JSON.parse(undoStack.pop()); loadSlide(Math.min(currentSlideIdx,slides.length-1)); }
+function redoAction(){ if(!redoStack.length) return; undoStack.push(JSON.stringify(slides)); slides=JSON.parse(redoStack.pop()); loadSlide(Math.min(currentSlideIdx,slides.length-1)); }
+
+// ============ ASPECT RATIO ============
+function setAspectRatio(r){
+  const canvas=document.getElementById('slideCanvas');
+  if(r==='16:9'){canvas.style.width='800px';canvas.style.height='450px';}
+  else{canvas.style.width='640px';canvas.style.height='480px';}
+}
+
+// ============ FILE OPS ============
+function toggleFileMenu(){ const m=document.getElementById('pptFileMenu'); m.style.display=m.style.display==='none'?'block':'none'; }
+function newPresentation(){ if(confirm('Create new presentation?')){ slides=[newSlide()]; currentSlideIdx=0; loadSlide(0); } document.getElementById('pptFileMenu').style.display='none'; }
+function savePresentation(){ localStorage.setItem('kairos_ppt',JSON.stringify(slides)); localStorage.setItem('kairos_ppt_name',presName); if(typeof showToast==='function') showToast('Presentation saved','success'); document.getElementById('pptFileMenu').style.display='none'; }
+function autoSavePres(){ localStorage.setItem('kairos_ppt_draft',JSON.stringify(slides)); }
+function renamePresentation(){ const n=prompt('Presentation name:',presName); if(n){presName=n;document.getElementById('presNameDisplay').textContent=n;document.title=n+' — PowerPoint';} document.getElementById('pptFileMenu').style.display='none'; }
+function downloadPresentation(fmt){
+  let content='',mime='text/plain',ext=fmt;
+  if(fmt==='txt') content=slides.map((s,i)=>'SLIDE '+(i+1)+'\n'+(s.elements.find(e=>e.type==='title')?.text||'')+'\n\n'+(s.elements.filter(e=>e.type==='body').map(e=>e.text).join('\n\n'))+'\n\nNotes:\n'+s.notes+'\n\n---\n\n').join('');
+  else{
+    mime='text/html';ext='html';
+    const slideHtml=slides.map(s=>'<div class="slide" style="background:'+s.bg+'">'+s.elements.map(el=>'<div style="position:absolute;left:'+el.x+'px;top:'+el.y+'px;width:'+el.w+'px;font-size:'+el.fontSize+'px;font-weight:'+el.fontWeight+';color:'+el.color+';text-align:'+el.textAlign+';white-space:pre-wrap">'+el.text+'<\/div>').join('')+'<\/div>').join('');
+    content=['<!DOCTYPE html>','<html>','<head><meta charset="UTF-8"><title>',presName,'</title><style>body{font-family:sans-serif;margin:0}.slide{width:800px;height:450px;margin:20px auto;position:relative;page-break-after:always;overflow:hidden;}<\/style><\/head>','<body>',slideHtml,'<\/body>','<\/html>'].join('');
+  }
+  const blob=new Blob([content],{type:mime}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=presName+'.'+ext; a.click();
+  document.getElementById('pptFileMenu').style.display='none';
+}
+function goBack(){ window.location.href='dashboard.html'; }
+
+// ============ RIBBON TABS ============
+function switchTab(name,btn){
+  document.querySelectorAll('.ribbon-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ribbon-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='design') buildThemeGallery();
+}
+
+// ============ KEYBOARD ============
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();savePresentation();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undoAction();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='y'){e.preventDefault();redoAction();}
+  if(e.key==='Delete'&&selectedElement&&document.activeElement.tagName!=='TEXTAREA'&&document.activeElement.contentEditable!=='true'){
+    pushUndo();
+    const id=selectedElement.el.id;
+    slides[currentSlideIdx].elements=slides[currentSlideIdx].elements.filter(e=>e.id!==id);
+    selectedElement.wrap.remove(); selectedElement=null;
+    renderThumbs();
+  }
+  if(e.key==='Escape') deselectAll();
+  if((e.ctrlKey||e.metaKey)&&e.key==='d'&&selectedElement){e.preventDefault();duplicateSlide();}
+});
+
+document.addEventListener('click',e=>{
+  const fm=document.getElementById('pptFileMenu'); const lm=document.getElementById('layoutModal');
+  if(!fm.contains(e.target)&&!e.target.classList.contains('file-tab')) fm.style.display='none';
+});
+
+// ============ INIT ============
+window.addEventListener('load',()=>{
+  const saved=localStorage.getItem('kairos_ppt');
+  const savedName=localStorage.getItem('kairos_ppt_name');
+  if(saved){ try{slides=JSON.parse(saved);}catch{slides=[newSlide()];} }
+  else slides=[newSlide()];
+  if(savedName){presName=savedName;document.getElementById('presNameDisplay').textContent=presName;document.title=presName+' — PowerPoint';}
+  currentSlideIdx=0;
+  renderCanvas();
+  renderThumbs();
+});
+</script>
 </body>
 </html>
