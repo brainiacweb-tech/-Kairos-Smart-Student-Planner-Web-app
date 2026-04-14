@@ -214,6 +214,9 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;background:v
 .table-grid-label{text-align:center;font-size:11px;color:#666;padding:4px 8px 8px}
 
 
+/* ====== MOBILE TOOLBAR (hidden on desktop) ====== */
+.mobile-toolbar{display:none}
+
 /* ====== RESPONSIVE ====== */
 @media(max-width:900px){
   .doc-page{width:100%;min-width:0;padding:48px 40px}
@@ -223,38 +226,48 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;background:v
 }
 
 @media(max-width:600px){
-  /* Title bar: hide window controls, compact QAT */
+  /* Title bar */
   .winctrls{display:none}
-  .qat{margin-right:6px}
-  .title-app-icon{width:24px;height:24px;font-size:13px;margin-right:4px}
-  .title-center{font-size:12px}
-  .title-right button{padding:3px 8px;font-size:11px}
+  .qat{margin-right:4px}
+  .title-app-icon{width:26px;height:26px;font-size:14px;margin-right:4px}
+  .title-center{font-size:11px}
+  .title-right button{padding:4px 10px;font-size:11px}
 
-  /* Ribbon: horizontally scrollable strip */
-  .ribbon-tabs-row{overflow-x:auto;flex-wrap:nowrap;padding:0 4px;-webkit-overflow-scrolling:touch}
-  .ribbon-tabs-row::-webkit-scrollbar{display:none}
-  .ribbon-tab{padding:7px 10px 6px;font-size:11px;white-space:nowrap;flex-shrink:0}
-  .ribbon-content{overflow-x:auto;flex-wrap:nowrap;min-height:64px;padding:3px 4px 0;-webkit-overflow-scrolling:touch;align-items:center}
-  .ribbon-content::-webkit-scrollbar{display:none}
-  .ribbon-group{flex-shrink:0;padding:2px 4px 0}
-  .ribbon-group-label{display:none}
-  .rb{height:44px;min-width:36px;padding:3px 4px}
-  .rb i{font-size:16px}
-  .rb span{display:none}
-  .rb-sm{height:28px;min-width:28px;padding:3px 5px;font-size:11px}
-  #ribbonFontName{width:90px}
-  #ribbonFontSize{width:40px}
-
-  /* Hide ruler on mobile */
+  /* Hide full ribbon + ruler */
+  .ribbon{display:none}
   .ruler-wrap{display:none}
 
-  /* Document page */
-  .doc-workspace{padding:12px 0}
-  .doc-page{padding:20px 16px;min-height:auto}
-  #editor{min-height:400px;font-size:14px}
+  /* Mobile toolbar */
+  .mobile-toolbar{
+    display:flex;
+    align-items:center;
+    overflow-x:auto;
+    background:#fff;
+    border-bottom:1px solid #d1d1d1;
+    padding:4px 6px;
+    gap:2px;
+    flex-shrink:0;
+    -webkit-overflow-scrolling:touch;
+    box-shadow:0 1px 3px rgba(0,0,0,.08);
+  }
+  .mobile-toolbar::-webkit-scrollbar{display:none}
+  .mtb-btn{
+    background:transparent;border:1px solid transparent;border-radius:4px;
+    width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+    font-size:14px;cursor:pointer;flex-shrink:0;color:#333;font-family:inherit;
+    transition:background .12s;
+  }
+  .mtb-btn:active,.mtb-btn.pressed{background:#cce4f7;border-color:#90c8f0}
+  .mtb-sep{width:1px;height:22px;background:#d1d1d1;margin:0 3px;flex-shrink:0}
+
+  /* Document */
+  .doc-workspace{padding:10px 0}
+  .doc-page{padding:18px 14px;min-height:auto;width:100%;box-shadow:none}
+  #editor{min-height:60vh;font-size:15px}
 
   /* Modal */
-  .modal-box{width:calc(100vw - 32px)}
+  .modal-box{width:calc(100vw - 24px)}
+  .modal-footer{flex-wrap:wrap}
 }
 </style>
 </head>
@@ -501,6 +514,34 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;background:v
     </div>
   </div>
 </div><!-- end ribbon -->
+
+<!-- MOBILE TOOLBAR -->
+<div class="mobile-toolbar" id="mobileToolbar">
+  <button class="mtb-btn" onclick="cmd('bold')" title="Bold"><b>B</b></button>
+  <button class="mtb-btn" onclick="cmd('italic')" title="Italic"><i style="font-style:italic">I</i></button>
+  <button class="mtb-btn" onclick="cmd('underline')" title="Underline"><u>U</u></button>
+  <button class="mtb-btn" onclick="cmd('strikeThrough')" title="Strike"><s>S</s></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="cmd('formatBlock','p')" title="Normal" style="font-size:11px">¶</button>
+  <button class="mtb-btn" onclick="cmd('formatBlock','h1')" title="Heading 1" style="font-size:12px;font-weight:700;color:#2B579A">H1</button>
+  <button class="mtb-btn" onclick="cmd('formatBlock','h2')" title="Heading 2" style="font-size:11px;font-weight:700;color:#2B579A">H2</button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="cmd('insertUnorderedList')" title="Bullets"><i class="fas fa-list-ul"></i></button>
+  <button class="mtb-btn" onclick="cmd('insertOrderedList')" title="Numbering"><i class="fas fa-list-ol"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="cmd('justifyLeft')" title="Align Left"><i class="fas fa-align-left"></i></button>
+  <button class="mtb-btn" onclick="cmd('justifyCenter')" title="Center"><i class="fas fa-align-center"></i></button>
+  <button class="mtb-btn" onclick="cmd('justifyRight')" title="Align Right"><i class="fas fa-align-right"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="cmd('indent')" title="Indent"><i class="fas fa-indent"></i></button>
+  <button class="mtb-btn" onclick="cmd('outdent')" title="Outdent"><i class="fas fa-outdent"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="openFindReplace()" title="Find &amp; Replace"><i class="fas fa-search"></i></button>
+  <button class="mtb-btn" onclick="openTableModal()" title="Insert Table"><i class="fas fa-table"></i></button>
+  <button class="mtb-btn" onclick="insertLink()" title="Insert Link"><i class="fas fa-link"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="saveDoc()" title="Save"><i class="fas fa-save"></i></button>
+</div>
 
 <!-- RULER -->
 <div class="ruler-wrap">

@@ -124,6 +124,9 @@ td.data-cell.align-right input{text-align:right}
 .file-menu-item:hover{background:#f0f0f0}
 .file-menu-item i{width:16px;color:#666}
 
+/* MOBILE TOOLBAR */
+.mobile-toolbar{display:none}
+
 @media(max-width:768px){
   #xlFontName{width:70px}
   .rb span{display:none}
@@ -135,39 +138,43 @@ td.data-cell.align-right input{text-align:right}
 @media(max-width:600px){
   /* Title bar */
   .winctrls{display:none}
-  .qat{margin-right:6px}
-  .title-app-icon{width:24px;height:24px;font-size:12px;margin-right:4px}
-  .title-center{font-size:12px}
-  .title-right button{padding:3px 8px;font-size:11px}
+  .qat{margin-right:4px}
+  .title-app-icon{width:26px;height:26px;font-size:13px;margin-right:4px}
+  .title-center{font-size:11px}
+  .title-right button{padding:4px 10px;font-size:11px}
 
-  /* Ribbon tabs: scrollable */
-  .ribbon-tabs-row{overflow-x:auto;flex-wrap:nowrap;padding:0 4px;-webkit-overflow-scrolling:touch}
-  .ribbon-tabs-row::-webkit-scrollbar{display:none}
-  .ribbon-tab{padding:7px 10px 6px;font-size:11px;white-space:nowrap;flex-shrink:0}
+  /* Hide full ribbon */
+  .ribbon{display:none}
 
-  /* Ribbon content: scrollable */
-  .ribbon-content{overflow-x:auto;flex-wrap:nowrap;min-height:60px;padding:3px 4px 0;align-items:center;-webkit-overflow-scrolling:touch}
-  .ribbon-content::-webkit-scrollbar{display:none}
-  .ribbon-group{flex-shrink:0;padding:2px 4px 0}
-  .ribbon-group-label{display:none}
-  .rb{height:44px;min-width:36px;padding:3px 4px}
-  .rb i{font-size:15px}
-  .rb span{display:none}
-  .rb-sm{height:28px;min-width:28px;padding:3px 4px;font-size:11px}
-  #xlFontName{width:80px}
-  #xlFontSize{width:38px}
+  /* Mobile toolbar */
+  .mobile-toolbar{
+    display:flex;align-items:center;overflow-x:auto;
+    background:#fff;border-bottom:1px solid #d1d1d1;
+    padding:4px 6px;gap:2px;flex-shrink:0;
+    -webkit-overflow-scrolling:touch;
+    box-shadow:0 1px 3px rgba(0,0,0,.07);
+  }
+  .mobile-toolbar::-webkit-scrollbar{display:none}
+  .mtb-btn{
+    background:transparent;border:1px solid transparent;border-radius:4px;
+    width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+    font-size:13px;cursor:pointer;flex-shrink:0;color:#333;font-family:inherit;
+  }
+  .mtb-btn:active,.mtb-btn.pressed{background:#cce4f7;border-color:#90c8f0}
+  .mtb-sep{width:1px;height:22px;background:#d1d1d1;margin:0 3px;flex-shrink:0}
 
   /* Formula bar */
   .formula-bar{height:32px}
-  .name-box{width:56px;font-size:11px}
+  .name-box{width:52px;font-size:11px}
+  .formula-input{font-size:12px}
 
-  /* Grid cells smaller on mobile */
-  th.col-header{min-width:50px}
-  td.data-cell{min-width:50px}
-  table.sheet th,table.sheet td{height:28px;font-size:11px}
+  /* Grid */
+  th.col-header{min-width:52px}
+  td.data-cell{min-width:52px}
+  table.sheet th,table.sheet td{height:26px;font-size:11px}
 
   /* Sheet tabs */
-  .sheet-tab{padding:4px 10px;font-size:11px}
+  .sheet-tab{padding:3px 10px;font-size:11px}
 
   /* Status bar */
   .status-bar{display:none}
@@ -373,6 +380,32 @@ td.data-cell.align-right input{text-align:right}
   </div>
 </div>
 
+<!-- MOBILE TOOLBAR -->
+<div class="mobile-toolbar" id="mobileToolbar">
+  <button class="mtb-btn" onclick="toggleStyle('bold')" title="Bold"><b>B</b></button>
+  <button class="mtb-btn" onclick="toggleStyle('italic')" title="Italic"><i style="font-style:italic">I</i></button>
+  <button class="mtb-btn" onclick="toggleStyle('underline')" title="Underline"><u>U</u></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="applyStyle('align','left')" title="Left"><i class="fas fa-align-left"></i></button>
+  <button class="mtb-btn" onclick="applyStyle('align','center')" title="Center"><i class="fas fa-align-center"></i></button>
+  <button class="mtb-btn" onclick="applyStyle('align','right')" title="Right"><i class="fas fa-align-right"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="applyNumFormat('currency')" title="Currency" style="font-size:12px">₵</button>
+  <button class="mtb-btn" onclick="applyNumFormat('percent')" title="Percent" style="font-size:12px">%</button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="mergeSelected()" title="Merge"><i class="fas fa-object-group"></i></button>
+  <button class="mtb-btn" onclick="wrapText()" title="Wrap"><i class="fas fa-align-justify"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="addRow()" title="Insert Row"><i class="fas fa-plus-square"></i></button>
+  <button class="mtb-btn" onclick="addCol()" title="Insert Column"><i class="fas fa-plus-circle"></i></button>
+  <button class="mtb-btn" onclick="deleteRow()" title="Delete Row"><i class="fas fa-minus-square"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="autoSum()" title="AutoSum" style="font-weight:700">Σ</button>
+  <button class="mtb-btn" onclick="sortAsc()" title="Sort A→Z"><i class="fas fa-sort-alpha-down"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="saveSheet()" title="Save"><i class="fas fa-save"></i></button>
+</div>
+
 <!-- FORMULA BAR -->
 <div class="formula-bar">
   <input class="name-box" id="nameBox" value="A1" onchange="goToCell(this.value)" title="Name Box — cell reference">
@@ -430,7 +463,7 @@ td.data-cell.align-right input{text-align:right}
   </div>
 </div>
 
-<script src="js/app.js?v=2"></script>
+<script src="js/app.js?v=3"></script>
 <script>
 // ============ STATE ============
 const ROWS = 50, COLS = 26;
