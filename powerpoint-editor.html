@@ -183,11 +183,59 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex
   .slide-thumb{width:120px;height:68px}
   .slide-canvas{width:600px;height:337px}
   #pptFont{width:80px}
-  .rb span{display:none}.rb{min-width:28px}
+  .rb span{display:none}
+  .rb{min-width:28px}
 }
+
 @media(max-width:600px){
-  .slide-panel{display:none}
-  .slide-canvas{width:100%;height:auto;min-height:200px}
+  /* Title bar */
+  .winctrls{display:none}
+  .qat{margin-right:4px}
+  .title-app-icon{width:22px;height:22px;font-size:12px;margin-right:4px}
+  .title-center{font-size:11px}
+  .title-right button{padding:3px 6px;font-size:10px;gap:3px}
+
+  /* Ribbon tabs: scrollable */
+  .ribbon-tabs-row{overflow-x:auto;flex-wrap:nowrap;padding:0 4px;-webkit-overflow-scrolling:touch}
+  .ribbon-tabs-row::-webkit-scrollbar{display:none}
+  .ribbon-tab{padding:6px 9px 5px;font-size:11px;white-space:nowrap;flex-shrink:0}
+
+  /* Ribbon content: scrollable */
+  .ribbon-content{overflow-x:auto;flex-wrap:nowrap;min-height:60px;padding:3px 4px 0;align-items:center;-webkit-overflow-scrolling:touch}
+  .ribbon-content::-webkit-scrollbar{display:none}
+  .ribbon-group{flex-shrink:0;padding:2px 4px 0}
+  .ribbon-group-label{display:none}
+  .rb{height:44px;min-width:36px;padding:3px 4px}
+  .rb i{font-size:15px}
+  .rb span{display:none}
+  .rb-sm{height:28px;min-width:28px;padding:3px 4px;font-size:11px}
+  #pptFont{width:90px}
+  #pptSize{width:42px}
+
+  /* Slide panel: collapse to thin strip */
+  .slide-panel{width:64px}
+  .slide-thumb{width:52px;height:30px}
+  .slide-thumb .thumb-title{font-size:7px;padding:2px 3px}
+  .slide-thumb .thumb-body{display:none}
+  .slide-thumb-num{display:none}
+  .slide-thumb-actions{display:none}
+  .slide-panel-header{padding:6px 4px;font-size:10px}
+  .slide-panel-header span{display:none}
+
+  /* Canvas: scale to fit */
+  .canvas-wrap{padding:8px}
+  .slide-canvas{
+    width:100% !important;
+    height:auto !important;
+    aspect-ratio:16/9;
+    min-height:0;
+  }
+
+  /* Notes: collapse */
+  .notes-area{height:70px}
+
+  /* Status bar */
+  .status-bar{display:none}
 }
 </style>
 </head>

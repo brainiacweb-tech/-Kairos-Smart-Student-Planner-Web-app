@@ -131,6 +131,47 @@ td.data-cell.align-right input{text-align:right}
   th.col-header{min-width:60px}
   td.data-cell{min-width:60px}
 }
+
+@media(max-width:600px){
+  /* Title bar */
+  .winctrls{display:none}
+  .qat{margin-right:6px}
+  .title-app-icon{width:24px;height:24px;font-size:12px;margin-right:4px}
+  .title-center{font-size:12px}
+  .title-right button{padding:3px 8px;font-size:11px}
+
+  /* Ribbon tabs: scrollable */
+  .ribbon-tabs-row{overflow-x:auto;flex-wrap:nowrap;padding:0 4px;-webkit-overflow-scrolling:touch}
+  .ribbon-tabs-row::-webkit-scrollbar{display:none}
+  .ribbon-tab{padding:7px 10px 6px;font-size:11px;white-space:nowrap;flex-shrink:0}
+
+  /* Ribbon content: scrollable */
+  .ribbon-content{overflow-x:auto;flex-wrap:nowrap;min-height:60px;padding:3px 4px 0;align-items:center;-webkit-overflow-scrolling:touch}
+  .ribbon-content::-webkit-scrollbar{display:none}
+  .ribbon-group{flex-shrink:0;padding:2px 4px 0}
+  .ribbon-group-label{display:none}
+  .rb{height:44px;min-width:36px;padding:3px 4px}
+  .rb i{font-size:15px}
+  .rb span{display:none}
+  .rb-sm{height:28px;min-width:28px;padding:3px 4px;font-size:11px}
+  #xlFontName{width:80px}
+  #xlFontSize{width:38px}
+
+  /* Formula bar */
+  .formula-bar{height:32px}
+  .name-box{width:56px;font-size:11px}
+
+  /* Grid cells smaller on mobile */
+  th.col-header{min-width:50px}
+  td.data-cell{min-width:50px}
+  table.sheet th,table.sheet td{height:28px;font-size:11px}
+
+  /* Sheet tabs */
+  .sheet-tab{padding:4px 10px;font-size:11px}
+
+  /* Status bar */
+  .status-bar{display:none}
+}
 </style>
 </head>
 <body>

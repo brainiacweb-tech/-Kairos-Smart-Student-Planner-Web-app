@@ -216,17 +216,45 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;background:v
 
 /* ====== RESPONSIVE ====== */
 @media(max-width:900px){
-  .doc-page{width:100%;min-width:0;padding:48px 48px}
+  .doc-page{width:100%;min-width:0;padding:48px 40px}
   #ribbonFontName{width:90px}
   .rb span{display:none}
   .rb{min-width:28px;padding:3px}
 }
+
 @media(max-width:600px){
-  .doc-page{padding:24px 24px}
-  .ribbon-content{flex-wrap:wrap;min-height:auto}
-  #ribbonFontName{width:70px}
-  #ribbonFontSize{width:36px}
-  .rb{height:40px}
+  /* Title bar: hide window controls, compact QAT */
+  .winctrls{display:none}
+  .qat{margin-right:6px}
+  .title-app-icon{width:24px;height:24px;font-size:13px;margin-right:4px}
+  .title-center{font-size:12px}
+  .title-right button{padding:3px 8px;font-size:11px}
+
+  /* Ribbon: horizontally scrollable strip */
+  .ribbon-tabs-row{overflow-x:auto;flex-wrap:nowrap;padding:0 4px;-webkit-overflow-scrolling:touch}
+  .ribbon-tabs-row::-webkit-scrollbar{display:none}
+  .ribbon-tab{padding:7px 10px 6px;font-size:11px;white-space:nowrap;flex-shrink:0}
+  .ribbon-content{overflow-x:auto;flex-wrap:nowrap;min-height:64px;padding:3px 4px 0;-webkit-overflow-scrolling:touch;align-items:center}
+  .ribbon-content::-webkit-scrollbar{display:none}
+  .ribbon-group{flex-shrink:0;padding:2px 4px 0}
+  .ribbon-group-label{display:none}
+  .rb{height:44px;min-width:36px;padding:3px 4px}
+  .rb i{font-size:16px}
+  .rb span{display:none}
+  .rb-sm{height:28px;min-width:28px;padding:3px 5px;font-size:11px}
+  #ribbonFontName{width:90px}
+  #ribbonFontSize{width:40px}
+
+  /* Hide ruler on mobile */
+  .ruler-wrap{display:none}
+
+  /* Document page */
+  .doc-workspace{padding:12px 0}
+  .doc-page{padding:20px 16px;min-height:auto}
+  #editor{min-height:400px;font-size:14px}
+
+  /* Modal */
+  .modal-box{width:calc(100vw - 32px)}
 }
 </style>
 </head>
