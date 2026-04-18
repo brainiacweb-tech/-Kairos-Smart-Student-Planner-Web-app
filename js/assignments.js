@@ -5,11 +5,80 @@
 let currentView = 'list';
 let filteredAssignments = [];
 
+let _attachedFiles = [];
+
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     populateFilters();
     applyFilters();
+    setupFileUpload();
 });
+
+// ── FILE UPLOAD ───────────────────────────────────────────────────────────────
+
+function setupFileUpload() {
+    const area = document.getElementById('fileUploadArea');
+    const input = document.getElementById('assignFiles');
+    if (!area || !input) return;
+
+    area.addEventListener('click', () => input.click());
+
+    area.addEventListener('dragover', e => {
+        e.preventDefault();
+        area.style.borderColor = 'var(--primary, #6C63FF)';
+        area.style.background = 'rgba(108,99,255,0.05)';
+    });
+    area.addEventListener('dragleave', () => {
+        area.style.borderColor = '';
+        area.style.background = '';
+    });
+    area.addEventListener('drop', e => {
+        e.preventDefault();
+        area.style.borderColor = '';
+        area.style.background = '';
+        addFiles(Array.from(e.dataTransfer.files));
+    });
+
+    input.addEventListener('change', () => {
+        addFiles(Array.from(input.files));
+        input.value = '';
+    });
+}
+
+function addFiles(files) {
+    files.forEach(file => {
+        if (_attachedFiles.find(f => f.name === file.name && f.size === file.size)) return;
+        _attachedFiles.push({ name: file.name, size: file.size, type: file.type });
+    });
+    renderFileList();
+}
+
+function removeFile(idx) {
+    _attachedFiles.splice(idx, 1);
+    renderFileList();
+}
+
+function renderFileList() {
+    const list = document.getElementById('uploadedFilesList');
+    if (!list) return;
+    if (_attachedFiles.length === 0) { list.innerHTML = ''; return; }
+    list.innerHTML = _attachedFiles.map((f, i) => `
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#f8f8f8;border-radius:6px;margin-top:6px;font-size:13px">
+            <i class="fas fa-${fileIcon(f.type)}" style="color:var(--primary,#6C63FF)"></i>
+            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</span>
+            <span style="color:#999;font-size:11px;flex-shrink:0">${(f.size/1024).toFixed(0)}KB</span>
+            <button onclick="removeFile(${i})" style="background:none;border:none;cursor:pointer;color:#ff4757;font-size:14px;padding:0 2px" title="Remove"><i class="fas fa-times"></i></button>
+        </div>`).join('');
+}
+
+function fileIcon(type) {
+    if (type.startsWith('image/')) return 'image';
+    if (type === 'application/pdf') return 'file-pdf';
+    if (type.includes('word')) return 'file-word';
+    if (type.includes('sheet') || type.includes('excel')) return 'file-excel';
+    if (type.includes('presentation') || type.includes('powerpoint')) return 'file-powerpoint';
+    return 'file-alt';
+}
 
 function openAddModal() {
     openDrawer('addAssignmentDrawer');
@@ -41,11 +110,17 @@ function handleAddAssignment(e) {
         status: document.getElementById('assignStatus').value,
         estimatedHours: parseFloat(document.getElementById('assignHours').value),
         notes: document.getElementById('assignNotes').value,
-        completed: document.getElementById('assignStatus').value === 'completed' ? 100 : 0
+        completed: document.getElementById('assignStatus').value === 'completed' ? 100 : 0,
+        attachments: _attachedFiles.map(f => f.name)
     };
-    
+
     KairosStorage.addAssignment(assignment);
     showToast('Assignment added successfully!', 'success');
+
+    // Reset file list
+    _attachedFiles = [];
+    renderFileList();
+
     closeDrawer('addAssignmentDrawer');
     applyFilters();
 }

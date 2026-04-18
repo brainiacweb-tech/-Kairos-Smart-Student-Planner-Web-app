@@ -559,4 +559,92 @@ document.addEventListener('click', (e) => {
 // Initialize profile menu on page load
 document.addEventListener('DOMContentLoaded', () => {
     updateProfileMenuUser();
+    checkDeadlineNotifications();
 });
+
+// ── NOTIFICATION PANEL (global – works on any page) ───────────────────────────
+
+function openNotificationPanel() {
+    const panel = document.getElementById('notificationPanel');
+    if (panel) {
+        openDrawer('notificationPanel');
+    } else {
+        // Pages without a drawer (assignments, etc.): navigate to dashboard
+        window.location.href = 'dashboard.html';
+    }
+}
+
+// ── BROWSER NOTIFICATION PERMISSION ──────────────────────────────────────────
+
+function requestBrowserNotificationPermission(callback) {
+    if (!('Notification' in window)) {
+        showToast('This browser does not support notifications', 'warning');
+        return;
+    }
+    if (Notification.permission === 'granted') {
+        if (callback) callback();
+        return;
+    }
+    if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                showToast('Browser notifications enabled!', 'success');
+                if (callback) callback();
+            } else {
+                showToast('Notification permission denied', 'warning');
+            }
+        });
+    }
+}
+
+function sendBrowserNotification(title, body, icon) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    try {
+        new Notification(title, {
+            body,
+            icon: icon || '1000669890-Photoroom.png',
+            badge: '1000669890-Photoroom.png'
+        });
+    } catch (e) { /* Safari/restricted contexts */ }
+}
+
+// ── DEADLINE ALARM CHECKER (runs on every page load) ─────────────────────────
+
+function checkDeadlineNotifications() {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+    const prefs = JSON.parse(localStorage.getItem('kairos_notif_prefs') || '{"48h":true,"24h":true,"12h":true,"3h":false,"1h":false}');
+    const assignments = JSON.parse(localStorage.getItem('kairos_assignments') || '[]');
+    const now = Date.now();
+    const fired = JSON.parse(localStorage.getItem('kairos_notif_fired') || '{}');
+
+    const thresholds = [
+        { key: '48h', ms: 48 * 3600000, label: '2 days' },
+        { key: '24h', ms: 24 * 3600000, label: '1 day' },
+        { key: '12h', ms: 12 * 3600000, label: '12 hours' },
+        { key: '3h',  ms:  3 * 3600000, label: '3 hours' },
+        { key: '1h',  ms:  1 * 3600000, label: '1 hour' },
+    ];
+
+    assignments.forEach(a => {
+        if (a.status === 'completed' || !a.dueDate) return;
+        const due = new Date(a.dueDate).getTime();
+        if (due < now) return;
+        const remaining = due - now;
+
+        thresholds.forEach(t => {
+            if (!prefs[t.key]) return;
+            if (remaining > t.ms) return;
+            const fireKey = `${a.id}_${t.key}`;
+            if (fired[fireKey]) return;
+
+            sendBrowserNotification(
+                `⏰ Due in ${t.label}: ${a.title}`,
+                `${a.course || 'Assignment'} is due ${new Date(a.dueDate).toLocaleString()}`,
+            );
+            fired[fireKey] = true;
+        });
+    });
+
+    localStorage.setItem('kairos_notif_fired', JSON.stringify(fired));
+}
