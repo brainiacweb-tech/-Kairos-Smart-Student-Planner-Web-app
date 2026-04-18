@@ -4,7 +4,7 @@
    Word→PDF / PPT→PDF still require the Python backend.
    =========================== */
 
-const BACKEND = 'http://localhost:5000/api';
+const BACKEND = (typeof KAIROS_API_BASE !== 'undefined') ? KAIROS_API_BASE : 'http://localhost:5000/api';
 
 // ── utilities ─────────────────────────────────────────────────────────────────
 

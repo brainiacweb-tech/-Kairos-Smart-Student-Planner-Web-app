@@ -1,0 +1,20 @@
+services:
+  # Python Flask backend
+  - type: web
+    name: kairos-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+
+  # Static frontend
+  - type: web
+    name: kairos-frontend
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: .
+    plan: free

@@ -556,6 +556,7 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex
   </div>
 </div>
 
+<script src="js/config.js"></script>
 <script>
 function showToast(msg,type){
   const t=document.createElement('div');
@@ -1038,7 +1039,7 @@ function downloadPresentation(fmt){
 function goBack(){ window.location.href='dashboard.html'; }
 
 // ============ PYTHON BACKEND – PPTX IMPORT / EXPORT ============
-const _PPT_API = 'http://localhost:5000/api';
+const _PPT_API = (typeof KAIROS_API_BASE !== 'undefined') ? KAIROS_API_BASE : 'http://localhost:5000/api';
 
 async function exportPptx(){
   document.getElementById('pptFileMenu').style.display='none';

@@ -474,6 +474,7 @@ td.data-cell.align-right input{text-align:right}
   </div>
 </div>
 
+<script src="js/config.js"></script>
 <script src="js/app.js?v=3"></script>
 <script>
 // ============ STATE ============
@@ -1033,7 +1034,7 @@ function toggleFileMenu(){
 function goBack(){ window.location.href='dashboard.html'; }
 
 // ============ PYTHON BACKEND – XLSX IMPORT / EXPORT ============
-const _XL_API = 'http://localhost:5000/api';
+const _XL_API = (typeof KAIROS_API_BASE !== 'undefined') ? KAIROS_API_BASE : 'http://localhost:5000/api';
 
 async function exportXlsx(){
   document.getElementById('xlFileMenu').style.display='none';

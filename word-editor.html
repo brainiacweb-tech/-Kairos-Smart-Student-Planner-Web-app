@@ -627,6 +627,7 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;background:v
   </div>
 </div>
 
+<script src="js/config.js"></script>
 <script>
 function showToast(msg,type){
   const t=document.createElement('div');
@@ -872,7 +873,7 @@ function printDoc(){ window.print(); document.getElementById('fileMenu').style.d
 function goBack(){ window.location.href='dashboard.html'; }
 
 // ============ PYTHON BACKEND – DOCX IMPORT / EXPORT ============
-const _WORD_API = 'http://localhost:5000/api';
+const _WORD_API = (typeof KAIROS_API_BASE !== 'undefined') ? KAIROS_API_BASE : 'http://localhost:5000/api';
 
 async function exportDocx(){
   document.getElementById('fileMenu').style.display='none';
