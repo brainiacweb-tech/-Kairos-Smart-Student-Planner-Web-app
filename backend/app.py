@@ -52,6 +52,22 @@ from PIL import Image
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
+# ── FRONTEND STATIC FILE SERVING ─────────────────────────────────────────────
+# Serve the HTML/CSS/JS frontend from the repo root (one directory up from backend/)
+FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+@app.route('/')
+def serve_index():
+    return send_file(os.path.join(FRONTEND_DIR, 'index.html'))
+
+@app.route('/<path:filename>')
+def serve_frontend(filename):
+    filepath = os.path.join(FRONTEND_DIR, filename)
+    if os.path.isfile(filepath):
+        return send_file(filepath)
+    # Fallback to index.html for SPA-style navigation
+    return send_file(os.path.join(FRONTEND_DIR, 'index.html'))
+
 
 # ─────────────────────────────────────────────
 #  HELPERS

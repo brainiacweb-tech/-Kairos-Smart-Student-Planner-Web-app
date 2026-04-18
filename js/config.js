@@ -1,7 +1,7 @@
 /* ===========================
    API CONFIGURATION
-   Update KAIROS_API_BASE to your Render backend URL after deploying.
-   Example: 'https://kairos-backend.onrender.com/api'
+   When frontend and backend are on the same server (Render),
+   use a relative path so no URL needs to be updated after deploy.
    =========================== */
 
-const KAIROS_API_BASE = 'https://YOUR-APP-NAME.onrender.com/api';
+const KAIROS_API_BASE = '/api';
