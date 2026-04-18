@@ -198,25 +198,33 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex
   .title-center{font-size:11px}
   .title-right button{padding:3px 7px;font-size:11px;gap:3px}
 
-  /* Hide full ribbon */
-  .ribbon{display:none}
+  /* Ribbon: scrollable on mobile */
+  .ribbon{display:block}
+  .ribbon-tabs-row{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+  .ribbon-tabs-row::-webkit-scrollbar{display:none}
+  .ribbon-content.active{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+  .ribbon-content::-webkit-scrollbar{display:none}
+  .ribbon-group{flex-shrink:0;padding:2px 4px 0}
+  .rb{min-width:38px;height:48px;padding:2px 4px}
+  .rb i{font-size:16px}
+  #pptFont{width:75px}
+  #pptSize{width:34px}
 
-  /* Mobile toolbar */
+  /* Mobile quick-access toolbar */
   .mobile-toolbar{
     display:flex;align-items:center;overflow-x:auto;
-    background:#fff;border-bottom:1px solid #d1d1d1;
-    padding:4px 6px;gap:2px;flex-shrink:0;
+    background:#f8f8f8;border-bottom:1px solid #d1d1d1;
+    padding:3px 6px;gap:2px;flex-shrink:0;
     -webkit-overflow-scrolling:touch;
-    box-shadow:0 1px 3px rgba(0,0,0,.07);
   }
   .mobile-toolbar::-webkit-scrollbar{display:none}
   .mtb-btn{
     background:transparent;border:1px solid transparent;border-radius:4px;
-    width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+    width:36px;height:36px;display:flex;align-items:center;justify-content:center;
     font-size:13px;cursor:pointer;flex-shrink:0;color:#333;font-family:inherit;
   }
   .mtb-btn:active{background:#fde8e4;border-color:#f0a898}
-  .mtb-sep{width:1px;height:22px;background:#d1d1d1;margin:0 3px;flex-shrink:0}
+  .mtb-sep{width:1px;height:20px;background:#d1d1d1;margin:0 2px;flex-shrink:0}
 
   /* Editor body */
   .editor-body{flex-direction:column}
@@ -528,6 +536,9 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex
   <button class="file-menu-item" onclick="newPresentation()"><i class="fas fa-file"></i> New</button>
   <button class="file-menu-item" onclick="savePresentation()"><i class="fas fa-save"></i> Save</button>
   <button class="file-menu-item" onclick="renamePresentation()"><i class="fas fa-pencil-alt"></i> Rename</button>
+  <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="openPptx()"><i class="fas fa-folder-open" style="color:#D04423"></i> Open PowerPoint (.pptx)</button>
+  <button class="file-menu-item" onclick="exportPptx()"><i class="fas fa-file-powerpoint" style="color:#D04423"></i> Export as PowerPoint (.pptx)</button>
   <div style="border-top:1px solid #eee;margin:4px 0"></div>
   <button class="file-menu-item" onclick="downloadPresentation('html')"><i class="fas fa-download"></i> Export as HTML</button>
   <button class="file-menu-item" onclick="downloadPresentation('txt')"><i class="fas fa-file-alt"></i> Export as Text</button>
@@ -1025,6 +1036,72 @@ function downloadPresentation(fmt){
   document.getElementById('pptFileMenu').style.display='none';
 }
 function goBack(){ window.location.href='dashboard.html'; }
+
+// ============ PYTHON BACKEND – PPTX IMPORT / EXPORT ============
+const _PPT_API = 'http://localhost:5000/api';
+
+async function exportPptx(){
+  document.getElementById('pptFileMenu').style.display='none';
+  saveCurrentSlide();
+  if(typeof showToast==='function') showToast('⏳ Exporting as PowerPoint…','info');
+  try {
+    const res = await fetch(`${_PPT_API}/ppt/export`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({slides, name: presName})
+    });
+    if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error||`HTTP ${res.status}`); }
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (presName.endsWith('.pptx')?presName:presName+'.pptx');
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    if(typeof showToast==='function') showToast('✅ PowerPoint exported!','success');
+  } catch(e){
+    const msg = e.name==='TypeError'
+      ? '❌ Backend not running. Start backend/start_server.bat'
+      : `❌ ${e.message}`;
+    if(typeof showToast==='function') showToast(msg,'error');
+  }
+}
+
+async function openPptx(){
+  document.getElementById('pptFileMenu').style.display='none';
+  if(slides.length && !confirm('Replace current presentation with the imported file?')) return;
+  const input = document.createElement('input');
+  input.type='file'; input.accept='.pptx'; input.style.display='none';
+  document.body.appendChild(input);
+  input.onchange = async ()=>{
+    document.body.removeChild(input);
+    const file = input.files[0];
+    if(!file) return;
+    if(typeof showToast==='function') showToast('⏳ Opening presentation…','info');
+    try {
+      const fd = new FormData(); fd.append('file', file);
+      const res = await fetch(`${_PPT_API}/ppt/import`,{method:'POST',body:fd});
+      if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error||`HTTP ${res.status}`); }
+      const data = await res.json();
+      if(data.slides && data.slides.length){
+        slides = data.slides;
+        presName = data.name || file.name.replace(/\.pptx$/i,'');
+        document.getElementById('presNameDisplay').textContent = presName;
+        document.title = presName + ' — PowerPoint';
+        currentSlideIdx = 0;
+        renderCanvas();
+        renderThumbs();
+        autoSavePres();
+        if(typeof showToast==='function') showToast('✅ Presentation opened!','success');
+      }
+    } catch(e){
+      const msg = e.name==='TypeError'
+        ? '❌ Backend not running. Start backend/start_server.bat'
+        : `❌ ${e.message}`;
+      if(typeof showToast==='function') showToast(msg,'error');
+    }
+  };
+  input.click();
+}
 
 // ============ RIBBON TABS ============
 function switchTab(name,btn){

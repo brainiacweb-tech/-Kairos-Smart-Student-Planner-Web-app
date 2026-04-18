@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/cranky-curran/backend/app.py\" \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/serene-tesla-1c07fb/backend/app.py\")",
+      "Bash(cp \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/cranky-curran/backend/requirements.txt\" \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/serene-tesla-1c07fb/backend/requirements.txt\")",
+      "Bash(cp \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/cranky-curran/backend/start_server.bat\" \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/serene-tesla-1c07fb/backend/start_server.bat\")",
+      "Bash(grep -n \"html,body\\\\|body{\" \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/serene-tesla-1c07fb/word-editor.html\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(cp \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/serene-tesla-1c07fb/word-editor.html\" \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/word-editor.html\")",
+      "Bash(cp \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/serene-tesla-1c07fb/excel-editor.html\" \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/excel-editor.html\")",
+      "Bash(cp \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/serene-tesla-1c07fb/powerpoint-editor.html\" \"C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/powerpoint-editor.html\")",
+      "Bash(cp 'C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/serene-tesla-1c07fb/js/app.js' 'C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/js/app.js')",
+      "Bash(cp 'C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/serene-tesla-1c07fb/js/settings.js' 'C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/js/settings.js')",
+      "Bash(cp 'C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/serene-tesla-1c07fb/js/assignments.js' 'C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/js/assignments.js')",
+      "Bash(cp 'C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/serene-tesla-1c07fb/settings.html' 'C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/settings.html')",
+      "Bash(cp 'C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/.claude/worktrees/serene-tesla-1c07fb/js/pdf-tools.js' 'C:/Users/USER/OneDrive/Desktop/KAIROS SMART STUDENT PLANNER/js/pdf-tools.js')"
+    ]
+  }
+}

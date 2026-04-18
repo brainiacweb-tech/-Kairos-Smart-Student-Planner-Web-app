@@ -233,32 +233,41 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;background:v
   .title-center{font-size:11px}
   .title-right button{padding:4px 10px;font-size:11px}
 
-  /* Hide full ribbon + ruler */
-  .ribbon{display:none}
+  /* Ribbon: scrollable on mobile */
+  .ribbon{display:block}
   .ruler-wrap{display:none}
+  .ribbon-tabs-row{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+  .ribbon-tabs-row::-webkit-scrollbar{display:none}
+  .ribbon-content.active{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+  .ribbon-content::-webkit-scrollbar{display:none}
+  .ribbon-group{padding:2px 4px 0;flex-shrink:0}
+  .rb{min-width:38px;height:48px;padding:2px 4px}
+  .rb i{font-size:16px}
+  #ribbonFontName{width:80px}
+  #ribbonFontSize{width:36px}
+  .font-combo{font-size:10px}
 
-  /* Mobile toolbar */
+  /* Mobile quick-access toolbar */
   .mobile-toolbar{
     display:flex;
     align-items:center;
     overflow-x:auto;
-    background:#fff;
+    background:#f8f8f8;
     border-bottom:1px solid #d1d1d1;
-    padding:4px 6px;
+    padding:3px 6px;
     gap:2px;
     flex-shrink:0;
     -webkit-overflow-scrolling:touch;
-    box-shadow:0 1px 3px rgba(0,0,0,.08);
   }
   .mobile-toolbar::-webkit-scrollbar{display:none}
   .mtb-btn{
     background:transparent;border:1px solid transparent;border-radius:4px;
-    width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+    width:36px;height:36px;display:flex;align-items:center;justify-content:center;
     font-size:14px;cursor:pointer;flex-shrink:0;color:#333;font-family:inherit;
     transition:background .12s;
   }
   .mtb-btn:active,.mtb-btn.pressed{background:#cce4f7;border-color:#90c8f0}
-  .mtb-sep{width:1px;height:22px;background:#d1d1d1;margin:0 3px;flex-shrink:0}
+  .mtb-sep{width:1px;height:20px;background:#d1d1d1;margin:0 2px;flex-shrink:0}
 
   /* Document */
   .doc-workspace{padding:10px 0}
@@ -568,6 +577,9 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;background:v
   <button class="file-menu-item" onclick="saveDoc()"><i class="fas fa-save"></i> Save</button>
   <button class="file-menu-item" onclick="renameDoc()"><i class="fas fa-pencil-alt"></i> Rename</button>
   <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="openDocx()"><i class="fas fa-folder-open" style="color:#2B579A"></i> Open Word (.docx)</button>
+  <button class="file-menu-item" onclick="exportDocx()"><i class="fas fa-file-word" style="color:#2B579A"></i> Export as Word (.docx)</button>
+  <div style="border-top:1px solid #eee;margin:4px 0"></div>
   <button class="file-menu-item" onclick="downloadDoc('html')"><i class="fas fa-download"></i> Download as HTML</button>
   <button class="file-menu-item" onclick="downloadDoc('txt')"><i class="fas fa-file-alt"></i> Download as TXT</button>
   <div style="border-top:1px solid #eee;margin:4px 0"></div>
@@ -858,6 +870,65 @@ function downloadDoc(fmt){
 }
 function printDoc(){ window.print(); document.getElementById('fileMenu').style.display='none'; }
 function goBack(){ window.location.href='dashboard.html'; }
+
+// ============ PYTHON BACKEND – DOCX IMPORT / EXPORT ============
+const _WORD_API = 'http://localhost:5000/api';
+
+async function exportDocx(){
+  document.getElementById('fileMenu').style.display='none';
+  if(typeof showToast==='function') showToast('⏳ Exporting as Word…','info');
+  try {
+    const res = await fetch(`${_WORD_API}/word/export`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({html: editor.innerHTML, name: docName})
+    });
+    if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error||`HTTP ${res.status}`); }
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (docName.endsWith('.docx')?docName:docName+'.docx');
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    if(typeof showToast==='function') showToast('✅ Word document exported!','success');
+  } catch(e){
+    const msg = e.name==='TypeError'
+      ? '❌ Backend not running. Start backend/start_server.bat'
+      : `❌ ${e.message}`;
+    if(typeof showToast==='function') showToast(msg,'error');
+  }
+}
+
+async function openDocx(){
+  document.getElementById('fileMenu').style.display='none';
+  if(editor.innerHTML.trim() && !confirm('Replace current document with the imported file?')) return;
+  const input = document.createElement('input');
+  input.type='file'; input.accept='.docx,.doc'; input.style.display='none';
+  document.body.appendChild(input);
+  input.onchange = async ()=>{
+    document.body.removeChild(input);
+    const file = input.files[0];
+    if(!file) return;
+    if(typeof showToast==='function') showToast('⏳ Opening Word document…','info');
+    try {
+      const fd = new FormData(); fd.append('file', file);
+      const res = await fetch(`${_WORD_API}/word/import`,{method:'POST',body:fd});
+      if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error||`HTTP ${res.status}`); }
+      const data = await res.json();
+      editor.innerHTML = data.html || '';
+      docName = data.name || file.name.replace(/\.(docx?)$/i,'');
+      updateDocName();
+      autoSave();
+      if(typeof showToast==='function') showToast('✅ Document opened!','success');
+    } catch(e){
+      const msg = e.name==='TypeError'
+        ? '❌ Backend not running. Start backend/start_server.bat'
+        : `❌ ${e.message}`;
+      if(typeof showToast==='function') showToast(msg,'error');
+    }
+  };
+  input.click();
+}
 
 // ============ RULER ============
 function drawRuler(){
