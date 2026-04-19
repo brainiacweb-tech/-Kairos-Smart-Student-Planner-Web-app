@@ -148,11 +148,6 @@
                 signin_time: new Date().toISOString()
             }));
 
-            // Initialize mock data if not exist
-            if (!localStorage.getItem('kairos_assignments')) {
-                initializeMockData();
-            }
-
             showToast('Successfully signed in! Redirecting...', 'success');
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
@@ -166,10 +161,6 @@
                 logged_in: true,
                 is_guest: true
             }));
-
-            if (!localStorage.getItem('kairos_assignments')) {
-                initializeMockData();
-            }
 
             showToast('Welcome, Guest! Entering as guest...', 'info');
             setTimeout(() => {
@@ -185,33 +176,6 @@
             }
         });
 
-        function initializeMockData() {
-            const mockAssignments = [
-                {
-                    id: 1,
-                    title: 'Financial Statements Analysis',
-                    course: 'ACC301',
-                    dueDate: new Date(Date.now() + 2*24*60*60*1000).toISOString(),
-                    priority: 'high',
-                    status: 'in-progress',
-                    estimatedHours: 5,
-                    completed: 40,
-                    notes: 'Focus on IFRS standards and audit procedures'
-                },
-                {
-                    id: 2,
-                    title: 'Strategic Management Project',
-                    course: 'BUS401',
-                    dueDate: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
-                    priority: 'medium',
-                    status: 'pending',
-                    estimatedHours: 8,
-                    completed: 0,
-                    notes: 'Study competitive analysis frameworks'
-                }
-            ];
-            localStorage.setItem('kairos_assignments', JSON.stringify(mockAssignments));
-        }
     </script>
 </body>
 </html>

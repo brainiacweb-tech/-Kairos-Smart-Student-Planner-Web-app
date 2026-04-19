@@ -174,7 +174,19 @@ function getCurrentPage() {
 function setupSidebarToggle() {
     const toggleBtn = document.querySelector('.navbar-toggle');
     const sidebar = document.querySelector('.sidebar');
-    
+
+    // Inject logo into navbar next to hamburger (visible on all screen sizes)
+    const navbarLeft = document.querySelector('.navbar-left');
+    if (navbarLeft && toggleBtn && !navbarLeft.querySelector('.navbar-logo-img')) {
+        const logoImg = document.createElement('img');
+        logoImg.src = '1000669890-Photoroom.png';
+        logoImg.alt = 'Kairos';
+        logoImg.className = 'navbar-logo-img';
+        logoImg.style.cssText = 'width:48px;height:48px;object-fit:contain;margin-left:8px;cursor:pointer;filter:drop-shadow(0 0 6px rgba(108,99,255,0.35));flex-shrink:0;';
+        logoImg.onclick = () => window.location.href = 'dashboard.html';
+        toggleBtn.insertAdjacentElement('afterend', logoImg);
+    }
+
     if (toggleBtn && sidebar) {
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('active');

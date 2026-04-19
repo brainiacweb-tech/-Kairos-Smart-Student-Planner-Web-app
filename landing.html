@@ -68,7 +68,6 @@
             max-width: 1200px;
             margin: 0 auto;
         }
-        .hero-text {}
         .hero-badge {
             display: inline-flex; align-items: center; gap: 7px;
             background: var(--primary-light); color: var(--primary);
@@ -90,6 +89,34 @@
         .hero-stats { display: flex; gap: 32px; margin-top: 40px; padding-top: 32px; border-top: 1px solid var(--border); }
         .hero-stat-val { font-family: 'Poppins', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--primary); }
         .hero-stat-label { font-size: 0.82rem; color: var(--text-secondary); }
+
+        /* ── APP STORE BADGES ── */
+        .store-badges {
+            display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 20px;
+        }
+        .store-badge {
+            display: flex; align-items: center; gap: 10px;
+            background: #111; color: #fff;
+            border-radius: 10px; padding: 9px 18px;
+            border: 1px solid rgba(255,255,255,0.12);
+            text-decoration: none;
+            position: relative;
+            opacity: 0.82;
+            cursor: default;
+            user-select: none;
+            min-width: 150px;
+        }
+        .store-badge-icon { font-size: 1.6rem; line-height: 1; }
+        .store-badge-text { display: flex; flex-direction: column; }
+        .store-badge-soon { font-size: 0.6rem; letter-spacing: 0.08em; color: #aaa; text-transform: uppercase; }
+        .store-badge-name { font-size: 0.88rem; font-weight: 700; font-family: 'Poppins', sans-serif; line-height: 1.2; }
+        .store-badge-pill {
+            position: absolute; top: -8px; right: -6px;
+            background: linear-gradient(135deg, #6C63FF, #A78BFA);
+            color: #fff; font-size: 0.58rem; font-weight: 700;
+            letter-spacing: 0.06em; padding: 2px 7px; border-radius: 20px;
+            text-transform: uppercase;
+        }
 
         /* ── BROWSER MOCKUP ── */
         .mockup-wrap {
@@ -207,84 +234,134 @@
 
         /* ── iPHONE 17 PRO MAX MOCKUP ── */
         .iphone17-mockup {
-            position: absolute; bottom: -36px; right: -48px;
-            width: 128px;
-            background: linear-gradient(175deg, #3a3a3a 0%, #1c1c1c 40%, #111 100%);
-            border-radius: 46px;
+            position: absolute; bottom: -40px; right: -52px;
+            width: 152px;
+            /* Titanium Natural finish */
+            background: linear-gradient(170deg,
+                #d4d4d4 0%, #b8b8b8 15%, #a0a0a0 35%,
+                #969696 55%, #acacac 75%, #c8c8c8 100%);
+            border-radius: 54px;
             box-shadow:
-                0 32px 70px rgba(0,0,0,0.55),
-                inset 0 0 0 1px rgba(255,255,255,0.14),
-                inset 0 1px 0 rgba(255,255,255,0.22);
-            border: 2px solid #2a2a2a;
-            overflow: hidden;
+                0 40px 90px rgba(0,0,0,0.65),
+                0 8px 24px rgba(0,0,0,0.4),
+                inset 0 0 0 1px rgba(255,255,255,0.35),
+                inset 0 2px 0 rgba(255,255,255,0.5);
+            padding: 4px;
             z-index: 10;
         }
+        /* Inner glass bezel */
+        .iphone17-inner-wrap {
+            background: #000;
+            border-radius: 50px;
+            overflow: hidden;
+            position: relative;
+        }
         .iphone17-topbar {
-            height: 26px; background: #0d0d0d;
+            height: 30px; background: #000;
             display: flex; align-items: center; justify-content: center;
             position: relative;
         }
+        /* Dynamic Island */
         .iphone17-island {
-            width: 48px; height: 12px; background: #000;
-            border-radius: 12px;
-            box-shadow: 0 0 0 1.5px rgba(255,255,255,0.07), 0 2px 8px rgba(0,0,0,0.8);
+            width: 58px; height: 16px; background: #0a0a0a;
+            border-radius: 20px;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.06),
+                inset 0 0 8px rgba(0,0,0,0.9);
+            display: flex; align-items: center; justify-content: flex-end;
+            padding-right: 5px; gap: 3px;
+        }
+        /* Camera lens inside Dynamic Island */
+        .iphone17-island::after {
+            content: '';
+            width: 7px; height: 7px;
+            background: radial-gradient(circle at 35% 35%, #2a3a5a, #050518);
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 0 4px rgba(100,140,255,0.25);
         }
         .iphone17-screen { background: #f8f9ff; padding: 8px; }
         .iphone17-home {
-            height: 14px; background: #0d0d0d;
-            display: flex; align-items: center; justify-content: center;
+            height: 18px; background: #000;
+            display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px;
         }
-        .iphone17-indicator { width: 38px; height: 4px; background: rgba(255,255,255,0.32); border-radius: 4px; }
-        /* Volume buttons left */
+        .iphone17-indicator { width: 40px; height: 4px; background: rgba(255,255,255,0.38); border-radius: 4px; }
+        /* Action button (left, top) + Volume buttons */
         .iphone17-mockup::before {
-            content: ''; position: absolute; left: -3.5px; top: 68px;
-            width: 3px; height: 22px; background: #2a2a2a; border-radius: 2px 0 0 2px;
-            box-shadow: 0 32px 0 #2a2a2a, 0 60px 0 22px #2a2a2a;
+            content: ''; position: absolute; left: 0px; top: 76px;
+            width: 3.5px; height: 10px; /* Action button */
+            background: linear-gradient(to right, #888, #aaa);
+            border-radius: 2px 0 0 2px;
+            box-shadow:
+                0 20px 0 14px linear-gradient(to right,#888,#aaa),
+                0 46px 0 14px linear-gradient(to right,#888,#aaa);
         }
-        /* Power button right */
+        /* Power / Side button right */
         .iphone17-mockup::after {
-            content: ''; position: absolute; right: -3.5px; top: 80px;
-            width: 3px; height: 52px; background: #2a2a2a; border-radius: 0 2px 2px 0;
+            content: ''; position: absolute; right: 0px; top: 90px;
+            width: 3.5px; height: 54px;
+            background: linear-gradient(to left, #888, #aaa);
+            border-radius: 0 2px 2px 0;
         }
 
-        /* ── SAMSUNG S26 ULTRA MOCKUP ── */
+        /* ── SAMSUNG GALAXY S26 ULTRA MOCKUP ── */
         .samsung-s26-mockup {
-            position: absolute; bottom: -24px; left: -42px;
-            width: 114px;
-            background: linear-gradient(175deg, #1e1e1e 0%, #0c0c0c 50%, #080808 100%);
-            border-radius: 26px 26px 28px 28px;
+            position: absolute; bottom: -28px; left: -46px;
+            width: 132px;
+            /* Titanium Black - flat matte finish */
+            background: linear-gradient(175deg, #2a2a2a 0%, #141414 40%, #101010 70%, #1c1c1c 100%);
+            border-radius: 20px 20px 22px 22px; /* Ultra's flatter corners */
             box-shadow:
-                0 32px 70px rgba(0,0,0,0.55),
-                inset 0 0 0 1px rgba(255,255,255,0.09),
-                inset 0 1px 0 rgba(255,255,255,0.15);
-            border: 1.5px solid #1a1a1a;
-            overflow: hidden;
+                0 40px 90px rgba(0,0,0,0.7),
+                0 8px 24px rgba(0,0,0,0.45),
+                inset 0 0 0 1px rgba(255,255,255,0.07),
+                inset 0 1px 0 rgba(255,255,255,0.12);
+            border: 1px solid #0a0a0a;
+            padding: 3px;
             z-index: 10;
         }
+        .samsung-s26-inner-wrap {
+            background: #050505;
+            border-radius: 17px 17px 19px 19px;
+            overflow: hidden;
+            position: relative;
+        }
         .samsung-s26-topbar {
-            height: 22px; background: #050505;
+            height: 24px; background: #050505;
             display: flex; align-items: center; justify-content: center;
         }
         .samsung-s26-camera {
-            width: 8px; height: 8px; background: #111; border-radius: 50%;
-            border: 1.5px solid rgba(255,255,255,0.15);
-            box-shadow: 0 0 6px rgba(100,180,255,0.3), inset 0 0 3px rgba(0,0,50,0.5);
+            width: 9px; height: 9px; background: #0a0a0a; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow:
+                0 0 0 1.5px rgba(255,255,255,0.04),
+                0 0 8px rgba(80,150,255,0.2),
+                inset 0 0 4px rgba(0,0,80,0.6);
         }
         .samsung-s26-screen { background: #f8f9ff; padding: 7px; }
         .samsung-s26-bottom {
-            height: 16px; background: #050505;
-            display: flex; align-items: center; justify-content: flex-end; padding-right: 6px;
+            height: 18px; background: #050505;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 8px;
         }
-        .samsung-s26-spen { width: 3px; height: 10px; background: #1a3a6a; border-radius: 1.5px; }
+        /* Gesture bar */
+        .samsung-s26-bar { width: 36px; height: 3px; background: rgba(255,255,255,0.25); border-radius: 2px; }
+        /* S Pen slot */
+        .samsung-s26-spen { width: 3px; height: 10px; background: linear-gradient(to bottom, #2255aa, #1a3a80); border-radius: 1.5px; box-shadow: 0 0 4px rgba(50,100,255,0.4); }
         /* Volume buttons right */
         .samsung-s26-mockup::before {
-            content: ''; position: absolute; right: -3px; top: 60px;
-            width: 2.5px; height: 54px; background: #1a1a1a; border-radius: 0 2px 2px 0;
+            content: ''; position: absolute; right: 0px; top: 56px;
+            width: 3px; height: 48px;
+            background: linear-gradient(to left, #222, #333);
+            border-radius: 0 2px 2px 0;
+            box-shadow: 0 62px 0 -14px linear-gradient(to left,#222,#333);
         }
-        /* Power button left */
+        /* Power button right (below volume) */
         .samsung-s26-mockup::after {
-            content: ''; position: absolute; left: -3px; top: 72px;
-            width: 2.5px; height: 32px; background: #1a1a1a; border-radius: 2px 0 0 2px;
+            content: ''; position: absolute; right: 0px; top: 112px;
+            width: 3px; height: 28px;
+            background: linear-gradient(to left, #222, #333);
+            border-radius: 0 2px 2px 0;
         }
 
         /* ── PLATFORM BADGE ICONS ── */
@@ -563,6 +640,25 @@
                 <i class="fas fa-download"></i> Install App
             </button>
         </div>
+        <!-- App Store Badges -->
+        <div class="store-badges">
+            <div class="store-badge">
+                <div class="store-badge-icon">🍎</div>
+                <div class="store-badge-text">
+                    <span class="store-badge-soon">Download on the</span>
+                    <span class="store-badge-name">App Store</span>
+                </div>
+                <span class="store-badge-pill">Coming Soon</span>
+            </div>
+            <div class="store-badge">
+                <div class="store-badge-icon">▶</div>
+                <div class="store-badge-text">
+                    <span class="store-badge-soon">Get it on</span>
+                    <span class="store-badge-name">Google Play</span>
+                </div>
+                <span class="store-badge-pill">Coming Soon</span>
+            </div>
+        </div>
         <div class="hero-stats">
             <div>
                 <div class="hero-stat-val">10+</div>
@@ -646,39 +742,46 @@
                 </div>
             </div>
         </div>
-        <!-- iPhone 17 -->
+        <!-- iPhone 17 Pro Max -->
         <div class="iphone17-mockup">
-            <div class="iphone17-topbar"><div class="iphone17-island"></div></div>
-            <div class="iphone17-screen">
-                <div style="font-size:0.6rem;font-weight:700;color:#6C63FF;margin-bottom:5px;font-family:'Poppins',sans-serif;">📋 Assignments</div>
-                <div class="mini-mobile-stat">
-                    <div class="mini-mobile-card"><div class="mini-mobile-card-num">8</div><div class="mini-mobile-card-lbl">Total</div></div>
-                    <div class="mini-mobile-card"><div class="mini-mobile-card-num" style="color:#2ED573">4</div><div class="mini-mobile-card-lbl">Done</div></div>
+            <div class="iphone17-inner-wrap">
+                <div class="iphone17-topbar"><div class="iphone17-island"></div></div>
+                <div class="iphone17-screen">
+                    <div style="font-size:0.6rem;font-weight:700;color:#6C63FF;margin-bottom:5px;font-family:'Poppins',sans-serif;">📋 Assignments</div>
+                    <div class="mini-mobile-stat">
+                        <div class="mini-mobile-card"><div class="mini-mobile-card-num">8</div><div class="mini-mobile-card-lbl">Total</div></div>
+                        <div class="mini-mobile-card"><div class="mini-mobile-card-num" style="color:#2ED573">4</div><div class="mini-mobile-card-lbl">Done</div></div>
+                    </div>
+                    <div class="mini-mobile-list">
+                        <div class="mini-mobile-item"><div class="mini-mobile-item-title">Fin. Statements</div><div class="mini-mobile-item-sub">ACC301 · 2 days</div></div>
+                        <div class="mini-mobile-item" style="border-left-color:#FFA502"><div class="mini-mobile-item-title">Strategic Mgmt</div><div class="mini-mobile-item-sub">BUS401 · 5 days</div></div>
+                        <div class="mini-mobile-item" style="border-left-color:#2ED573"><div class="mini-mobile-item-title">Marketing Pres.</div><div class="mini-mobile-item-sub">Completed ✓</div></div>
+                    </div>
                 </div>
-                <div class="mini-mobile-list">
-                    <div class="mini-mobile-item"><div class="mini-mobile-item-title">Fin. Statements</div><div class="mini-mobile-item-sub">ACC301 · 2 days</div></div>
-                    <div class="mini-mobile-item" style="border-left-color:#FFA502"><div class="mini-mobile-item-title">Strategic Mgmt</div><div class="mini-mobile-item-sub">BUS401 · 5 days</div></div>
-                    <div class="mini-mobile-item" style="border-left-color:#2ED573"><div class="mini-mobile-item-title">Marketing Pres.</div><div class="mini-mobile-item-sub">Completed ✓</div></div>
-                </div>
+                <div class="iphone17-home"><div class="iphone17-indicator"></div></div>
             </div>
-            <div class="iphone17-home"><div class="iphone17-indicator"></div></div>
         </div>
-        <!-- Samsung S26 Ultra -->
+        <!-- Samsung Galaxy S26 Ultra -->
         <div class="samsung-s26-mockup">
-            <div class="samsung-s26-topbar"><div class="samsung-s26-camera"></div></div>
-            <div class="samsung-s26-screen">
-                <div style="font-size:0.58rem;font-weight:700;color:#6C63FF;margin-bottom:5px;font-family:'Poppins',sans-serif;">📊 CWA Overview</div>
-                <div style="text-align:center;margin-bottom:5px;">
-                    <div style="font-family:'Poppins',sans-serif;font-size:1.5rem;font-weight:700;color:#6C63FF;line-height:1">80</div>
-                    <div style="font-size:0.5rem;color:#6b7280">CWA Score</div>
+            <div class="samsung-s26-inner-wrap">
+                <div class="samsung-s26-topbar"><div class="samsung-s26-camera"></div></div>
+                <div class="samsung-s26-screen">
+                    <div style="font-size:0.58rem;font-weight:700;color:#6C63FF;margin-bottom:5px;font-family:'Poppins',sans-serif;">📊 CWA Overview</div>
+                    <div style="text-align:center;margin-bottom:5px;">
+                        <div style="font-family:'Poppins',sans-serif;font-size:1.5rem;font-weight:700;color:#6C63FF;line-height:1">80</div>
+                        <div style="font-size:0.5rem;color:#6b7280">CWA Score</div>
+                    </div>
+                    <div class="mini-mobile-list">
+                        <div class="mini-mobile-item" style="border-left-color:#2ED573"><div class="mini-mobile-item-title">ACC301 Financial</div><div class="mini-mobile-item-sub">Score: 85/100</div></div>
+                        <div class="mini-mobile-item" style="border-left-color:#6C63FF"><div class="mini-mobile-item-title">MKT201 Marketing</div><div class="mini-mobile-item-sub">Score: 92/100</div></div>
+                        <div class="mini-mobile-item" style="border-left-color:#FFA502"><div class="mini-mobile-item-title">BUS401 Strategy</div><div class="mini-mobile-item-sub">Score: 78/100</div></div>
+                    </div>
                 </div>
-                <div class="mini-mobile-list">
-                    <div class="mini-mobile-item" style="border-left-color:#2ED573"><div class="mini-mobile-item-title">ACC301 Financial</div><div class="mini-mobile-item-sub">Score: 85/100</div></div>
-                    <div class="mini-mobile-item" style="border-left-color:#6C63FF"><div class="mini-mobile-item-title">MKT201 Marketing</div><div class="mini-mobile-item-sub">Score: 92/100</div></div>
-                    <div class="mini-mobile-item" style="border-left-color:#FFA502"><div class="mini-mobile-item-title">BUS401 Strategy</div><div class="mini-mobile-item-sub">Score: 78/100</div></div>
+                <div class="samsung-s26-bottom">
+                    <div class="samsung-s26-bar"></div>
+                    <div class="samsung-s26-spen"></div>
                 </div>
             </div>
-            <div class="samsung-s26-bottom"><div class="samsung-s26-spen"></div></div>
         </div>
     </div>
 </div>
@@ -1139,7 +1242,7 @@
     function promptPWAInstall() {
         if (!_deferredInstallPrompt) return;
         _deferredInstallPrompt.prompt();
-        _deferredInstallPrompt.userChoice.then(() => { _deferredInstallPrompt = null; });
+        _deferredInstallPrompt.userChoice.then(() => { _deferredInstallPrompt = null; }).catch(() => {});
     }
 </script>
 </body>

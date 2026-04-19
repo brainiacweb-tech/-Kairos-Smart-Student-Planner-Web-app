@@ -49,7 +49,7 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex
 /* RIBBON */
 .ribbon{background:var(--ribbon-bg);border-bottom:1px solid var(--ribbon-border);flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 .ribbon-tabs-row{display:flex;align-items:flex-end;padding:0 8px;border-bottom:1px solid #e0e0e0}
-.ribbon-tab{padding:8px 14px 7px;background:transparent;border:none;font-size:12px;font-weight:400;color:#555;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;font-family:inherit}
+.ribbon-tab{padding:8px 14px 7px;background:transparent;border:none;font-size:12px;font-weight:400;color:#555;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;font-family:inherit;touch-action:manipulation}
 .ribbon-tab:hover{color:#111}
 .ribbon-tab.active{color:var(--xl-green);border-bottom-color:var(--xl-green);font-weight:600}
 .ribbon-tab.file-tab{background:var(--xl-green);color:white;border-radius:2px 2px 0 0;padding:8px 16px 7px;font-weight:600;margin-right:4px}
@@ -60,7 +60,7 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex
 .ribbon-group:last-child{border-right:none}
 .ribbon-group-btns{display:flex;align-items:flex-end;gap:1px;flex-wrap:wrap}
 .ribbon-group-label{font-size:10px;color:#888;padding:3px 0 4px;text-align:center;width:100%}
-.rb{background:transparent;border:1px solid transparent;cursor:pointer;border-radius:2px;transition:all .12s;font-family:inherit;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:3px 5px;min-width:36px;height:58px;font-size:11px}
+.rb{background:transparent;border:1px solid transparent;cursor:pointer;border-radius:2px;transition:all .12s;font-family:inherit;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:3px 5px;min-width:36px;height:58px;font-size:11px;touch-action:manipulation}
 .rb:hover{background:#e8e8e8;border-color:#c8c8c8}
 .rb.pressed{background:#cce4f7;border-color:#90c8f0}
 .rb i{font-size:18px;color:#444}

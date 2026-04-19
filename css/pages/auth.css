@@ -18,7 +18,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: Linear-gradient(135deg, rgba(108, 99, 255, 0.1), rgba(46, 213, 115, 0.1));
+  background: linear-gradient(135deg, rgba(108, 99, 255, 0.1), rgba(46, 213, 115, 0.1));
   z-index: -1;
 }
 
@@ -85,13 +85,13 @@
   align-items: center;
   justify-content: center;
   width: auto;
-  height: 220px;
+  height: 110px;
   background: transparent;
 }
 
 .auth-logo-icon img {
-  width: 220px;
-  height: 220px;
+  width: 110px;
+  height: 110px;
   object-fit: contain;
   background: transparent;
 }
@@ -204,13 +204,6 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-}
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
   pointer-events: auto;
   flex-shrink: 0;
   line-height: 1;
