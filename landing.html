@@ -221,6 +221,9 @@
     <div class="hero-btns">
         <a href="signup.html" class="btn btn-primary"><i class="fas fa-rocket"></i> Get Started Free</a>
         <a href="index.html" class="btn btn-outline">Log In</a>
+        <button id="pwaInstallBtn" onclick="promptPWAInstall()" style="display:none;align-items:center;gap:8px;padding:14px 32px;border-radius:12px;font-size:1rem;font-weight:600;border:2px solid var(--primary);color:var(--primary);background:transparent;cursor:pointer;transition:all 0.2s;">
+            <i class="fas fa-download"></i> Install App
+        </button>
     </div>
 </div>
 
@@ -331,5 +334,27 @@
     </div>
 </footer>
 
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+    let _deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        _deferredInstallPrompt = e;
+        const btn = document.getElementById('pwaInstallBtn');
+        if (btn) btn.style.display = 'inline-flex';
+    });
+    window.addEventListener('appinstalled', () => {
+        _deferredInstallPrompt = null;
+        const btn = document.getElementById('pwaInstallBtn');
+        if (btn) btn.style.display = 'none';
+    });
+    function promptPWAInstall() {
+        if (!_deferredInstallPrompt) return;
+        _deferredInstallPrompt.prompt();
+        _deferredInstallPrompt.userChoice.then(() => { _deferredInstallPrompt = null; });
+    }
+</script>
 </body>
 </html>

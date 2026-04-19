@@ -691,11 +691,14 @@
 
             <!-- PAGE CONTENT -->
             <main class="main-content">
-                <div class="page-header">
+                <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                     <div>
                         <h1 class="page-title">📅 Timetable Manager</h1>
-                        <p style="color: var(--text-secondary); margin-top: var(--spacing-xs);">Create, upload, and manage your school timetable with daily alerts</p>
+                        <p style="color: var(--text-secondary); margin-top: var(--spacing-xs);">Upload your timetable, add lectures, and let Kairos suggest a personalised study plan</p>
                     </div>
+                    <button class="btn btn-primary" onclick="generateStudyPlan()" style="flex-shrink:0;">
+                        <i class="fas fa-magic"></i> Suggest Study Plan
+                    </button>
                 </div>
 
                 <!-- TAB NAVIGATION -->
@@ -960,6 +963,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script src="js/app.js?v=2"></script>
-    <script src="js/timetable.js?v=2"></script>
+    <script src="js/storage.js?v=2"></script>
+    <script src="js/timetable.js?v=3"></script>
 </body>
 </html>

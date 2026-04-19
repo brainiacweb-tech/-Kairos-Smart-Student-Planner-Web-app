@@ -1,141 +1,111 @@
 /**
- * Timetable Manager - File Upload & Schedule Management
- * Handles PDF, Image, and CSV timetable uploads with daily alerts
+ * Timetable Manager - File Upload, Extraction & Smart Suggestions
  */
 
 class TimetableManager {
     constructor() {
         this.timetables = this.loadTimetables();
-        this.lectures = this.loadLectures();
-        this.settings = this.loadSettings();
+        this.lectures   = this.loadLectures();
+        this.settings   = this.loadSettings();
         this.initializeEventListeners();
         this.renderUI();
         this.startDailyAlertCheck();
     }
 
     initializeEventListeners() {
-        // Drag and drop
         const uploadArea = document.getElementById('uploadArea');
         if (uploadArea) {
-            uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
+            uploadArea.addEventListener('dragover',  (e) => this.handleDragOver(e));
             uploadArea.addEventListener('dragleave', (e) => this.handleDragLeave(e));
-            uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
+            uploadArea.addEventListener('drop',      (e) => this.handleDrop(e));
         }
-
-        // Alert toggle
         const dailyToggle = document.getElementById('dailyAlertsToggle');
-        if (dailyToggle && this.settings.dailyAlerts) {
-            dailyToggle.classList.add('on');
-        }
-
+        if (dailyToggle && this.settings.dailyAlerts) dailyToggle.classList.add('on');
         const soundToggle = document.getElementById('soundNotifToggle');
-        if (soundToggle && this.settings.soundNotif) {
-            soundToggle.classList.add('on');
-        }
+        if (soundToggle && this.settings.soundNotif)  soundToggle.classList.add('on');
     }
 
-    handleDragOver(e) {
-        e.preventDefault();
-        document.getElementById('uploadArea').classList.add('drag-over');
-    }
-
-    handleDragLeave(e) {
-        e.preventDefault();
-        document.getElementById('uploadArea').classList.remove('drag-over');
-    }
-
+    handleDragOver(e)  { e.preventDefault(); document.getElementById('uploadArea').classList.add('drag-over'); }
+    handleDragLeave(e) { e.preventDefault(); document.getElementById('uploadArea').classList.remove('drag-over'); }
     handleDrop(e) {
         e.preventDefault();
         document.getElementById('uploadArea').classList.remove('drag-over');
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            this.processFile(files[0]);
-        }
+        if (e.dataTransfer.files.length > 0) this.processFile(e.dataTransfer.files[0]);
     }
 
-    handleFileUpload(file) {
-        this.processFile(file);
-    }
+    handleFileUpload(file) { this.processFile(file); }
 
     processFile(file) {
         const fileName = file.name;
-        const fileType = file.type;
-        const fileExt = fileName.slice(fileName.lastIndexOf('.')).toLowerCase();
-
-        // Validate file
+        const fileExt  = fileName.slice(fileName.lastIndexOf('.')).toLowerCase();
         const validExts = ['.pdf', '.png', '.jpg', '.jpeg', '.csv'];
         if (!validExts.includes(fileExt)) {
-            this.showToast('❌ Invalid file format. Use PDF, PNG, JPG, or CSV', 'error');
+            this.showToast('Invalid file format. Use PDF, PNG, JPG, or CSV', 'error');
             return;
         }
 
+        this.showToast('Reading file…', 'info');
         const reader = new FileReader();
 
         reader.onload = (e) => {
             const fileData = e.target.result;
-            
             if (fileExt === '.csv') {
                 this.parseCSVFile(fileData, fileName);
-            } else if (['.pdf', '.png', '.jpg', '.jpeg'].includes(fileExt)) {
-                this.storeImageOrPDF(fileData, fileName, file.type);
+            } else {
+                // Store file and open the extraction editor so user can fill in courses
+                // while viewing their uploaded timetable image/PDF
+                this.storeAndExtract(fileData, fileName, file.type, fileExt);
             }
         };
-
-        reader.onerror = () => {
-            this.showToast('❌ Error reading file', 'error');
-        };
-
-        if (fileExt === '.csv') {
-            reader.readAsText(file);
-        } else {
-            reader.readAsDataURL(file);
-        }
+        reader.onerror = () => this.showToast('Error reading file', 'error');
+        fileExt === '.csv' ? reader.readAsText(file) : reader.readAsDataURL(file);
     }
+
+    /* ── CSV PARSING ────────────────────────────────────────────────────── */
 
     parseCSVFile(csvData, fileName) {
         try {
-            const lines = csvData.trim().split('\n');
-            let lecturesToAdd = [];
+            const lines = csvData.trim().split(/\r?\n/);
+            const added = [];
 
-            // Try to parse CSV (flexible format)
-            // Expected format: Course,Time,Room,Days (or similar)
+            // Flexible CSV: Course,Time,Room,Days  (header row skipped)
             for (let i = 1; i < lines.length; i++) {
-                const parts = lines[i].split(',').map(p => p.trim());
-                if (parts.length >= 2) {
-                    const course = parts[0];
-                    const time = parts[1];
-                    const room = parts.length > 2 ? parts[2] : 'TBA';
-                    const days = parts.length > 3 ? parts[3] : 'Mon,Tue,Wed,Thu,Fri';
+                const parts = lines[i].split(',').map(p => p.trim().replace(/^"|"$/g, ''));
+                if (parts.length < 2 || !parts[0]) continue;
 
-                    // Parse time "HH:MM-HH:MM" or "HH:MM"
-                    const timeMatch = time.match(/(\d{1,2}):(\d{2})/);
-                    if (timeMatch) {
-                        lecturesToAdd.push({
-                            course,
-                            room,
-                            startTime: time.split('-')[0].trim(),
-                            endTime: time.split('-')[1]?.trim() || 'TBA',
-                            days: days.split('|').map(d => d.trim()),
-                            uploadedFile: fileName
-                        });
-                    }
+                const course = parts[0];
+                const time   = parts[1] || '';
+                const room   = parts[2] || 'TBA';
+                const daysRaw = parts[3] || 'Mon,Tue,Wed,Thu,Fri';
+
+                const timeParts = time.split(/[-–]/);
+                const startTime = timeParts[0]?.trim() || '';
+                const endTime   = timeParts[1]?.trim() || '';
+
+                // Accept any time-like string
+                if (course) {
+                    added.push({
+                        id:          'lec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                        course,
+                        room,
+                        startTime,
+                        endTime,
+                        days:        daysRaw.split(/[|,]/).map(d => d.trim()).filter(Boolean),
+                        dateAdded:   new Date().toLocaleDateString(),
+                        uploadedFile: fileName
+                    });
                 }
             }
 
-            if (lecturesToAdd.length > 0) {
-                lecturesToAdd.forEach(lec => this.lectures.push({
-                    id: Date.now() + Math.random(),
-                    ...lec,
-                    dateAdded: new Date().toLocaleDateString()
-                }));
-
-                this.saveLectures();
-                this.showToast(`✅ Added ${lecturesToAdd.length} lectures from CSV`, 'success');
+            if (added.length === 0) {
+                this.showToast('No valid courses found in CSV. Check the format.', 'warning');
             } else {
-                this.showToast('⚠️ No valid lectures found in CSV', 'warning');
+                added.forEach(l => this.lectures.push(l));
+                this.saveLectures();
+                this.showToast(`Added ${added.length} lecture(s) from CSV!`, 'success');
             }
         } catch (err) {
-            this.showToast('❌ Error parsing CSV file', 'error');
+            this.showToast('Error parsing CSV file', 'error');
             console.error(err);
         }
 
@@ -143,234 +113,463 @@ class TimetableManager {
         this.renderUI();
     }
 
-    storeImageOrPDF(fileData, fileName, fileType) {
-        const timetable = {
-            id: Date.now(),
-            name: fileName,
-            type: fileType.includes('pdf') ? 'pdf' : 'image',
-            data: fileData,
-            dateAdded: new Date().toLocaleDateString(),
-            size: (fileData.length / 1024).toFixed(2) + 'KB'
-        };
+    /* ── IMAGE / PDF UPLOAD → EXTRACTION EDITOR ─────────────────────────── */
 
+    storeAndExtract(fileData, fileName, fileType, fileExt) {
+        // Persist the file
+        const timetable = {
+            id:        Date.now(),
+            name:      fileName,
+            type:      fileType.includes('pdf') ? 'pdf' : 'image',
+            data:      fileData,
+            dateAdded: new Date().toLocaleDateString(),
+            size:      (fileData.length / 1024).toFixed(0) + ' KB'
+        };
         this.timetables.push(timetable);
         this.saveTimetables();
-        this.showToast(`✅ Timetable "${fileName}" uploaded successfully`, 'success');
         this.renderUI();
+
+        this.showToast(`"${fileName}" uploaded! Fill in your courses below.`, 'success');
+
+        // Open extraction editor so user can view the image and enter their courses
+        this.openExtractionEditor(timetable);
     }
 
-    saveTimetable(name, data, type) {
-        const timetable = {
-            id: Date.now(),
-            name: name,
-            type: type,
-            data: data,
-            dateAdded: new Date().toLocaleDateString(),
-            size: (data.length / 1024).toFixed(2) + 'KB'
-        };
+    /* ── EXTRACTION EDITOR MODAL ─────────────────────────────────────────── */
 
-        this.timetables.push(timetable);
-        this.saveTimetables();
+    openExtractionEditor(timetable) {
+        // Remove any existing modal
+        document.getElementById('extractionModal')?.remove();
+
+        const isImage = timetable.type === 'image';
+        const previewHTML = isImage
+            ? `<img src="${timetable.data}" style="max-width:100%;border-radius:8px;display:block;">`
+            : `<iframe src="${timetable.data}" style="width:100%;height:400px;border:none;border-radius:8px;"></iframe>`;
+
+        const modal = document.createElement('div');
+        modal.id = 'extractionModal';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;';
+        modal.innerHTML = `
+            <div style="background:#fff;border-radius:16px;max-width:960px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+                <div style="padding:20px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+                    <div>
+                        <h2 style="margin:0;font-size:1.25rem;color:#1a1a2e;">📅 Timetable Extraction</h2>
+                        <p style="margin:4px 0 0;font-size:0.85rem;color:#6b7280;">View your timetable and enter the courses you see</p>
+                    </div>
+                    <button onclick="document.getElementById('extractionModal').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#999;line-height:1;">✕</button>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;flex:1;overflow:hidden;">
+                    <!-- Left: Image preview -->
+                    <div style="padding:16px;overflow-y:auto;border-right:1px solid #eee;background:#f8f9ff;">
+                        <div style="font-weight:600;margin-bottom:12px;color:#6C63FF;font-size:0.9rem;">YOUR UPLOADED TIMETABLE</div>
+                        ${previewHTML}
+                    </div>
+                    <!-- Right: Course entry -->
+                    <div style="padding:16px;overflow-y:auto;">
+                        <div style="font-weight:600;margin-bottom:12px;color:#6C63FF;font-size:0.9rem;">ENTER COURSES YOU SEE</div>
+                        <div id="extractedCoursesList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;max-height:240px;overflow-y:auto;"></div>
+                        <div style="background:#f8f9ff;border-radius:12px;padding:16px;">
+                            <div style="display:grid;gap:8px;">
+                                <input id="exCourse" type="text" placeholder="Course name (e.g. ACC301)" style="padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;width:100%;">
+                                <input id="exRoom" type="text" placeholder="Room (e.g. Hall A)" style="padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;width:100%;">
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                                    <div><label style="font-size:0.8rem;color:#6b7280;">Start Time</label><input id="exStart" type="time" style="padding:8px;border:1px solid #e5e7eb;border-radius:8px;width:100%;font-size:0.9rem;"></div>
+                                    <div><label style="font-size:0.8rem;color:#6b7280;">End Time</label><input id="exEnd" type="time" style="padding:8px;border:1px solid #e5e7eb;border-radius:8px;width:100%;font-size:0.9rem;"></div>
+                                </div>
+                                <div>
+                                    <label style="font-size:0.8rem;color:#6b7280;display:block;margin-bottom:6px;">Days</label>
+                                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                                        ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => `
+                                            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:0.85rem;">
+                                                <input type="checkbox" class="ex-day" value="${d}"> ${d}
+                                            </label>`).join('')}
+                                    </div>
+                                </div>
+                                <button onclick="timetableManager.addExtractedCourse()" style="background:#6C63FF;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">
+                                    <i class="fas fa-plus"></i> Add Course
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding:16px 24px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:12px;flex-shrink:0;">
+                    <button onclick="document.getElementById('extractionModal').remove()" style="padding:10px 20px;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;font-weight:600;">Cancel</button>
+                    <button onclick="timetableManager.saveExtractedCourses()" style="padding:10px 24px;background:#6C63FF;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+                        ✓ Save All Courses
+                    </button>
+                </div>
+            </div>`;
+
+        this._pendingExtracted = [];
+        document.body.appendChild(modal);
     }
 
-    addManualLecture() {
-        const courseName = document.getElementById('courseName').value.trim();
-        const roomLocation = document.getElementById('roomLocation').value.trim();
-        const startTime = document.getElementById('startTime').value;
-        const endTime = document.getElementById('endTime').value;
+    addExtractedCourse() {
+        const course = document.getElementById('exCourse').value.trim();
+        const room   = document.getElementById('exRoom').value.trim() || 'TBA';
+        const start  = document.getElementById('exStart').value;
+        const end    = document.getElementById('exEnd').value;
+        const days   = Array.from(document.querySelectorAll('.ex-day:checked')).map(c => c.value);
 
-        const selectedDays = Array.from(document.querySelectorAll('.day-checkbox:checked'))
-            .map(cb => cb.value);
+        if (!course) { this.showToast('Please enter a course name', 'warning'); return; }
 
-        if (!courseName || !startTime || selectedDays.length === 0) {
-            this.showToast('⚠️ Please fill in all required fields', 'warning');
+        const entry = { course, room, startTime: start, endTime: end, days };
+        if (!this._pendingExtracted) this._pendingExtracted = [];
+        this._pendingExtracted.push(entry);
+
+        // Render it in the list
+        const list = document.getElementById('extractedCoursesList');
+        const item = document.createElement('div');
+        item.style.cssText = 'background:#f0eeff;border-left:3px solid #6C63FF;padding:8px 12px;border-radius:6px;font-size:0.85rem;';
+        item.innerHTML = `<strong>${course}</strong> &nbsp;${start}–${end} &nbsp;<span style="color:#6b7280">${days.join(', ')}</span>`;
+        list.appendChild(item);
+
+        // Clear form
+        document.getElementById('exCourse').value = '';
+        document.getElementById('exRoom').value = '';
+        document.getElementById('exStart').value = '';
+        document.getElementById('exEnd').value = '';
+        document.querySelectorAll('.ex-day').forEach(c => c.checked = false);
+    }
+
+    saveExtractedCourses() {
+        const pending = this._pendingExtracted || [];
+        if (pending.length === 0) {
+            this.showToast('Add at least one course first', 'warning');
+            return;
+        }
+        pending.forEach(entry => {
+            this.lectures.push({
+                id:          'lec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                course:      entry.course,
+                room:        entry.room,
+                startTime:   entry.startTime,
+                endTime:     entry.endTime,
+                days:        entry.days,
+                dateAdded:   new Date().toLocaleDateString(),
+                uploadedFile: 'Extracted from upload'
+            });
+        });
+        this.saveLectures();
+        document.getElementById('extractionModal')?.remove();
+        this._pendingExtracted = [];
+        this.renderUI();
+        this.showToast(`Saved ${pending.length} course(s) to your timetable!`, 'success');
+
+        // Prompt to generate study plan
+        setTimeout(() => {
+            if (confirm(`${pending.length} course(s) saved!\n\nWould you like Kairos to suggest a personal study timetable based on your lectures?`)) {
+                this.generateStudyPlan();
+            }
+        }, 400);
+    }
+
+    /* ── SMART STUDY PLAN GENERATOR ──────────────────────────────────────── */
+
+    generateStudyPlan() {
+        if (this.lectures.length === 0) {
+            this.showToast('Add your lectures first before generating a study plan', 'warning');
             return;
         }
 
-        const lecture = {
-            id: Date.now() + Math.random(),
-            course: courseName,
-            room: roomLocation || 'TBA',
-            startTime: startTime,
-            endTime: endTime || 'TBA',
-            days: selectedDays,
-            dateAdded: new Date().toLocaleDateString(),
-            uploadedFile: 'Manual Entry'
-        };
+        const dayMap = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 0 };
+        const suggestions = [];
 
-        this.lectures.push(lecture);
+        // For each lecture, suggest a pre-lecture study session and a post-lecture review
+        this.lectures.forEach(lec => {
+            (lec.days || []).forEach(day => {
+                const dayIdx = dayMap[day] ?? dayMap[day.slice(0, 3)];
+                if (dayIdx === undefined) return;
+
+                // Pre-study: 1 hour before class (if class has a start time)
+                if (lec.startTime) {
+                    const [h, m] = lec.startTime.split(':').map(Number);
+                    const preHour = Math.max(6, h - 1);
+                    const preHourIdx = preHour - 6; // timetable grid starts at 6AM (index 0)
+                    if (preHourIdx >= 0 && preHourIdx < 17) {
+                        suggestions.push({
+                            title:    `Study: ${lec.course}`,
+                            type:     'study',
+                            dayIndex: dayIdx,
+                            hourIndex: preHourIdx
+                        });
+                    }
+                }
+
+                // Post-review: 1 hour after class
+                if (lec.endTime && lec.endTime !== 'TBA') {
+                    const [h2, m2] = lec.endTime.split(':').map(Number);
+                    const reviewHour = h2 + (m2 > 0 ? 1 : 0);
+                    const reviewHourIdx = reviewHour - 6;
+                    if (reviewHourIdx >= 0 && reviewHourIdx < 17) {
+                        suggestions.push({
+                            title:    `Review: ${lec.course}`,
+                            type:     'study',
+                            dayIndex: dayIdx,
+                            hourIndex: reviewHourIdx
+                        });
+                    }
+                }
+            });
+        });
+
+        if (suggestions.length === 0) {
+            this.showToast('Could not generate suggestions — make sure your lectures have times and days set', 'warning');
+            return;
+        }
+
+        // Show the suggestion preview modal
+        this.showStudyPlanModal(suggestions);
+    }
+
+    showStudyPlanModal(suggestions) {
+        document.getElementById('studyPlanModal')?.remove();
+
+        const DAYS  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const HOURS = ['6AM','7AM','8AM','9AM','10AM','11AM','12PM','1PM','2PM','3PM','4PM','5PM','6PM','7PM','8PM','9PM','10PM'];
+
+        const rows = suggestions.map(s => `
+            <tr style="border-bottom:1px solid #f3f4f6;">
+                <td style="padding:8px 12px;font-weight:500">${s.title}</td>
+                <td style="padding:8px 12px;color:#6b7280">${DAYS[s.dayIndex]}</td>
+                <td style="padding:8px 12px;color:#6b7280">${HOURS[s.hourIndex] || ''}</td>
+            </tr>`).join('');
+
+        const modal = document.createElement('div');
+        modal.id = 'studyPlanModal';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;';
+        modal.innerHTML = `
+            <div style="background:#fff;border-radius:16px;max-width:600px;width:100%;max-height:80vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.35);">
+                <div style="padding:20px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <h2 style="margin:0;font-size:1.15rem;color:#1a1a2e;">✨ Suggested Study Timetable</h2>
+                        <p style="margin:4px 0 0;font-size:0.85rem;color:#6b7280;">Based on your ${this.lectures.length} lecture(s) — edit to your preference in the Planner</p>
+                    </div>
+                    <button onclick="document.getElementById('studyPlanModal').remove()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#999;">✕</button>
+                </div>
+                <div style="overflow-y:auto;flex:1;padding:16px 24px;">
+                    <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+                        <thead>
+                            <tr style="background:#f8f9ff;">
+                                <th style="padding:8px 12px;text-align:left;color:#6C63FF;font-size:0.8rem;">SESSION</th>
+                                <th style="padding:8px 12px;text-align:left;color:#6C63FF;font-size:0.8rem;">DAY</th>
+                                <th style="padding:8px 12px;text-align:left;color:#6C63FF;font-size:0.8rem;">TIME</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+                <div style="padding:16px 24px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;gap:12px;">
+                    <p style="margin:0;font-size:0.82rem;color:#6b7280;">These will be added to your Planner. You can edit or delete them there.</p>
+                    <div style="display:flex;gap:10px;flex-shrink:0;">
+                        <button onclick="document.getElementById('studyPlanModal').remove()" style="padding:10px 18px;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">Dismiss</button>
+                        <button onclick="timetableManager.applyStudyPlan()" style="padding:10px 22px;background:#6C63FF;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">
+                            Apply to Planner
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+
+        this._pendingSuggestions = suggestions;
+        document.body.appendChild(modal);
+    }
+
+    applyStudyPlan() {
+        const suggestions = this._pendingSuggestions || [];
+        suggestions.forEach(s => {
+            const existing = JSON.parse(localStorage.getItem('kairos_events') || '[]');
+            const conflict = existing.some(e => e.dayIndex === s.dayIndex && e.hourIndex === s.hourIndex);
+            if (!conflict) {
+                const events = JSON.parse(localStorage.getItem('kairos_events') || '[]');
+                events.push({
+                    id:        'evt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
+                    title:     s.title,
+                    type:      s.type,
+                    dayIndex:  s.dayIndex,
+                    hourIndex: s.hourIndex,
+                    createdAt: new Date().toISOString()
+                });
+                localStorage.setItem('kairos_events', JSON.stringify(events));
+            }
+        });
+
+        document.getElementById('studyPlanModal')?.remove();
+        this._pendingSuggestions = [];
+        this.showToast(`Study plan added to your Planner! Go to Planner to edit.`, 'success');
+    }
+
+    /* ── MANUAL LECTURE (upload tab) ─────────────────────────────────────── */
+
+    addManualLecture() {
+        const course    = document.getElementById('courseName').value.trim();
+        const room      = document.getElementById('roomLocation').value.trim();
+        const startTime = document.getElementById('startTime').value;
+        const endTime   = document.getElementById('endTime').value;
+        const days      = Array.from(document.querySelectorAll('.day-checkbox:checked')).map(c => c.value);
+
+        if (!course || !startTime || days.length === 0) {
+            this.showToast('Please fill in course name, start time, and select at least one day', 'warning');
+            return;
+        }
+
+        this.lectures.push({
+            id:          'lec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+            course,
+            room:        room || 'TBA',
+            startTime,
+            endTime:     endTime || 'TBA',
+            days,
+            dateAdded:   new Date().toLocaleDateString(),
+            uploadedFile: 'Manual Entry'
+        });
         this.saveLectures();
 
-        // Clear form
-        document.getElementById('courseName').value = '';
-        document.getElementById('roomLocation').value = '';
-        document.getElementById('startTime').value = '';
-        document.getElementById('endTime').value = '';
-        document.querySelectorAll('.day-checkbox').forEach(cb => cb.checked = false);
+        document.getElementById('courseName').value    = '';
+        document.getElementById('roomLocation').value  = '';
+        document.getElementById('startTime').value     = '';
+        document.getElementById('endTime').value       = '';
+        document.querySelectorAll('.day-checkbox').forEach(c => c.checked = false);
 
-        this.showToast('✅ Lecture added successfully', 'success');
+        this.showToast('Lecture added!', 'success');
         this.renderUI();
     }
 
-    getTodayLectures() {
-        const today = new Date();
-        const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][today.getDay()];
+    /* ── CREATE TAB (quick add) ──────────────────────────────────────────── */
 
-        return this.lectures.filter(lec => lec.days && lec.days.includes(dayName))
-            .sort((a, b) => a.startTime.localeCompare(b.startTime));
+    quickAddLecture() {
+        const course    = document.getElementById('quickCourseName').value.trim();
+        const room      = document.getElementById('quickRoom').value.trim();
+        const startTime = document.getElementById('quickStartTime').value;
+        const endTime   = document.getElementById('quickEndTime').value;
+        const days      = Array.from(document.querySelectorAll('.quick-day-checkbox:checked')).map(c => c.value);
+
+        if (!course || !startTime || days.length === 0) {
+            this.showToast('Please fill in required fields', 'warning');
+            return;
+        }
+
+        this.lectures.push({
+            id:          'lec_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+            course,
+            room:        room || 'TBA',
+            startTime,
+            endTime:     endTime || 'TBA',
+            days,
+            dateAdded:   new Date().toLocaleDateString(),
+            uploadedFile: 'Created',
+            isCustom:    true
+        });
+        this.saveLectures();
+
+        document.getElementById('quickCourseName').value = '';
+        document.getElementById('quickRoom').value       = '';
+        document.getElementById('quickStartTime').value  = '';
+        document.getElementById('quickEndTime').value    = '';
+        document.querySelectorAll('.quick-day-checkbox').forEach(c => c.checked = false);
+
+        this.renderCreateUI();
+        this.showToast('Lecture added to timetable!', 'success');
     }
 
-    startDailyAlertCheck() {
-        // Check every minute
-        setInterval(() => {
-            if (this.settings.dailyAlerts) {
-                this.checkUpcomingLectures();
-            }
-        }, 60000); // Check every minute
-
-        // Also check on load
-        if (this.settings.dailyAlerts) {
-            this.checkUpcomingLectures();
+    saveTimetableAsNew() {
+        const customLectures = this.lectures.filter(l => l.isCustom);
+        if (customLectures.length === 0) {
+            this.showToast('Add at least one lecture first', 'warning');
+            return;
         }
+        const name = prompt('Enter a name for your timetable:', `My Timetable - ${new Date().toLocaleDateString()}`);
+        if (!name) return;
+
+        this.timetables.push({
+            id:           Date.now(),
+            name,
+            type:         'custom',
+            lectureCount: customLectures.length,
+            dateAdded:    new Date().toLocaleDateString()
+        });
+        this.saveTimetables();
+        this.showToast(`Timetable "${name}" saved!`, 'success');
+        this.renderUI();
+    }
+
+    clearCreateTimetable() {
+        if (!confirm('Clear all custom lectures?')) return;
+        this.lectures = this.lectures.filter(l => !l.isCustom);
+        this.saveLectures();
+        document.getElementById('quickCourseName').value = '';
+        document.getElementById('quickRoom').value       = '';
+        document.getElementById('quickStartTime').value  = '';
+        document.getElementById('quickEndTime').value    = '';
+        document.querySelectorAll('.quick-day-checkbox').forEach(c => c.checked = false);
+        this.renderCreateUI();
+        this.showToast('Custom timetable cleared', 'info');
+    }
+
+    /* ── ALERTS ──────────────────────────────────────────────────────────── */
+
+    startDailyAlertCheck() {
+        setInterval(() => { if (this.settings.dailyAlerts) this.checkUpcomingLectures(); }, 60000);
+        if (this.settings.dailyAlerts) this.checkUpcomingLectures();
     }
 
     checkUpcomingLectures() {
         const now = new Date();
-        const currentTime = now.getHours().toString().padStart(2, '0') + ':' + 
-                          now.getMinutes().toString().padStart(2, '0');
+        const today = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()];
+        const todayLectures = this.lectures.filter(l => l.days && l.days.some(d => today.startsWith(d)));
+        const currentMin = now.getHours() * 60 + now.getMinutes();
+        const advance = parseInt(this.settings.alertAdvanceTime);
 
-        const todayLectures = this.getTodayLectures();
+        todayLectures.forEach(lec => {
+            if (!lec.startTime) return;
+            const [h, m] = lec.startTime.split(':').map(Number);
+            const lectureMin = h * 60 + m;
+            const alertMin   = lectureMin - advance;
 
-        todayLectures.forEach(lecture => {
-            // Convert time to minutes for comparison
-            const [lectureHour, lectureMin] = lecture.startTime.split(':').map(Number);
-            const lectureTimeInMin = lectureHour * 60 + lectureMin;
-            
-            const [currentHour, currentMin] = currentTime.split(':').map(Number);
-            const currentTimeInMin = currentHour * 60 + currentMin;
-
-            const minutesBefore = parseInt(this.settings.alertAdvanceTime);
-            const alertTimeInMin = lectureTimeInMin - minutesBefore;
-
-            // Check if within alert window
-            if (currentTimeInMin >= alertTimeInMin && currentTimeInMin < lectureTimeInMin) {
-                // Check if already notified (store in sessionStorage to prevent duplicate alerts)
-                const alertKey = `notified_${lecture.id}_${new Date().toDateString()}`;
-                if (!sessionStorage.getItem(alertKey)) {
-                    this.sendLectureAlert(lecture);
-                    sessionStorage.setItem(alertKey, 'true');
+            if (currentMin >= alertMin && currentMin < lectureMin) {
+                const key = `notif_${lec.id}_${now.toDateString()}`;
+                if (!sessionStorage.getItem(key)) {
+                    this.sendLectureAlert(lec);
+                    sessionStorage.setItem(key, '1');
                 }
             }
         });
     }
 
     sendLectureAlert(lecture) {
-        // Show toast notification
-        this.showToast(
-            `🔔 ${lecture.course} starts at ${lecture.startTime} (${lecture.room})`,
-            'info'
-        );
-
-        // Play sound if enabled
-        if (this.settings.soundNotif) {
-            this.playAlertSound();
-        }
-
-        // Send browser notification if permitted
+        this.showToast(`🔔 ${lecture.course} starts at ${lecture.startTime} (${lecture.room})`, 'info');
+        if (this.settings.soundNotif) this.playAlertSound();
         if (Notification.permission === 'granted') {
-            new Notification('Lecture Alert - Kairos', {
-                body: `${lecture.course} starts at ${lecture.startTime} in room ${lecture.room}`,
-                icon: '📅',
-                tag: `lecture_${lecture.id}`
+            new Notification('Lecture Alert – Kairos', {
+                body: `${lecture.course} starts at ${lecture.startTime} in ${lecture.room}`,
+                icon: '1000669890-Photoroom.png',
+                tag:  `lec_${lecture.id}`
             });
         }
     }
 
     playAlertSound() {
-        // Create a simple beep sound using Web Audio API
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-
-        oscillator.frequency.value = 800; // Hz
-        oscillator.type = 'sine';
-
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.5);
-    }
-
-    requestNotificationPermission() {
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
-        }
-    }
-
-    deleteTimetable(id) {
-        if (confirm('Delete this timetable?')) {
-            this.timetables = this.timetables.filter(t => t.id !== id);
-            this.saveTimetables();
-            this.showToast('✅ Timetable deleted', 'info');
-            this.renderUI();
-        }
-    }
-
-    viewTimetable(id) {
-        const timetable = this.timetables.find(t => t.id === id);
-        if (!timetable) return;
-
-        if (timetable.type === 'pdf' || timetable.type === 'image') {
-            const newWindow = window.open();
-            newWindow.document.write(`
-                <html>
-                <head><title>${timetable.name}</title></head>
-                <body style="display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #1a1a1a;">
-                    <img src="${timetable.data}" style="max-width: 90%; max-height: 90%; border-radius: 8px;">
-                </body>
-                </html>
-            `);
-        }
-    }
-
-    downloadTimetable(id) {
-        const timetable = this.timetables.find(t => t.id === id);
-        if (!timetable) return;
-
-        const link = document.createElement('a');
-        link.href = timetable.data;
-        link.download = timetable.name;
-        link.click();
-    }
-
-    deleteLecture(id) {
-        if (confirm('Delete this lecture?')) {
-            this.lectures = this.lectures.filter(l => l.id !== id);
-            this.saveLectures();
-            this.showToast('✅ Lecture deleted', 'info');
-            this.renderUI();
-        }
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.frequency.value = 800; osc.type = 'sine';
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+            osc.start(); osc.stop(ctx.currentTime + 0.5);
+        } catch(e) {}
     }
 
     toggleDailyAlerts() {
         this.settings.dailyAlerts = !this.settings.dailyAlerts;
         this.saveSettings();
-        
-        const toggle = document.getElementById('dailyAlertsToggle');
-        toggle.classList.toggle('on');
-
-        const status = this.settings.dailyAlerts ? 'ON' : 'OFF';
-        document.getElementById('alertStatus').textContent = status;
-
-        this.showToast(`✅ Daily alerts turned ${status}`, 'info');
-
-        // Request notification permission if enabling
+        document.getElementById('dailyAlertsToggle').classList.toggle('on');
+        document.getElementById('alertStatus').textContent = this.settings.dailyAlerts ? 'ON' : 'OFF';
+        this.showToast(`Daily alerts ${this.settings.dailyAlerts ? 'enabled' : 'disabled'}`, 'info');
         if (this.settings.dailyAlerts) {
-            this.requestNotificationPermission();
+            if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
             this.checkUpcomingLectures();
         }
     }
@@ -378,118 +577,113 @@ class TimetableManager {
     toggleSoundNotif() {
         this.settings.soundNotif = !this.settings.soundNotif;
         this.saveSettings();
-        
-        const toggle = document.getElementById('soundNotifToggle');
-        toggle.classList.toggle('on');
-
-        this.showToast(`✅ Sound notifications ${this.settings.soundNotif ? 'enabled' : 'disabled'}`, 'info');
+        document.getElementById('soundNotifToggle').classList.toggle('on');
+        this.showToast(`Sound ${this.settings.soundNotif ? 'enabled' : 'disabled'}`, 'info');
     }
 
-    quickAddLecture() {
-        const courseName = document.getElementById('quickCourseName').value.trim();
-        const room = document.getElementById('quickRoom').value.trim();
-        const startTime = document.getElementById('quickStartTime').value;
-        const endTime = document.getElementById('quickEndTime').value;
+    /* ── CRUD ACTIONS ────────────────────────────────────────────────────── */
 
-        const selectedDays = Array.from(document.querySelectorAll('.quick-day-checkbox:checked'))
-            .map(cb => cb.value);
-
-        if (!courseName || !startTime || selectedDays.length === 0) {
-            this.showToast('⚠️ Please fill in required fields', 'warning');
-            return;
-        }
-
-        const lecture = {
-            id: Date.now() + Math.random(),
-            course: courseName,
-            room: room || 'TBA',
-            startTime: startTime,
-            endTime: endTime || 'TBA',
-            days: selectedDays,
-            dateAdded: new Date().toLocaleDateString(),
-            uploadedFile: 'Created',
-            isCustom: true
-        };
-
-        this.lectures.push(lecture);
-        this.saveLectures();
-
-        // Clear form
-        document.getElementById('quickCourseName').value = '';
-        document.getElementById('quickRoom').value = '';
-        document.getElementById('quickStartTime').value = '';
-        document.getElementById('quickEndTime').value = '';
-        document.querySelectorAll('.quick-day-checkbox').forEach(cb => cb.checked = false);
-
-        this.renderCreateUI();
-        this.showToast('✅ Lecture added to timetable', 'success');
-    }
-
-    renderDaysGrid() {
-        const daysGrid = document.getElementById('daysGrid');
-        if (!daysGrid) return;
-
-        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        
-        daysGrid.innerHTML = days.map(day => {
-            const dayLectures = this.lectures.filter(l => l.days && l.days.includes(day));
-            return `
-                <div class="day-card ${dayLectures.length > 0 ? 'has-lectures' : ''}" onclick="timetableManager.viewDayLectures('${day}')">
-                    <div class="day-name">${day.slice(0, 3)}</div>
-                    <div class="lecture-count">${dayLectures.length} lecture${dayLectures.length !== 1 ? 's' : ''}</div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    viewDayLectures(day) {
-        const lectures = this.lectures.filter(l => l.days && l.days.includes(day))
-            .sort((a, b) => a.startTime.localeCompare(b.startTime));
-        
-        // Scroll to preview and highlight
-        const preview = document.getElementById('timetablePreview');
-        preview.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    saveTimetableAsNew() {
-        const customLectures = this.lectures.filter(l => l.isCustom);
-        
-        if (customLectures.length === 0) {
-            this.showToast('⚠️ Add at least one lecture to your timetable', 'warning');
-            return;
-        }
-
-        const name = prompt('Enter a name for your timetable:', `My Timetable - ${new Date().toLocaleDateString()}`);
-        if (!name) return;
-
-        const timetable = {
-            id: Date.now(),
-            name: name,
-            type: 'custom',
-            lectureCount: customLectures.length,
-            dateAdded: new Date().toLocaleDateString(),
-            lectureIds: customLectures.map(l => l.id)
-        };
-
-        this.timetables.push(timetable);
+    deleteTimetable(id) {
+        if (!confirm('Delete this timetable?')) return;
+        this.timetables = this.timetables.filter(t => t.id !== id);
         this.saveTimetables();
-
-        this.showToast(`✅ Timetable "${name}" saved successfully`, 'success');
+        this.showToast('Timetable deleted', 'info');
         this.renderUI();
     }
 
-    clearCreateTimetable() {
-        if (confirm('Clear all custom lectures?')) {
-            this.lectures = this.lectures.filter(l => !l.isCustom);
-            this.saveLectures();
-            document.getElementById('quickCourseName').value = '';
-            document.getElementById('quickRoom').value = '';
-            document.getElementById('quickStartTime').value = '';
-            document.getElementById('quickEndTime').value = '';
-            document.querySelectorAll('.quick-day-checkbox').forEach(cb => cb.checked = false);
-            this.renderCreateUI();
-            this.showToast('✅ Custom timetable cleared', 'info');
+    viewTimetable(id) {
+        const t = this.timetables.find(t => t.id === id);
+        if (!t || !t.data) return;
+        const w = window.open('', '_blank');
+        w.document.write(`<html><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+            <img src="${t.data}" style="max-width:95%;max-height:95vh;border-radius:8px;">
+        </body></html>`);
+    }
+
+    downloadTimetable(id) {
+        const t = this.timetables.find(t => t.id === id);
+        if (!t || !t.data) return;
+        const a = document.createElement('a');
+        a.href = t.data; a.download = t.name; a.click();
+    }
+
+    deleteLecture(id) {
+        if (!confirm('Delete this lecture?')) return;
+        this.lectures = this.lectures.filter(l => String(l.id) !== String(id));
+        this.saveLectures();
+        this.showToast('Lecture deleted', 'info');
+        this.renderUI();
+    }
+
+    /* ── TODAY'S LECTURES ────────────────────────────────────────────────── */
+
+    getTodayLectures() {
+        const today = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()];
+        return this.lectures
+            .filter(l => l.days && l.days.some(d => today.startsWith(d)))
+            .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+    }
+
+    /* ── RENDER ──────────────────────────────────────────────────────────── */
+
+    renderUI() {
+        // Stats
+        const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        setEl('totalTimetables', this.timetables.length);
+        setEl('totalLectures',   this.lectures.length);
+        setEl('alertStatus',     this.settings.dailyAlerts ? 'ON' : 'OFF');
+
+        // Uploaded files
+        const fc = document.getElementById('uploadedFiles');
+        if (fc) {
+            if (this.timetables.length === 0) {
+                fc.innerHTML = '<p style="color:var(--text-secondary);text-align:center;margin:0;">No timetables uploaded yet</p>';
+            } else {
+                fc.innerHTML = this.timetables.map(t => `
+                    <div class="file-item">
+                        <div class="file-icon"><i class="fas ${t.type === 'pdf' ? 'fa-file-pdf' : t.type === 'custom' ? 'fa-calendar-check' : 'fa-image'}"></i></div>
+                        <div class="file-info">
+                            <p class="file-name" title="${t.name}">${t.name}</p>
+                            <p class="file-time">${t.dateAdded}${t.size ? ' · ' + t.size : ''}</p>
+                        </div>
+                        <div class="file-actions">
+                            ${t.data ? `<button class="btn-view" onclick="timetableManager.viewTimetable(${t.id})" title="View"><i class="fas fa-eye"></i></button>` : ''}
+                            ${t.data ? `<button class="btn-download-file" onclick="timetableManager.downloadTimetable(${t.id})" title="Download"><i class="fas fa-download"></i></button>` : ''}
+                            <button class="btn-delete-file" onclick="timetableManager.deleteTimetable(${t.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`).join('');
+            }
         }
+
+        // Today's lectures
+        const lc = document.getElementById('lectureSchedule');
+        if (lc) {
+            const today = this.getTodayLectures();
+            if (this.lectures.length === 0) {
+                lc.innerHTML = '<p style="color:var(--text-secondary);text-align:center;margin:0;">No lectures scheduled yet</p>';
+            } else if (today.length === 0) {
+                lc.innerHTML = `<p style="color:var(--text-secondary);text-align:center;margin:0;">No lectures today</p>
+                    <p style="color:var(--text-secondary);font-size:0.85rem;text-align:center;margin:var(--spacing-md) 0 0 0;">You have ${this.lectures.length} lecture(s) this week</p>`;
+            } else {
+                lc.innerHTML = today.map(l => this.renderLectureItem(l)).join('');
+            }
+        }
+    }
+
+    renderLectureItem(l) {
+        return `<div class="lecture-item">
+            <div style="display:flex;justify-content:space-between;align-items:start;">
+                <div>
+                    <div class="lecture-time">${l.startTime || '?'} – ${l.endTime || '?'}</div>
+                    <p class="lecture-course">${l.course}</p>
+                    <p class="lecture-room"><i class="fas fa-map-marker-alt" style="margin-right:4px;"></i>${l.room}</p>
+                    <p style="font-size:0.8rem;color:var(--text-secondary);margin:4px 0 0 0;">${(l.days || []).join(', ')}</p>
+                </div>
+                <button class="btn-delete-file" onclick="timetableManager.deleteLecture('${l.id}')" style="padding:4px 8px;" title="Delete">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>`;
     }
 
     renderCreateUI() {
@@ -497,288 +691,88 @@ class TimetableManager {
         this.renderTimetablePreview();
     }
 
+    renderDaysGrid() {
+        const grid = document.getElementById('daysGrid');
+        if (!grid) return;
+        const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+        grid.innerHTML = days.map(day => {
+            const count = this.lectures.filter(l => l.days && l.days.some(d => day.startsWith(d))).length;
+            return `<div class="day-card ${count > 0 ? 'has-lectures' : ''}">
+                <div class="day-name">${day.slice(0, 3)}</div>
+                <div class="lecture-count">${count} lecture${count !== 1 ? 's' : ''}</div>
+            </div>`;
+        }).join('');
+    }
+
     renderTimetablePreview() {
         const preview = document.getElementById('timetablePreview');
         if (!preview) return;
-
-        const customLectures = this.lectures
-            .filter(l => l.isCustom)
-            .sort((a, b) => a.startTime.localeCompare(b.startTime));
-
-        if (customLectures.length === 0) {
-            preview.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin: 0;">No lectures added yet</p>';
+        const custom = this.lectures.filter(l => l.isCustom).sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+        if (custom.length === 0) {
+            preview.innerHTML = '<p style="color:var(--text-secondary);text-align:center;margin:0;">No lectures added yet</p>';
             return;
         }
-
-        preview.innerHTML = customLectures.map(l => `
-            <div class="lecture-item" style="margin-bottom: var(--spacing-md);">
-                <div style="display: flex; justify-content: space-between; align-items: start;">
-                    <div>
-                        <div class="lecture-time">${l.startTime} - ${l.endTime}</div>
-                        <p class="lecture-course">${l.course}</p>
-                        <p class="lecture-room"><i class="fas fa-map-marker-alt" style="margin-right: 4px;"></i>${l.room}</p>
-                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 4px 0 0 0;">
-                            ${l.days.join(', ')}
-                        </p>
-                    </div>
-                    <button class="btn-delete-file" onclick="timetableManager.deleteLecture(${l.id})" style="padding: 4px 8px;">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-            </div>
-        `).join('');
+        preview.innerHTML = custom.map(l => this.renderLectureItem(l)).join('');
     }
 
-    renderUI() {
-        // Update stats
-        document.getElementById('totalTimetables').textContent = this.timetables.length;
-        document.getElementById('totalLectures').textContent = this.lectures.length;
-        document.getElementById('alertStatus').textContent = this.settings.dailyAlerts ? 'ON' : 'OFF';
-
-        // Render uploaded files
-        const filesContainer = document.getElementById('uploadedFiles');
-        if (this.timetables.length === 0) {
-            filesContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin: 0;">No timetables uploaded yet</p>';
-        } else {
-            filesContainer.innerHTML = this.timetables.map(t => `
-                <div class="file-item">
-                    <div class="file-icon">
-                        <i class="fas ${t.type === 'pdf' ? 'fa-file-pdf' : 'fa-image'}"></i>
-                    </div>
-                    <div class="file-info">
-                        <p class="file-name" title="${t.name}">${t.name}</p>
-                        <p class="file-time">${t.dateAdded}</p>
-                    </div>
-                    <div class="file-actions">
-                        <button class="btn-view" onclick="timetableManager.viewTimetable(${t.id})">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn-download-file" onclick="timetableManager.downloadTimetable(${t.id})">
-                            <i class="fas fa-download"></i>
-                        </button>
-                        <button class="btn-delete-file" onclick="timetableManager.deleteTimetable(${t.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Render lectures (today first)
-        const lectureContainer = document.getElementById('lectureSchedule');
-        const todayLectures = this.getTodayLectures();
-
-        if (this.lectures.length === 0) {
-            lectureContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin: 0;">No lectures scheduled</p>';
-        } else if (todayLectures.length === 0) {
-            lectureContainer.innerHTML = `
-                <p style="color: var(--text-secondary); text-align: center; margin: 0;">No lectures today</p>
-                <p style="color: var(--text-secondary); font-size: 0.85rem; text-align: center; margin: var(--spacing-md) 0 0 0;">You have ${this.lectures.length} lecture(s) scheduled this week</p>
-            `;
-        } else {
-            lectureContainer.innerHTML = todayLectures.map(l => `
-                <div class="lecture-item">
-                    <div style="display: flex; justify-content: space-between; align-items: start;">
-                        <div>
-                            <div class="lecture-time">${l.startTime} - ${l.endTime}</div>
-                            <p class="lecture-course">${l.course}</p>
-                            <p class="lecture-room"><i class="fas fa-map-marker-alt" style="margin-right: 4px;"></i>${l.room}</p>
-                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 4px 0 0 0;">
-                                ${l.days.join(', ')}
-                            </p>
-                        </div>
-                        <button class="btn-delete-file" onclick="timetableManager.deleteLecture(${l.id})" style="padding: 4px 8px;">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-    }
+    /* ── TOAST ───────────────────────────────────────────────────────────── */
 
     showToast(message, type = 'info') {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        
-        let bgColor = 'linear-gradient(135deg, #6C63FF, #a39bff)';
-        if (type === 'success') bgColor = 'linear-gradient(135deg, #2ED573, #6DE89F)';
-        if (type === 'error') bgColor = 'linear-gradient(135deg, #FF4757, #FF8C98)';
-        if (type === 'warning') bgColor = 'linear-gradient(135deg, #FFA502, #FFB84D)';
-
-        toast.style.cssText = `
-            background: ${bgColor};
-            color: white;
-            padding: 16px 20px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: slideIn 0.3s ease;
-            font-weight: 500;
-        `;
-        toast.textContent = message;
-
-        container.appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => toast.remove(), 300);
-        }, 3500);
+        // Use global showToast from app.js if available
+        if (typeof showToast === 'function') { showToast(message, type); return; }
+        const c = document.getElementById('toastContainer');
+        if (!c) return;
+        const t = document.createElement('div');
+        const bg = { success: '#2ED573', error: '#FF4757', warning: '#FFA502', info: '#6C63FF' }[type] || '#6C63FF';
+        t.style.cssText = `background:${bg};color:#fff;padding:14px 18px;margin-bottom:10px;border-radius:8px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
+        t.textContent = message;
+        c.appendChild(t);
+        setTimeout(() => t.remove(), 3500);
     }
 
-    loadTimetables() {
-        try {
-            return JSON.parse(localStorage.getItem('kairos_timetables')) || [];
-        } catch {
-            return [];
-        }
-    }
+    /* ── PERSISTENCE ─────────────────────────────────────────────────────── */
 
-    saveTimetables() {
-        localStorage.setItem('kairos_timetables', JSON.stringify(this.timetables));
-    }
-
-    loadLectures() {
-        try {
-            return JSON.parse(localStorage.getItem('kairos_lectures')) || [];
-        } catch {
-            return [];
-        }
-    }
-
-    saveLectures() {
-        localStorage.setItem('kairos_lectures', JSON.stringify(this.lectures));
-    }
+    loadTimetables() { try { return JSON.parse(localStorage.getItem('kairos_timetables')) || []; } catch { return []; } }
+    saveTimetables() { localStorage.setItem('kairos_timetables', JSON.stringify(this.timetables)); }
+    loadLectures()   { try { return JSON.parse(localStorage.getItem('kairos_lectures'))   || []; } catch { return []; } }
+    saveLectures()   { localStorage.setItem('kairos_lectures',   JSON.stringify(this.lectures)); }
 
     loadSettings() {
-        try {
-            const defaults = {
-                dailyAlerts: false,
-                soundNotif: false,
-                alertAdvanceTime: '15'
-            };
-            return { ...defaults, ...JSON.parse(localStorage.getItem('kairos_timetable_settings')) };
-        } catch {
-            return {
-                dailyAlerts: false,
-                soundNotif: false,
-                alertAdvanceTime: '15'
-            };
-        }
+        const defaults = { dailyAlerts: false, soundNotif: false, alertAdvanceTime: '15' };
+        try { return { ...defaults, ...JSON.parse(localStorage.getItem('kairos_timetable_settings') || '{}') }; }
+        catch { return defaults; }
     }
-
-    saveSettings() {
-        localStorage.setItem('kairos_timetable_settings', JSON.stringify(this.settings));
-    }
+    saveSettings() { localStorage.setItem('kairos_timetable_settings', JSON.stringify(this.settings)); }
 }
 
-// Initialize on page load
+/* ── INIT ─────────────────────────────────────────────────────────────────── */
+
 let timetableManager;
 
 document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
     timetableManager = new TimetableManager();
 });
 
-// Global functions for HTML onclick handlers
+/* ── GLOBAL HANDLERS for HTML onclick ────────────────────────────────────── */
+
 function handleFileUpload(event) {
     const file = event.target.files[0];
-    if (file && timetableManager) {
-        timetableManager.handleFileUpload(file);
-    }
+    if (file && timetableManager) timetableManager.handleFileUpload(file);
+    event.target.value = '';  // allow re-uploading same file
 }
-
-function addManualLecture() {
-    if (timetableManager) {
-        timetableManager.addManualLecture();
-    }
-}
-
-function quickAddLecture() {
-    if (timetableManager) {
-        timetableManager.quickAddLecture();
-    }
-}
-
-function saveTimetableAsNew() {
-    if (timetableManager) {
-        timetableManager.saveTimetableAsNew();
-    }
-}
-
-function clearCreateTimetable() {
-    if (timetableManager) {
-        timetableManager.clearCreateTimetable();
-    }
-}
+function addManualLecture()    { timetableManager?.addManualLecture(); }
+function quickAddLecture()     { timetableManager?.quickAddLecture(); }
+function saveTimetableAsNew()  { timetableManager?.saveTimetableAsNew(); }
+function clearCreateTimetable(){ timetableManager?.clearCreateTimetable(); }
+function toggleDailyAlerts()   { timetableManager?.toggleDailyAlerts(); }
+function toggleSoundNotif()    { timetableManager?.toggleSoundNotif(); }
+function generateStudyPlan()   { timetableManager?.generateStudyPlan(); }
 
 function switchTab(tabName) {
-    // Hide all tabs
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    // Remove active state from buttons
-    document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    // Show selected tab
-    const selectedTab = document.getElementById(`tab-${tabName}`);
-    if (selectedTab) {
-        selectedTab.classList.add('active');
-    }
-
-    // Set button active
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${tabName}`)?.classList.add('active');
     event.target.classList.add('active');
-
-    // Render UI for create tab
-    if (tabName === 'create' && timetableManager) {
-        timetableManager.renderCreateUI();
-    }
+    if (tabName === 'create' && timetableManager) timetableManager.renderCreateUI();
 }
-
-function toggleDailyAlerts() {
-    if (timetableManager) {
-        timetableManager.toggleDailyAlerts();
-    }
-}
-
-function toggleSoundNotif() {
-    if (timetableManager) {
-        timetableManager.toggleSoundNotif();
-    }
-}
-
-// Add CSS animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-    }
-
-    .toast-container {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 10000;
-        max-width: 400px;
-    }
-`;
-document.head.appendChild(style);
