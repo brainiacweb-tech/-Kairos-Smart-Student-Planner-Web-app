@@ -56,25 +56,40 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 # Serve the HTML/CSS/JS frontend from the repo root (one directory up from backend/)
 FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
+def _no_cache(resp):
+    """Prevent any proxy/CDN/browser from caching this response."""
+    resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '0'
+    return resp
+
 @app.route('/')
 def serve_index():
-    return send_from_directory(FRONTEND_DIR, 'landing.html')
+    return _no_cache(send_from_directory(FRONTEND_DIR, 'landing.html'))
 
 @app.route('/<path:filename>')
 def serve_frontend(filename):
     filepath = os.path.join(FRONTEND_DIR, filename)
     if os.path.isfile(filepath):
         resp = send_from_directory(FRONTEND_DIR, filename)
-        # Ensure service worker gets the correct MIME type (required by browsers)
+        # Service worker: no-cache + correct MIME (browsers reject SW otherwise)
         if filename == 'sw.js':
             resp.headers['Content-Type'] = 'application/javascript'
             resp.headers['Service-Worker-Allowed'] = '/'
-        # Ensure manifest gets correct MIME type
+            return _no_cache(resp)
+        # Manifest: correct MIME
         if filename == 'manifest.json':
             resp.headers['Content-Type'] = 'application/manifest+json'
+            return _no_cache(resp)
+        # HTML pages: always no-cache so browsers pick up new deployments immediately
+        if filename.endswith('.html'):
+            return _no_cache(resp)
+        # JS/CSS: short cache (1 hour) — version params handle busting
+        if filename.endswith(('.js', '.css')):
+            resp.headers['Cache-Control'] = 'public, max-age=3600'
         return resp
-    # SPA fallback — unknown paths go to landing
-    return send_from_directory(FRONTEND_DIR, 'landing.html')
+    # SPA fallback
+    return _no_cache(send_from_directory(FRONTEND_DIR, 'landing.html'))
 
 
 # ─────────────────────────────────────────────
