@@ -54,10 +54,19 @@
 
         /* HERO */
         .hero {
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-            padding: 100px 24px 80px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 80px 40px 60px;
             background: linear-gradient(135deg, #f0eeff 0%, #f8f9ff 60%, #e8f4ff 100%);
+            gap: 64px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
+        .hero-wrapper {
+            background: linear-gradient(135deg, #f0eeff 0%, #f8f9ff 60%, #e8f4ff 100%);
+            overflow: hidden;
+        }
+        .hero-text { flex: 1; min-width: 0; }
+        .hero-visual { flex: 1; min-width: 0; display: flex; justify-content: center; }
         .hero-badge {
             display: inline-flex; align-items: center; gap: 6px;
             background: rgba(108,99,255,0.1); color: var(--primary);
@@ -65,15 +74,91 @@
             margin-bottom: 24px;
         }
         .hero h1 {
-            font-family: 'Poppins', sans-serif; font-size: clamp(2.2rem, 5vw, 3.8rem);
-            font-weight: 800; line-height: 1.15; max-width: 800px;
+            font-family: 'Poppins', sans-serif; font-size: clamp(2rem, 4vw, 3.4rem);
+            font-weight: 800; line-height: 1.15;
             background: linear-gradient(135deg, #6C63FF, #3b82f6);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             margin-bottom: 20px;
         }
-        .hero p { font-size: 1.15rem; color: var(--text-secondary); max-width: 560px; margin-bottom: 40px; }
-        .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+        .hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 480px; margin-bottom: 40px; }
+        .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
         .hero-btns .btn { padding: 14px 32px; font-size: 1rem; border-radius: 12px; }
+
+        /* HERO MOCKUP */
+        .hero-mockup {
+            width: 100%; max-width: 520px;
+            border-radius: 20px;
+            box-shadow: 0 32px 80px rgba(108,99,255,0.22), 0 8px 24px rgba(0,0,0,0.08);
+            overflow: hidden;
+            background: #1e1b4b;
+            transform: perspective(1200px) rotateY(-6deg) rotateX(3deg);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .hero-mockup:hover {
+            transform: perspective(1200px) rotateY(-2deg) rotateX(1deg);
+            box-shadow: 0 40px 100px rgba(108,99,255,0.28), 0 12px 32px rgba(0,0,0,0.1);
+        }
+        .mockup-topbar {
+            background: #13103a; padding: 12px 16px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .mockup-topbar-title {
+            margin-left: 8px; color: rgba(255,255,255,0.5); font-size: 0.78rem;
+            font-family: 'Poppins', sans-serif;
+        }
+        .mockup-body { display: flex; height: 340px; }
+        .mockup-sidebar {
+            width: 56px; background: #13103a; padding: 16px 0;
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+        }
+        .mockup-sidebar-icon {
+            width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; color: rgba(255,255,255,0.4);
+            transition: background 0.2s;
+        }
+        .mockup-sidebar-icon.active { background: var(--primary); color: #fff; }
+        .mockup-content { flex: 1; padding: 16px; background: #f8f9ff; overflow: hidden; display: flex; flex-direction: column; gap: 12px; }
+        .mockup-header { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--text); }
+        .mockup-stats { display: flex; gap: 8px; }
+        .mockup-stat {
+            flex: 1; border-radius: 10px; padding: 10px;
+            font-size: 0.72rem; font-weight: 600;
+        }
+        .mockup-stat.purple { background: rgba(108,99,255,0.12); color: var(--primary); }
+        .mockup-stat.blue { background: rgba(59,130,246,0.12); color: #3b82f6; }
+        .mockup-stat.green { background: rgba(16,185,129,0.12); color: #10b981; }
+        .mockup-stat-num { font-size: 1.2rem; font-weight: 800; display: block; }
+        .mockup-tasks { display: flex; flex-direction: column; gap: 6px; }
+        .mockup-task {
+            background: #fff; border-radius: 8px; padding: 9px 12px;
+            border: 1px solid var(--border); display: flex; align-items: center; gap: 10px;
+            font-size: 0.75rem;
+        }
+        .mockup-task-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .mockup-task-label { color: var(--text); font-weight: 500; flex: 1; }
+        .mockup-task-badge {
+            font-size: 0.65rem; font-weight: 600; padding: 2px 7px; border-radius: 100px;
+        }
+        .badge-urgent { background: rgba(239,68,68,0.1); color: #ef4444; }
+        .badge-soon { background: rgba(245,158,11,0.1); color: #f59e0b; }
+        .badge-ok { background: rgba(16,185,129,0.1); color: #10b981; }
+        .mockup-progress-label { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); margin-top: 2px; }
+        .mockup-progress-bar { height: 6px; background: var(--border); border-radius: 100px; margin-top: 4px; overflow: hidden; }
+        .mockup-progress-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, #6C63FF, #3b82f6); }
+
+        @media(max-width: 900px) {
+            .hero { flex-direction: column; padding: 60px 24px 40px; gap: 40px; text-align: center; }
+            .hero-btns { justify-content: center; }
+            .hero p { margin: 0 auto 40px; }
+            .hero-mockup { transform: none; max-width: 420px; }
+            .hero-mockup:hover { transform: none; }
+        }
+        @media(max-width: 640px) {
+            .hero-mockup { max-width: 320px; }
+            .mockup-body { height: 260px; }
+        }
 
         /* FEATURES */
         section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
@@ -208,14 +293,81 @@
 </nav>
 
 <!-- HERO -->
+<div class="hero-wrapper">
 <div class="hero">
-    <div class="hero-badge"><i class="fas fa-bolt"></i> Smart Academic Planning</div>
-    <h1>Plan Smarter.<br>Study Better.<br>Act at the Right Time.</h1>
-    <p>Kairos helps students manage assignments, track deadlines, organise schedules, and stay on top of their academic goals — all in one beautiful app.</p>
-    <div class="hero-btns">
-        <a href="signup.html" class="btn btn-primary"><i class="fas fa-rocket"></i> Get Started Free</a>
-        <a href="index.html" class="btn btn-outline">Log In</a>
+    <div class="hero-text">
+        <div class="hero-badge"><i class="fas fa-bolt"></i> Smart Academic Planning</div>
+        <h1>Plan Smarter.<br>Study Better.<br>Act at the Right Time.</h1>
+        <p>Kairos helps students manage assignments, track deadlines, organise schedules, and stay on top of their academic goals — all in one beautiful app.</p>
+        <div class="hero-btns">
+            <a href="signup.html" class="btn btn-primary"><i class="fas fa-rocket"></i> Get Started Free</a>
+            <a href="index.html" class="btn btn-outline">Log In</a>
+        </div>
     </div>
+    <div class="hero-visual">
+        <div class="hero-mockup">
+            <!-- Top bar -->
+            <div class="mockup-topbar">
+                <div class="mockup-dot" style="background:#ff5f57"></div>
+                <div class="mockup-dot" style="background:#febc2e"></div>
+                <div class="mockup-dot" style="background:#28c840"></div>
+                <span class="mockup-topbar-title">Kairos — Dashboard</span>
+            </div>
+            <!-- Body -->
+            <div class="mockup-body">
+                <!-- Sidebar -->
+                <div class="mockup-sidebar">
+                    <div class="mockup-sidebar-icon active"><i class="fas fa-th-large"></i></div>
+                    <div class="mockup-sidebar-icon"><i class="fas fa-tasks"></i></div>
+                    <div class="mockup-sidebar-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="mockup-sidebar-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="mockup-sidebar-icon"><i class="fas fa-cog"></i></div>
+                </div>
+                <!-- Content -->
+                <div class="mockup-content">
+                    <div class="mockup-header">Good morning, Alex 👋</div>
+                    <!-- Stats -->
+                    <div class="mockup-stats">
+                        <div class="mockup-stat purple">
+                            <span class="mockup-stat-num">5</span>Due Today
+                        </div>
+                        <div class="mockup-stat blue">
+                            <span class="mockup-stat-num">12</span>This Week
+                        </div>
+                        <div class="mockup-stat green">
+                            <span class="mockup-stat-num">3.8</span>GPA
+                        </div>
+                    </div>
+                    <!-- Tasks -->
+                    <div class="mockup-tasks">
+                        <div class="mockup-task">
+                            <div class="mockup-task-dot" style="background:#ef4444"></div>
+                            <span class="mockup-task-label">Calculus Assignment</span>
+                            <span class="mockup-task-badge badge-urgent">Due today</span>
+                        </div>
+                        <div class="mockup-task">
+                            <div class="mockup-task-dot" style="background:#f59e0b"></div>
+                            <span class="mockup-task-label">Essay Draft — History</span>
+                            <span class="mockup-task-badge badge-soon">2 days</span>
+                        </div>
+                        <div class="mockup-task">
+                            <div class="mockup-task-dot" style="background:#10b981"></div>
+                            <span class="mockup-task-label">Physics Lab Report</span>
+                            <span class="mockup-task-badge badge-ok">5 days</span>
+                        </div>
+                    </div>
+                    <!-- Progress -->
+                    <div>
+                        <div class="mockup-progress-label">Weekly Progress — 68%</div>
+                        <div class="mockup-progress-bar">
+                            <div class="mockup-progress-fill" style="width:68%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 
 <!-- FEATURES -->
