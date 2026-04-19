@@ -3,7 +3,7 @@
    Enables offline support + installability on Android, iOS & desktop
    =========================== */
 
-const CACHE_NAME = 'kairos-v1';
+const CACHE_NAME = 'kairos-v2';
 
 const STATIC_ASSETS = [
     '/',

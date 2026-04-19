@@ -58,14 +58,23 @@ FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 @app.route('/')
 def serve_index():
-    return send_from_directory(FRONTEND_DIR, 'index.html')
+    return send_from_directory(FRONTEND_DIR, 'landing.html')
 
 @app.route('/<path:filename>')
 def serve_frontend(filename):
     filepath = os.path.join(FRONTEND_DIR, filename)
     if os.path.isfile(filepath):
-        return send_from_directory(FRONTEND_DIR, filename)
-    return send_from_directory(FRONTEND_DIR, 'index.html')
+        resp = send_from_directory(FRONTEND_DIR, filename)
+        # Ensure service worker gets the correct MIME type (required by browsers)
+        if filename == 'sw.js':
+            resp.headers['Content-Type'] = 'application/javascript'
+            resp.headers['Service-Worker-Allowed'] = '/'
+        # Ensure manifest gets correct MIME type
+        if filename == 'manifest.json':
+            resp.headers['Content-Type'] = 'application/manifest+json'
+        return resp
+    # SPA fallback — unknown paths go to landing
+    return send_from_directory(FRONTEND_DIR, 'landing.html')
 
 
 # ─────────────────────────────────────────────
