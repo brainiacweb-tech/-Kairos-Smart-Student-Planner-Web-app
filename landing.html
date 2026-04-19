@@ -205,6 +205,80 @@
         .mini-mobile-item-title { font-size: 0.55rem; font-weight: 600; color: #1a1a2e; }
         .mini-mobile-item-sub { font-size: 0.48rem; color: #6b7280; }
 
+        /* ── iPHONE 17 MOCKUP ── */
+        .iphone17-mockup {
+            position: absolute; bottom: -32px; right: -42px;
+            width: 122px;
+            background: linear-gradient(160deg, #2d2d2d 0%, #1a1a1a 100%);
+            border-radius: 38px;
+            box-shadow: 0 28px 65px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.11);
+            border: 2.5px solid #3a3a3a;
+            overflow: hidden;
+            z-index: 10;
+        }
+        .iphone17-topbar {
+            height: 23px; background: #1a1a1a;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .iphone17-island {
+            width: 46px; height: 11px; background: #000;
+            border-radius: 11px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+        }
+        .iphone17-screen { background: #f8f9ff; padding: 8px; }
+        .iphone17-home {
+            height: 13px; background: #1a1a1a;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .iphone17-indicator { width: 36px; height: 4px; background: rgba(255,255,255,0.28); border-radius: 4px; }
+        .iphone17-mockup::before {
+            content: ''; position: absolute; left: -3px; top: 62px;
+            width: 2.5px; height: 24px; background: #3a3a3a; border-radius: 2px 0 0 2px;
+            box-shadow: 0 36px 0 #3a3a3a;
+        }
+        .iphone17-mockup::after {
+            content: ''; position: absolute; right: -3px; top: 76px;
+            width: 2.5px; height: 48px; background: #3a3a3a; border-radius: 0 2px 2px 0;
+        }
+
+        /* ── SAMSUNG S26 ULTRA MOCKUP ── */
+        .samsung-s26-mockup {
+            position: absolute; bottom: -22px; left: -38px;
+            width: 110px;
+            background: linear-gradient(160deg, #1e1e1e 0%, #0d0d0d 100%);
+            border-radius: 24px;
+            box-shadow: 0 28px 65px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.07);
+            border: 2px solid #252525;
+            overflow: hidden;
+            z-index: 10;
+        }
+        .samsung-s26-topbar {
+            height: 21px; background: #0d0d0d;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .samsung-s26-camera {
+            width: 7px; height: 7px; background: #1a1a1a; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.13);
+            box-shadow: 0 0 5px rgba(80,160,255,0.22);
+        }
+        .samsung-s26-screen { background: #f8f9ff; padding: 7px; }
+        .samsung-s26-bottom { height: 14px; background: #0d0d0d; }
+        .samsung-s26-mockup::before {
+            content: ''; position: absolute; right: -3px; top: 58px;
+            width: 2px; height: 52px; background: #252525; border-radius: 0 2px 2px 0;
+        }
+        .samsung-s26-mockup::after {
+            content: ''; position: absolute; left: -3px; top: 62px;
+            width: 2px; height: 26px; background: #252525; border-radius: 2px 0 0 2px;
+            box-shadow: 0 38px 0 #252525;
+        }
+
+        /* ── PLATFORM BADGE ICONS ── */
+        .platform-badge {
+            width: 58px; height: 58px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.75rem; color: #fff; margin-bottom: 4px;
+        }
+
         /* ── SECTION COMMON ── */
         .section { padding: 100px 48px; max-width: 1200px; margin: 0 auto; }
         .section-label { color: var(--primary); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
@@ -557,11 +631,11 @@
                 </div>
             </div>
         </div>
-        <!-- Floating phone -->
-        <div class="phone-mockup">
-            <div class="phone-notch"><div class="phone-notch-inner"></div></div>
-            <div class="phone-screen">
-                <div style="font-size:0.62rem;font-weight:700;color:#6C63FF;margin-bottom:6px;font-family:'Poppins',sans-serif;">📋 My Assignments</div>
+        <!-- iPhone 17 -->
+        <div class="iphone17-mockup">
+            <div class="iphone17-topbar"><div class="iphone17-island"></div></div>
+            <div class="iphone17-screen">
+                <div style="font-size:0.6rem;font-weight:700;color:#6C63FF;margin-bottom:5px;font-family:'Poppins',sans-serif;">📋 Assignments</div>
                 <div class="mini-mobile-stat">
                     <div class="mini-mobile-card"><div class="mini-mobile-card-num">8</div><div class="mini-mobile-card-lbl">Total</div></div>
                     <div class="mini-mobile-card"><div class="mini-mobile-card-num" style="color:#2ED573">4</div><div class="mini-mobile-card-lbl">Done</div></div>
@@ -572,6 +646,24 @@
                     <div class="mini-mobile-item" style="border-left-color:#2ED573"><div class="mini-mobile-item-title">Marketing Pres.</div><div class="mini-mobile-item-sub">Completed ✓</div></div>
                 </div>
             </div>
+            <div class="iphone17-home"><div class="iphone17-indicator"></div></div>
+        </div>
+        <!-- Samsung S26 Ultra -->
+        <div class="samsung-s26-mockup">
+            <div class="samsung-s26-topbar"><div class="samsung-s26-camera"></div></div>
+            <div class="samsung-s26-screen">
+                <div style="font-size:0.58rem;font-weight:700;color:#6C63FF;margin-bottom:5px;font-family:'Poppins',sans-serif;">📊 CWA Overview</div>
+                <div style="text-align:center;margin-bottom:5px;">
+                    <div style="font-family:'Poppins',sans-serif;font-size:1.5rem;font-weight:700;color:#6C63FF;line-height:1">80</div>
+                    <div style="font-size:0.5rem;color:#6b7280">CWA Score</div>
+                </div>
+                <div class="mini-mobile-list">
+                    <div class="mini-mobile-item" style="border-left-color:#2ED573"><div class="mini-mobile-item-title">ACC301 Financial</div><div class="mini-mobile-item-sub">Score: 85/100</div></div>
+                    <div class="mini-mobile-item" style="border-left-color:#6C63FF"><div class="mini-mobile-item-title">MKT201 Marketing</div><div class="mini-mobile-item-sub">Score: 92/100</div></div>
+                    <div class="mini-mobile-item" style="border-left-color:#FFA502"><div class="mini-mobile-item-title">BUS401 Strategy</div><div class="mini-mobile-item-sub">Score: 78/100</div></div>
+                </div>
+            </div>
+            <div class="samsung-s26-bottom"></div>
         </div>
     </div>
 </div>
@@ -738,56 +830,56 @@
         </div>
     </div>
 
-    <!-- GPA -->
+    <!-- CWA -->
     <div class="showcase-row">
         <div class="showcase-text">
-            <div class="pill pill-orange"><i class="fas fa-calculator"></i> GPA & Analytics</div>
+            <div class="pill pill-orange"><i class="fas fa-calculator"></i> CWA Calculator</div>
             <h3>Know exactly where you stand</h3>
-            <p>Calculate your GPA, convert your CWA score, and track how each course is affecting your overall average — all updated in real time.</p>
+            <p>Track your CWA score per course, see your cumulative weighted average, and watch how each grade affects your overall academic standing — all in real time.</p>
             <div class="check-list">
-                <div class="check-item"><i class="fas fa-check-circle"></i> GPA calculator with grade point scale</div>
+                <div class="check-item"><i class="fas fa-check-circle"></i> CWA calculator with per-course score entry</div>
                 <div class="check-item"><i class="fas fa-check-circle"></i> CWA → GPA conversion built in</div>
-                <div class="check-item"><i class="fas fa-check-circle"></i> Per-course grade breakdown</div>
+                <div class="check-item"><i class="fas fa-check-circle"></i> Visual progress bar per course</div>
                 <div class="check-item"><i class="fas fa-check-circle"></i> Productivity analytics dashboard</div>
             </div>
         </div>
         <div class="screen-mockup">
             <div class="screen-topbar">
-                <span class="screen-title">📊 GPA Calculator</span>
+                <span class="screen-title">📊 CWA Calculator</span>
                 <span class="screen-badge" style="background:#fff4e5;color:#FFA502">Semester 1</span>
             </div>
             <div class="screen-body">
                 <div class="mock-gpa-circle">
                     <svg class="mock-gpa-svg" viewBox="0 0 100 100">
                         <circle class="mock-gpa-bg" cx="50" cy="50" r="40"/>
-                        <circle class="mock-gpa-fill" cx="50" cy="50" r="40"/>
+                        <circle class="mock-gpa-fill" cx="50" cy="50" r="40" style="stroke-dashoffset:50"/>
                     </svg>
                     <div class="mock-gpa-value">
-                        <div class="mock-gpa-num">3.62</div>
-                        <div class="mock-gpa-lbl">GPA</div>
+                        <div class="mock-gpa-num">80</div>
+                        <div class="mock-gpa-lbl">CWA</div>
                     </div>
                 </div>
                 <div class="mock-gpa-courses">
                     <div class="mock-gpa-row">
                         <span class="mock-gpa-course">ACC301 – Financial Accounting</span>
-                        <span class="mock-gpa-grade">A (4.0)</span>
+                        <span class="mock-gpa-grade">85 / 100</span>
                     </div>
-                    <div class="mock-gpa-minibar"><div class="mock-gpa-minibar-fill" style="width:100%"></div></div>
+                    <div class="mock-gpa-minibar"><div class="mock-gpa-minibar-fill" style="width:85%"></div></div>
                     <div class="mock-gpa-row">
                         <span class="mock-gpa-course">BUS401 – Strategic Management</span>
-                        <span class="mock-gpa-grade">B+ (3.3)</span>
+                        <span class="mock-gpa-grade">78 / 100</span>
                     </div>
-                    <div class="mock-gpa-minibar"><div class="mock-gpa-minibar-fill" style="width:82%"></div></div>
+                    <div class="mock-gpa-minibar"><div class="mock-gpa-minibar-fill" style="width:78%"></div></div>
                     <div class="mock-gpa-row">
                         <span class="mock-gpa-course">MKT201 – Principles of Marketing</span>
-                        <span class="mock-gpa-grade">A- (3.7)</span>
+                        <span class="mock-gpa-grade">92 / 100</span>
                     </div>
                     <div class="mock-gpa-minibar"><div class="mock-gpa-minibar-fill" style="width:92%"></div></div>
                     <div class="mock-gpa-row">
                         <span class="mock-gpa-course">HRM301 – Human Resource Mgmt</span>
-                        <span class="mock-gpa-grade">B (3.0)</span>
+                        <span class="mock-gpa-grade">74 / 100</span>
                     </div>
-                    <div class="mock-gpa-minibar"><div class="mock-gpa-minibar-fill" style="width:75%"></div></div>
+                    <div class="mock-gpa-minibar"><div class="mock-gpa-minibar-fill" style="width:74%"></div></div>
                 </div>
             </div>
         </div>
@@ -928,22 +1020,30 @@
     <p class="section-sub" style="margin:8px auto 0">Kairos is a Progressive Web App — install it once, use it anywhere, even offline.</p>
     <div class="platforms-grid">
         <div class="platform-card">
-            <div class="platform-icon">🤖</div>
+            <div class="platform-badge" style="background:linear-gradient(135deg,#3DDC84,#00C853)">
+                <i class="fab fa-android"></i>
+            </div>
             <div class="platform-name">Android</div>
             <div class="platform-sub">Add to Home Screen via Chrome</div>
         </div>
         <div class="platform-card">
-            <div class="platform-icon">🍎</div>
+            <div class="platform-badge" style="background:linear-gradient(135deg,#555,#1a1a1a)">
+                <i class="fab fa-apple"></i>
+            </div>
             <div class="platform-name">iPhone / iPad</div>
             <div class="platform-sub">Add to Home Screen via Safari</div>
         </div>
         <div class="platform-card">
-            <div class="platform-icon">💻</div>
+            <div class="platform-badge" style="background:linear-gradient(135deg,#0078D4,#005a9e)">
+                <i class="fab fa-windows"></i>
+            </div>
             <div class="platform-name">Windows / Mac</div>
             <div class="platform-sub">Install via Chrome or Edge</div>
         </div>
         <div class="platform-card">
-            <div class="platform-icon">📶</div>
+            <div class="platform-badge" style="background:linear-gradient(135deg,#6C63FF,#a39bff)">
+                <i class="fas fa-wifi"></i>
+            </div>
             <div class="platform-name">Works Offline</div>
             <div class="platform-sub">Cached for offline use</div>
         </div>
