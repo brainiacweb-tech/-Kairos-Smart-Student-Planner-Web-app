@@ -122,8 +122,55 @@
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="js/app.js?v=2"></script>
     <script>
+        const GOOGLE_CLIENT_ID = '211537278617-ioagbmritu95qf9n2ce49h5gqqkcfri2.apps.googleusercontent.com';
+
+        function decodeJwt(token) {
+            try { return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); }
+            catch(e) { return null; }
+        }
+
+        function handleGoogleCredential(response) {
+            const payload = decodeJwt(response.credential);
+            if (!payload) { showToast('Google sign-in failed', 'error'); return; }
+            localStorage.setItem('kairos_user', JSON.stringify({
+                email: payload.email,
+                name: payload.name,
+                avatarUrl: payload.picture,
+                google_id: payload.sub,
+                logged_in: true,
+                created_at: new Date().toISOString()
+            }));
+            if (!localStorage.getItem('kairos_assignments')) initializeMockData();
+            showToast('Welcome to Kairos, ' + payload.name + '!', 'success');
+            setTimeout(() => window.location.href = 'dashboard.html', 800);
+        }
+
+        window.addEventListener('load', () => {
+            if (typeof google !== 'undefined') {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleGoogleCredential,
+                    auto_select: false
+                });
+            }
+        });
+
+        document.querySelector('.oauth-google').addEventListener('click', () => {
+            if (typeof google === 'undefined') { showToast('Google Sign-In not loaded yet, try again', 'warning'); return; }
+            google.accounts.id.prompt((notification) => {
+                if (notification.isSkippedMoment() || notification.isDismissedMoment()) {
+                    const tmp = document.createElement('div');
+                    tmp.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#fff;padding:20px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.2)';
+                    tmp.innerHTML = '<p style="margin-bottom:12px;font-family:Inter,sans-serif;font-size:14px;text-align:center">Sign up with Google</p><div id="gBtnContainer"></div><button onclick="this.parentElement.remove()" style="margin-top:10px;width:100%;padding:8px;border:none;border-radius:8px;background:#f3f4f6;cursor:pointer;font-size:13px">Cancel</button>';
+                    document.body.appendChild(tmp);
+                    google.accounts.id.renderButton(document.getElementById('gBtnContainer'), { theme:'outline', size:'large', width:280 });
+                }
+            });
+        });
+
         document.getElementById('signupForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
