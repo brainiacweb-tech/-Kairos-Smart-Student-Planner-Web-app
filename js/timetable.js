@@ -113,10 +113,9 @@ class TimetableManager {
         this.renderUI();
     }
 
-    /* ── IMAGE / PDF UPLOAD → EXTRACTION EDITOR ─────────────────────────── */
+    /* ── IMAGE / PDF UPLOAD → AUTO-EXTRACTION ──────────────────────────────── */
 
-    storeAndExtract(fileData, fileName, fileType, fileExt) {
-        // Persist the file
+    async storeAndExtract(fileData, fileName, fileType, fileExt) {
         const timetable = {
             id:        Date.now(),
             name:      fileName,
@@ -129,81 +128,257 @@ class TimetableManager {
         this.saveTimetables();
         this.renderUI();
 
-        this.showToast(`"${fileName}" uploaded! Fill in your courses below.`, 'success');
+        // Show scanning overlay
+        this._showScanModal(fileName);
+        let detected = [];
+        try {
+            if (timetable.type === 'image') {
+                detected = await this._ocrImage(fileData);
+            } else {
+                detected = await this._pdfExtractText(fileData);
+            }
+        } catch(e) {
+            console.warn('Auto-extraction failed:', e);
+        }
+        document.getElementById('_kairosDetectModal')?.remove();
 
-        // Open extraction editor so user can view the image and enter their courses
-        this.openExtractionEditor(timetable);
+        if (detected.length > 0) {
+            this.showToast(`Detected ${detected.length} course(s) from "${fileName}". Review below.`, 'success');
+        } else {
+            this.showToast(`Could not auto-detect courses from "${fileName}". Enter them manually.`, 'info');
+        }
+        this.openExtractionEditor(timetable, detected);
+    }
+
+    _showScanModal(fileName) {
+        document.getElementById('_kairosDetectModal')?.remove();
+        const m = document.createElement('div');
+        m.id = '_kairosDetectModal';
+        m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;display:flex;align-items:center;justify-content:center;';
+        m.innerHTML = `<div style="background:#fff;border-radius:18px;padding:36px 40px;text-align:center;max-width:340px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.3);">
+            <div style="font-size:2.8rem;margin-bottom:14px;">🔍</div>
+            <h3 style="margin:0 0 6px;font-family:Poppins,sans-serif;color:#1a1a2e;">Scanning Timetable</h3>
+            <p style="color:#6b7280;font-size:0.88rem;margin-bottom:20px;">Auto-detecting courses from<br><strong>${fileName}</strong></p>
+            <div style="height:5px;background:#f0eeff;border-radius:3px;overflow:hidden;">
+              <div id="_kairosDetectBar" style="height:100%;background:linear-gradient(90deg,#6C63FF,#a39bff);border-radius:3px;width:30%;animation:_kScan 1.4s ease-in-out infinite;"></div>
+            </div>
+            <style>@keyframes _kScan{0%,100%{width:20%;margin-left:0}50%{width:50%;margin-left:30%}}</style>
+        </div>`;
+        document.body.appendChild(m);
+    }
+
+    async _ocrImage(dataUrl) {
+        if (!window.Tesseract) throw new Error('Tesseract not loaded');
+        const bar = document.getElementById('_kairosDetectBar');
+        const result = await Tesseract.recognize(dataUrl, 'eng', {
+            logger: m => {
+                if (m.status === 'recognizing text' && bar) {
+                    const pct = Math.round(m.progress * 100);
+                    bar.style.cssText = `height:100%;background:linear-gradient(90deg,#6C63FF,#a39bff);border-radius:3px;width:${pct}%;animation:none;transition:width 0.3s;`;
+                }
+            }
+        });
+        return this._parseTimetableText(result.data.text);
+    }
+
+    async _pdfExtractText(dataUrl) {
+        if (!window.pdfjsLib) {
+            await new Promise(resolve => {
+                const s = document.createElement('script');
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+                s.onload = s.onerror = resolve;
+                document.head.appendChild(s);
+            });
+        }
+        if (!window.pdfjsLib) return [];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const b64 = dataUrl.split(',')[1];
+        const bin = atob(b64);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+        let text = '';
+        for (let p = 1; p <= pdf.numPages; p++) {
+            const page = await pdf.getPage(p);
+            const tc = await page.getTextContent();
+            text += tc.items.map(i => i.str).join(' ') + '\n';
+        }
+        return this._parseTimetableText(text);
+    }
+
+    _parseTimetableText(text) {
+        const courses = [], seen = new Set();
+        const lines = text.split(/[\n\r]+/).map(l => l.trim()).filter(l => l.length > 2);
+
+        const codeRx   = /\b([A-Z]{2,5}\s?\d{3,4}[A-Z]?)\b/g;
+        const t24Rx    = /\b([01]?\d|2[0-3]):([0-5]\d)\b/g;
+        const t12Rx    = /\b(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([AaPp][Mm])\b/g;
+        const dayRx    = /\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/gi;
+
+        for (let i = 0; i < lines.length; i++) {
+            const block = lines.slice(Math.max(0, i - 1), i + 3).join(' ');
+            let m; codeRx.lastIndex = 0;
+            while ((m = codeRx.exec(block)) !== null) {
+                const code = m[1].replace(/\s+/, '');
+                if (seen.has(code)) continue;
+                seen.add(code);
+
+                const times = [];
+                let tm; t24Rx.lastIndex = 0;
+                while ((tm = t24Rx.exec(block)) !== null)
+                    times.push(`${tm[1].padStart(2,'0')}:${tm[2]}`);
+                if (!times.length) {
+                    t12Rx.lastIndex = 0;
+                    while ((tm = t12Rx.exec(block)) !== null) {
+                        let h = parseInt(tm[1]);
+                        const mn = tm[2] || '00', ap = tm[3].toUpperCase();
+                        if (ap === 'PM' && h !== 12) h += 12;
+                        if (ap === 'AM' && h === 12) h = 0;
+                        times.push(`${String(h).padStart(2,'0')}:${mn}`);
+                    }
+                }
+
+                const days = [];
+                dayRx.lastIndex = 0;
+                while ((tm = dayRx.exec(block)) !== null) {
+                    const d = tm[1].slice(0,3);
+                    const nd = d.charAt(0).toUpperCase() + d.slice(1).toLowerCase();
+                    if (!days.includes(nd)) days.push(nd);
+                }
+
+                const roomM = block.match(/\b(Room\s*\w+|Hall\s*[A-Z]?\d*|Lab\s*\w+|[A-Z]{1,2}\d{2,4})\b/i);
+                const st = times[0] || '08:00';
+                const et = times[1] || this._addHours(st, 2);
+                courses.push({
+                    course: code, room: roomM ? roomM[1].trim() : 'TBA',
+                    startTime: st, endTime: et,
+                    days: days.length ? days : ['Mon']
+                });
+            }
+        }
+        return courses;
+    }
+
+    _addHours(t, h) {
+        const [hh, mm] = t.split(':').map(Number);
+        return `${String(Math.min(23, hh + h)).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
     }
 
     /* ── EXTRACTION EDITOR MODAL ─────────────────────────────────────────── */
 
-    openExtractionEditor(timetable) {
-        // Remove any existing modal
+    openExtractionEditor(timetable, preDetected = []) {
         document.getElementById('extractionModal')?.remove();
+        this._pendingExtracted = [...preDetected];
 
         const isImage = timetable.type === 'image';
         const previewHTML = isImage
             ? `<img src="${timetable.data}" style="max-width:100%;border-radius:8px;display:block;">`
-            : `<iframe src="${timetable.data}" style="width:100%;height:400px;border:none;border-radius:8px;"></iframe>`;
+            : `<iframe src="${timetable.data}" style="width:100%;height:380px;border:none;border-radius:8px;"></iframe>`;
+
+        const hasDetected = preDetected.length > 0;
 
         const modal = document.createElement('div');
         modal.id = 'extractionModal';
-        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:12px;';
         modal.innerHTML = `
-            <div style="background:#fff;border-radius:16px;max-width:960px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
-                <div style="padding:20px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+            <div style="background:#fff;border-radius:16px;max-width:980px;width:100%;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+                <div style="padding:18px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
                     <div>
-                        <h2 style="margin:0;font-size:1.25rem;color:#1a1a2e;">📅 Timetable Extraction</h2>
-                        <p style="margin:4px 0 0;font-size:0.85rem;color:#6b7280;">View your timetable and enter the courses you see</p>
+                        <h2 style="margin:0;font-size:1.2rem;color:#1a1a2e;font-family:Poppins,sans-serif;">
+                            ${hasDetected ? '✅ Courses Auto-Detected' : '📅 Timetable Editor'}
+                        </h2>
+                        <p style="margin:3px 0 0;font-size:0.82rem;color:#6b7280;">
+                            ${hasDetected ? `Found ${preDetected.length} course(s). Review, edit, or add more below.` : 'View your timetable and add courses manually.'}
+                        </p>
                     </div>
-                    <button onclick="document.getElementById('extractionModal').remove()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#999;line-height:1;">✕</button>
+                    <button onclick="document.getElementById('extractionModal').remove()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#999;">✕</button>
                 </div>
 
-                <div style="display:grid;grid-template-columns:1fr 1fr;flex:1;overflow:hidden;">
-                    <!-- Left: Image preview -->
-                    <div style="padding:16px;overflow-y:auto;border-right:1px solid #eee;background:#f8f9ff;">
-                        <div style="font-weight:600;margin-bottom:12px;color:#6C63FF;font-size:0.9rem;">YOUR UPLOADED TIMETABLE</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;flex:1;overflow:hidden;min-height:0;">
+                    <div style="padding:14px;overflow-y:auto;border-right:1px solid #eee;background:#f8f9ff;">
+                        <div style="font-weight:700;margin-bottom:10px;color:#6C63FF;font-size:0.8rem;letter-spacing:0.06em;">YOUR TIMETABLE</div>
                         ${previewHTML}
                     </div>
-                    <!-- Right: Course entry -->
-                    <div style="padding:16px;overflow-y:auto;">
-                        <div style="font-weight:600;margin-bottom:12px;color:#6C63FF;font-size:0.9rem;">ENTER COURSES YOU SEE</div>
-                        <div id="extractedCoursesList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;max-height:240px;overflow-y:auto;"></div>
-                        <div style="background:#f8f9ff;border-radius:12px;padding:16px;">
-                            <div style="display:grid;gap:8px;">
-                                <input id="exCourse" type="text" placeholder="Course name (e.g. ACC301)" style="padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;width:100%;">
-                                <input id="exRoom" type="text" placeholder="Room (e.g. Hall A)" style="padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.9rem;width:100%;">
+                    <div style="padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;">
+                        <div style="font-weight:700;color:#6C63FF;font-size:0.8rem;letter-spacing:0.06em;">
+                            ${hasDetected ? 'AUTO-DETECTED COURSES (tap to remove)' : 'ADD COURSES'}
+                        </div>
+                        <div id="extractedCoursesList" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;"></div>
+                        <details style="margin-top:4px;" ${hasDetected ? '' : 'open'}>
+                            <summary style="cursor:pointer;font-size:0.85rem;font-weight:600;color:#6C63FF;padding:6px 0;list-style:none;">
+                                <span>+ Add / Edit a Course Manually</span>
+                            </summary>
+                            <div style="background:#f8f9ff;border-radius:10px;padding:14px;margin-top:8px;display:grid;gap:8px;">
+                                <input id="exCourse" type="text" placeholder="Course code (e.g. ACC301)" style="padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.88rem;width:100%;">
+                                <input id="exRoom" type="text" placeholder="Room (e.g. Hall A)" style="padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.88rem;width:100%;">
                                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                                    <div><label style="font-size:0.8rem;color:#6b7280;">Start Time</label><input id="exStart" type="time" style="padding:8px;border:1px solid #e5e7eb;border-radius:8px;width:100%;font-size:0.9rem;"></div>
-                                    <div><label style="font-size:0.8rem;color:#6b7280;">End Time</label><input id="exEnd" type="time" style="padding:8px;border:1px solid #e5e7eb;border-radius:8px;width:100%;font-size:0.9rem;"></div>
+                                    <div><label style="font-size:0.78rem;color:#6b7280;display:block;margin-bottom:3px;">Start Time</label><input id="exStart" type="time" value="08:00" style="padding:7px;border:1px solid #e5e7eb;border-radius:8px;width:100%;font-size:0.88rem;"></div>
+                                    <div><label style="font-size:0.78rem;color:#6b7280;display:block;margin-bottom:3px;">End Time</label><input id="exEnd" type="time" value="10:00" style="padding:7px;border:1px solid #e5e7eb;border-radius:8px;width:100%;font-size:0.88rem;"></div>
                                 </div>
                                 <div>
-                                    <label style="font-size:0.8rem;color:#6b7280;display:block;margin-bottom:6px;">Days</label>
-                                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                                        ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => `
-                                            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:0.85rem;">
+                                    <label style="font-size:0.78rem;color:#6b7280;display:block;margin-bottom:5px;">Days</label>
+                                    <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                                        ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d =>
+                                            `<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:0.82rem;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:3px 8px;">
                                                 <input type="checkbox" class="ex-day" value="${d}"> ${d}
                                             </label>`).join('')}
                                     </div>
                                 </div>
-                                <button onclick="timetableManager.addExtractedCourse()" style="background:#6C63FF;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">
-                                    <i class="fas fa-plus"></i> Add Course
+                                <button onclick="timetableManager.addExtractedCourse()" style="background:#6C63FF;color:#fff;border:none;padding:9px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;">
+                                    + Add Course
                                 </button>
                             </div>
-                        </div>
+                        </details>
                     </div>
                 </div>
 
-                <div style="padding:16px 24px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:12px;flex-shrink:0;">
-                    <button onclick="document.getElementById('extractionModal').remove()" style="padding:10px 20px;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;font-weight:600;">Cancel</button>
-                    <button onclick="timetableManager.saveExtractedCourses()" style="padding:10px 24px;background:#6C63FF;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
-                        ✓ Save All Courses
-                    </button>
+                <div style="padding:14px 24px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:12px;">
+                    <span id="exCountBadge" style="font-size:0.85rem;color:#6b7280;"></span>
+                    <div style="display:flex;gap:10px;">
+                        <button onclick="document.getElementById('extractionModal').remove()" style="padding:9px 18px;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;">Cancel</button>
+                        <button onclick="timetableManager.saveExtractedCourses()" style="padding:9px 22px;background:#6C63FF;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;">
+                            Save ${hasDetected ? preDetected.length : ''} Course(s)
+                        </button>
+                    </div>
                 </div>
             </div>`;
 
-        this._pendingExtracted = [];
         document.body.appendChild(modal);
+
+        // Render pre-detected courses
+        preDetected.forEach((c, idx) => this._renderExtractedItem(c, idx));
+        this._updateExCount();
+    }
+
+    _renderExtractedItem(entry, idx) {
+        const list = document.getElementById('extractedCoursesList');
+        if (!list) return;
+        const item = document.createElement('div');
+        item.id = `exItem_${idx}`;
+        item.style.cssText = 'background:#f0eeff;border-left:3px solid #6C63FF;padding:8px 12px;border-radius:7px;font-size:0.83rem;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;cursor:pointer;';
+        item.title = 'Tap to remove';
+        item.innerHTML = `<div>
+            <strong>${entry.course}</strong> <span style="color:#6b7280;font-size:0.75rem;">${entry.room}</span><br>
+            <span style="color:#6C63FF;">${entry.startTime}${entry.endTime ? ' - ' + entry.endTime : ''}</span>
+            <span style="color:#6b7280;margin-left:6px;font-size:0.75rem;">${(entry.days||[]).join(', ')}</span>
+        </div><button onclick="timetableManager.removeExtractedItem(${idx})" style="background:none;border:none;color:#FF4757;cursor:pointer;font-size:0.95rem;padding:0 2px;">✕</button>`;
+        list.appendChild(item);
+        this._updateExCount();
+    }
+
+    removeExtractedItem(idx) {
+        this._pendingExtracted.splice(idx, 1);
+        // Re-render list
+        const list = document.getElementById('extractedCoursesList');
+        if (!list) return;
+        list.innerHTML = '';
+        this._pendingExtracted.forEach((c, i) => this._renderExtractedItem(c, i));
+        this._updateExCount();
+    }
+
+    _updateExCount() {
+        const badge = document.getElementById('exCountBadge');
+        if (badge) badge.textContent = `${(this._pendingExtracted||[]).length} course(s) ready to save`;
     }
 
     addExtractedCourse() {
@@ -218,19 +393,13 @@ class TimetableManager {
         const entry = { course, room, startTime: start, endTime: end, days };
         if (!this._pendingExtracted) this._pendingExtracted = [];
         this._pendingExtracted.push(entry);
-
-        // Render it in the list
-        const list = document.getElementById('extractedCoursesList');
-        const item = document.createElement('div');
-        item.style.cssText = 'background:#f0eeff;border-left:3px solid #6C63FF;padding:8px 12px;border-radius:6px;font-size:0.85rem;';
-        item.innerHTML = `<strong>${course}</strong> &nbsp;${start}–${end} &nbsp;<span style="color:#6b7280">${days.join(', ')}</span>`;
-        list.appendChild(item);
+        this._renderExtractedItem(entry, this._pendingExtracted.length - 1);
 
         // Clear form
         document.getElementById('exCourse').value = '';
         document.getElementById('exRoom').value = '';
-        document.getElementById('exStart').value = '';
-        document.getElementById('exEnd').value = '';
+        document.getElementById('exStart').value = '08:00';
+        document.getElementById('exEnd').value = '10:00';
         document.querySelectorAll('.ex-day').forEach(c => c.checked = false);
     }
 
@@ -316,7 +485,7 @@ class TimetableManager {
         });
 
         if (suggestions.length === 0) {
-            this.showToast('Could not generate suggestions — make sure your lectures have times and days set', 'warning');
+            this.showToast('Could not generate suggestions  -  make sure your lectures have times and days set', 'warning');
             return;
         }
 
@@ -345,7 +514,7 @@ class TimetableManager {
                 <div style="padding:20px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
                     <div>
                         <h2 style="margin:0;font-size:1.15rem;color:#1a1a2e;">✨ Suggested Study Timetable</h2>
-                        <p style="margin:4px 0 0;font-size:0.85rem;color:#6b7280;">Based on your ${this.lectures.length} lecture(s) — edit to your preference in the Planner</p>
+                        <p style="margin:4px 0 0;font-size:0.85rem;color:#6b7280;">Based on your ${this.lectures.length} lecture(s)  -  edit to your preference in the Planner</p>
                     </div>
                     <button onclick="document.getElementById('studyPlanModal').remove()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#999;">✕</button>
                 </div>

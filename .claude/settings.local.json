@@ -5,7 +5,9 @@
       "Bash(gh run:*)",
       "Bash(grep -l \"css/main.css\" *.html)",
       "Bash(sed -i 's|word-editor\\\\.html|word-editor.html|g' *.html)",
-      "Bash(sed -i 's|css/main\\\\.css?v=2|css/main.css?v=3|g; s|css/components\\\\.css?v=2|css/components.css?v=3|g; s|css/pages/|css/pages/|g; s|\\\\.css?v=2|.css?v=3|g; s|\\\\.js?v=2|.js?v=3|g' word-editor.html excel-editor.html powerpoint-editor.html)"
+      "Bash(sed -i 's|css/main\\\\.css?v=2|css/main.css?v=3|g; s|css/components\\\\.css?v=2|css/components.css?v=3|g; s|css/pages/|css/pages/|g; s|\\\\.css?v=2|.css?v=3|g; s|\\\\.js?v=2|.js?v=3|g' word-editor.html excel-editor.html powerpoint-editor.html)",
+      "Bash(grep \"\\\\.html$\")",
+      "Bash(node -e ' *)"
     ]
   }
 }

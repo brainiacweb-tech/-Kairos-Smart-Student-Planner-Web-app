@@ -46,7 +46,8 @@ function renderTimetable() {
         if (cells[cellIndex]) {
             const eventEl = document.createElement('div');
             eventEl.className = `timetable-event ${event.type}`;
-            eventEl.innerHTML = `<span>${event.title.substring(0, 12)}</span><button class="event-delete-btn" onclick="deleteEvent(${index}, event)"><i class="fas fa-trash-alt"></i></button>`;
+            const timeLbl = event.startTime ? `<small style="font-size:0.6em;display:block;opacity:0.85;margin-top:1px">${event.startTime}${event.endTime ? ' - ' + event.endTime : ''}</small>` : '';
+            eventEl.innerHTML = `<span>${event.title.substring(0, 14)}</span>${timeLbl}<button class="event-delete-btn" onclick="deleteEvent(${index}, event)"><i class="fas fa-trash-alt"></i></button>`;
             eventEl.style.cursor = 'pointer';
             cells[cellIndex].appendChild(eventEl);
         }
@@ -69,28 +70,34 @@ function openAddEventModal() {
     document.getElementById('eventTitle').value = '';
     document.getElementById('eventType').value = 'study';
     document.getElementById('eventDay').value = '1';
-    document.getElementById('eventHour').value = '9';
+    document.getElementById('eventStartTime').value = '09:00';
+    document.getElementById('eventEndTime').value = '10:00';
     openDrawer('addEventDrawer');
 }
 
 function handleAddEvent(e) {
     e.preventDefault();
-    
+
     const title = document.getElementById('eventTitle').value.trim();
     const type = document.getElementById('eventType').value;
     const dayIndex = parseInt(document.getElementById('eventDay').value);
-    const hourIndex = parseInt(document.getElementById('eventHour').value);
-    
+    const startTime = document.getElementById('eventStartTime').value || '09:00';
+    const endTime = document.getElementById('eventEndTime').value || '';
+    const startHour = parseInt(startTime.split(':')[0]);
+    const hourIndex = Math.max(0, Math.min(16, startHour - 6));
+
     if (!title) {
         showToast('Please enter an event title', 'warning');
         return;
     }
-    
+
     const event = {
         title: title,
         type: type,
         dayIndex: dayIndex,
         hourIndex: hourIndex,
+        startTime: startTime,
+        endTime: endTime,
         id: 'event_' + Date.now()
     };
     

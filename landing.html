@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" href="1000669890-Photoroom.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kairos - Smart Student Planner</title>
-    <meta name="description" content="Kairos is a smart student planner that helps you manage assignments, schedules, and academic goals — all in one place.">
+    <meta name="description" content="Kairos is a smart student planner that helps you manage assignments, schedules, and academic goals  -  all in one place.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -205,71 +205,86 @@
         .mini-mobile-item-title { font-size: 0.55rem; font-weight: 600; color: #1a1a2e; }
         .mini-mobile-item-sub { font-size: 0.48rem; color: #6b7280; }
 
-        /* ── iPHONE 17 MOCKUP ── */
+        /* ── iPHONE 17 PRO MAX MOCKUP ── */
         .iphone17-mockup {
-            position: absolute; bottom: -32px; right: -42px;
-            width: 122px;
-            background: linear-gradient(160deg, #2d2d2d 0%, #1a1a1a 100%);
-            border-radius: 38px;
-            box-shadow: 0 28px 65px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.11);
-            border: 2.5px solid #3a3a3a;
+            position: absolute; bottom: -36px; right: -48px;
+            width: 128px;
+            background: linear-gradient(175deg, #3a3a3a 0%, #1c1c1c 40%, #111 100%);
+            border-radius: 46px;
+            box-shadow:
+                0 32px 70px rgba(0,0,0,0.55),
+                inset 0 0 0 1px rgba(255,255,255,0.14),
+                inset 0 1px 0 rgba(255,255,255,0.22);
+            border: 2px solid #2a2a2a;
             overflow: hidden;
             z-index: 10;
         }
         .iphone17-topbar {
-            height: 23px; background: #1a1a1a;
+            height: 26px; background: #0d0d0d;
             display: flex; align-items: center; justify-content: center;
+            position: relative;
         }
         .iphone17-island {
-            width: 46px; height: 11px; background: #000;
-            border-radius: 11px; box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+            width: 48px; height: 12px; background: #000;
+            border-radius: 12px;
+            box-shadow: 0 0 0 1.5px rgba(255,255,255,0.07), 0 2px 8px rgba(0,0,0,0.8);
         }
         .iphone17-screen { background: #f8f9ff; padding: 8px; }
         .iphone17-home {
-            height: 13px; background: #1a1a1a;
+            height: 14px; background: #0d0d0d;
             display: flex; align-items: center; justify-content: center;
         }
-        .iphone17-indicator { width: 36px; height: 4px; background: rgba(255,255,255,0.28); border-radius: 4px; }
+        .iphone17-indicator { width: 38px; height: 4px; background: rgba(255,255,255,0.32); border-radius: 4px; }
+        /* Volume buttons left */
         .iphone17-mockup::before {
-            content: ''; position: absolute; left: -3px; top: 62px;
-            width: 2.5px; height: 24px; background: #3a3a3a; border-radius: 2px 0 0 2px;
-            box-shadow: 0 36px 0 #3a3a3a;
+            content: ''; position: absolute; left: -3.5px; top: 68px;
+            width: 3px; height: 22px; background: #2a2a2a; border-radius: 2px 0 0 2px;
+            box-shadow: 0 32px 0 #2a2a2a, 0 60px 0 22px #2a2a2a;
         }
+        /* Power button right */
         .iphone17-mockup::after {
-            content: ''; position: absolute; right: -3px; top: 76px;
-            width: 2.5px; height: 48px; background: #3a3a3a; border-radius: 0 2px 2px 0;
+            content: ''; position: absolute; right: -3.5px; top: 80px;
+            width: 3px; height: 52px; background: #2a2a2a; border-radius: 0 2px 2px 0;
         }
 
         /* ── SAMSUNG S26 ULTRA MOCKUP ── */
         .samsung-s26-mockup {
-            position: absolute; bottom: -22px; left: -38px;
-            width: 110px;
-            background: linear-gradient(160deg, #1e1e1e 0%, #0d0d0d 100%);
-            border-radius: 24px;
-            box-shadow: 0 28px 65px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.07);
-            border: 2px solid #252525;
+            position: absolute; bottom: -24px; left: -42px;
+            width: 114px;
+            background: linear-gradient(175deg, #1e1e1e 0%, #0c0c0c 50%, #080808 100%);
+            border-radius: 26px 26px 28px 28px;
+            box-shadow:
+                0 32px 70px rgba(0,0,0,0.55),
+                inset 0 0 0 1px rgba(255,255,255,0.09),
+                inset 0 1px 0 rgba(255,255,255,0.15);
+            border: 1.5px solid #1a1a1a;
             overflow: hidden;
             z-index: 10;
         }
         .samsung-s26-topbar {
-            height: 21px; background: #0d0d0d;
+            height: 22px; background: #050505;
             display: flex; align-items: center; justify-content: center;
         }
         .samsung-s26-camera {
-            width: 7px; height: 7px; background: #1a1a1a; border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.13);
-            box-shadow: 0 0 5px rgba(80,160,255,0.22);
+            width: 8px; height: 8px; background: #111; border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            box-shadow: 0 0 6px rgba(100,180,255,0.3), inset 0 0 3px rgba(0,0,50,0.5);
         }
         .samsung-s26-screen { background: #f8f9ff; padding: 7px; }
-        .samsung-s26-bottom { height: 14px; background: #0d0d0d; }
-        .samsung-s26-mockup::before {
-            content: ''; position: absolute; right: -3px; top: 58px;
-            width: 2px; height: 52px; background: #252525; border-radius: 0 2px 2px 0;
+        .samsung-s26-bottom {
+            height: 16px; background: #050505;
+            display: flex; align-items: center; justify-content: flex-end; padding-right: 6px;
         }
+        .samsung-s26-spen { width: 3px; height: 10px; background: #1a3a6a; border-radius: 1.5px; }
+        /* Volume buttons right */
+        .samsung-s26-mockup::before {
+            content: ''; position: absolute; right: -3px; top: 60px;
+            width: 2.5px; height: 54px; background: #1a1a1a; border-radius: 0 2px 2px 0;
+        }
+        /* Power button left */
         .samsung-s26-mockup::after {
-            content: ''; position: absolute; left: -3px; top: 62px;
-            width: 2px; height: 26px; background: #252525; border-radius: 2px 0 0 2px;
-            box-shadow: 0 38px 0 #252525;
+            content: ''; position: absolute; left: -3px; top: 72px;
+            width: 2.5px; height: 32px; background: #1a1a1a; border-radius: 2px 0 0 2px;
         }
 
         /* ── PLATFORM BADGE ICONS ── */
@@ -540,7 +555,7 @@
     <div class="hero-text">
         <div class="hero-badge"><i class="fas fa-bolt"></i> Smart Academic Planning</div>
         <h1>Plan Smarter.<br><span class="grad">Study Better.</span><br>Graduate Stronger.</h1>
-        <p>Kairos helps students manage assignments, track deadlines, organise schedules, and stay on top of their academic goals — all in one beautiful app.</p>
+        <p>Kairos helps students manage assignments, track deadlines, organise schedules, and stay on top of their academic goals  -  all in one beautiful app.</p>
         <div class="hero-btns">
             <a href="signup.html" class="btn btn-primary btn-lg"><i class="fas fa-rocket"></i> Get Started Free</a>
             <a href="index.html" class="btn btn-outline btn-lg">Log In</a>
@@ -663,7 +678,7 @@
                     <div class="mini-mobile-item" style="border-left-color:#FFA502"><div class="mini-mobile-item-title">BUS401 Strategy</div><div class="mini-mobile-item-sub">Score: 78/100</div></div>
                 </div>
             </div>
-            <div class="samsung-s26-bottom"></div>
+            <div class="samsung-s26-bottom"><div class="samsung-s26-spen"></div></div>
         </div>
     </div>
 </div>
@@ -673,7 +688,7 @@
 <section class="section" id="features">
     <div class="section-label">Features</div>
     <h2 class="section-title">Everything a student needs</h2>
-    <p class="section-sub">From assignment tracking to GPA calculation — Kairos has all the tools built in, for free.</p>
+    <p class="section-sub">From assignment tracking to GPA calculation  -  Kairos has all the tools built in, for free.</p>
     <div class="features-grid">
         <div class="feature-card">
             <div class="feature-icon"><i class="fas fa-tasks"></i></div>
@@ -703,7 +718,7 @@
         <div class="feature-card">
             <div class="feature-icon"><i class="fas fa-file-alt"></i></div>
             <h3>Built-in Office Suite</h3>
-            <p>Word, Excel, PowerPoint editors plus full PDF tools — merge, split, compress, and convert without leaving the app.</p>
+            <p>Word, Excel, PowerPoint editors plus full PDF tools  -  merge, split, compress, and convert without leaving the app.</p>
         </div>
     </div>
 </section>
@@ -717,7 +732,7 @@
         <div class="showcase-text">
             <div class="pill pill-purple"><i class="fas fa-tasks"></i> Assignment Management</div>
             <h3>Never miss a deadline again</h3>
-            <p>Track every assignment with course codes, due dates, priority levels, estimated hours, notes, and progress — all in one place.</p>
+            <p>Track every assignment with course codes, due dates, priority levels, estimated hours, notes, and progress  -  all in one place.</p>
             <div class="check-list">
                 <div class="check-item"><i class="fas fa-check-circle"></i> High / Medium / Low priority with colour badges</div>
                 <div class="check-item"><i class="fas fa-check-circle"></i> Progress tracking from 0% to 100%</div>
@@ -835,7 +850,7 @@
         <div class="showcase-text">
             <div class="pill pill-orange"><i class="fas fa-calculator"></i> CWA Calculator</div>
             <h3>Know exactly where you stand</h3>
-            <p>Track your CWA score per course, see your cumulative weighted average, and watch how each grade affects your overall academic standing — all in real time.</p>
+            <p>Track your CWA score per course, see your cumulative weighted average, and watch how each grade affects your overall academic standing  -  all in real time.</p>
             <div class="check-list">
                 <div class="check-item"><i class="fas fa-check-circle"></i> CWA calculator with per-course score entry</div>
                 <div class="check-item"><i class="fas fa-check-circle"></i> CWA → GPA conversion built in</div>
@@ -861,22 +876,22 @@
                 </div>
                 <div class="mock-gpa-courses">
                     <div class="mock-gpa-row">
-                        <span class="mock-gpa-course">ACC301 – Financial Accounting</span>
+                        <span class="mock-gpa-course">ACC301  -  Financial Accounting</span>
                         <span class="mock-gpa-grade">85 / 100</span>
                     </div>
                     <div class="mock-gpa-minibar"><div class="mock-gpa-minibar-fill" style="width:85%"></div></div>
                     <div class="mock-gpa-row">
-                        <span class="mock-gpa-course">BUS401 – Strategic Management</span>
+                        <span class="mock-gpa-course">BUS401  -  Strategic Management</span>
                         <span class="mock-gpa-grade">78 / 100</span>
                     </div>
                     <div class="mock-gpa-minibar"><div class="mock-gpa-minibar-fill" style="width:78%"></div></div>
                     <div class="mock-gpa-row">
-                        <span class="mock-gpa-course">MKT201 – Principles of Marketing</span>
+                        <span class="mock-gpa-course">MKT201  -  Principles of Marketing</span>
                         <span class="mock-gpa-grade">92 / 100</span>
                     </div>
                     <div class="mock-gpa-minibar"><div class="mock-gpa-minibar-fill" style="width:92%"></div></div>
                     <div class="mock-gpa-row">
-                        <span class="mock-gpa-course">HRM301 – Human Resource Mgmt</span>
+                        <span class="mock-gpa-course">HRM301  -  Human Resource Mgmt</span>
                         <span class="mock-gpa-grade">74 / 100</span>
                     </div>
                     <div class="mock-gpa-minibar"><div class="mock-gpa-minibar-fill" style="width:74%"></div></div>
@@ -890,11 +905,11 @@
         <div class="showcase-text">
             <div class="pill pill-red"><i class="fas fa-bell"></i> Smart Reminders</div>
             <h3>Get reminded before it's too late</h3>
-            <p>Enable browser push notifications and Kairos alerts you at every key milestone before each deadline — so you always have time to prepare.</p>
+            <p>Enable browser push notifications and Kairos alerts you at every key milestone before each deadline  -  so you always have time to prepare.</p>
             <div class="check-list">
                 <div class="check-item"><i class="fas fa-check-circle"></i> 48h, 24h, 12h, 3h, 1h reminders</div>
                 <div class="check-item"><i class="fas fa-check-circle"></i> Lecture alerts before class starts</div>
-                <div class="check-item"><i class="fas fa-check-circle"></i> Works as a PWA — no app download needed</div>
+                <div class="check-item"><i class="fas fa-check-circle"></i> Works as a PWA  -  no app download needed</div>
                 <div class="check-item"><i class="fas fa-check-circle"></i> Fully customisable in Settings</div>
             </div>
         </div>
@@ -954,7 +969,7 @@
                 <div class="step-num">2</div>
                 <div>
                     <h4>Upload your timetable</h4>
-                    <p>Upload your school timetable as an image or CSV — Kairos reads your schedule and suggests study blocks automatically.</p>
+                    <p>Upload your school timetable as an image or CSV  -  Kairos reads your schedule and suggests study blocks automatically.</p>
                 </div>
             </div>
             <div class="step">
@@ -968,7 +983,7 @@
                 <div class="step-num">4</div>
                 <div>
                     <h4>Install it on your phone</h4>
-                    <p>Add Kairos to your home screen on Android, iOS, or desktop. Works offline — no app store download required.</p>
+                    <p>Add Kairos to your home screen on Android, iOS, or desktop. Works offline  -  no app store download required.</p>
                 </div>
             </div>
         </div>
@@ -1017,7 +1032,7 @@
 <div class="platforms-section">
     <div class="section-label">Available Everywhere</div>
     <h2 class="section-title">Install on any device</h2>
-    <p class="section-sub" style="margin:8px auto 0">Kairos is a Progressive Web App — install it once, use it anywhere, even offline.</p>
+    <p class="section-sub" style="margin:8px auto 0">Kairos is a Progressive Web App  -  install it once, use it anywhere, even offline.</p>
     <div class="platforms-grid">
         <div class="platform-card">
             <div class="platform-badge" style="background:linear-gradient(135deg,#3DDC84,#00C853)">
@@ -1056,7 +1071,7 @@
         <h2>Ready to take control of your studies?</h2>
         <p>Join students already using Kairos to stay organised and ace their academic goals.</p>
         <div class="cta-btns">
-            <a href="signup.html" class="btn btn-white btn-lg"><i class="fas fa-rocket"></i> Get Started — It's Free</a>
+            <a href="signup.html" class="btn btn-white btn-lg"><i class="fas fa-rocket"></i> Get Started  -  It's Free</a>
             <a href="index.html" class="btn btn-white-outline btn-lg">Log In</a>
         </div>
     </div>

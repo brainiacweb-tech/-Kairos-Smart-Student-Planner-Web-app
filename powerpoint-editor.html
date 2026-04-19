@@ -279,7 +279,7 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex
     <button class="qat-btn" onclick="undoAction()" title="Undo"><i class="fas fa-undo"></i></button>
     <button class="qat-btn" onclick="redoAction()" title="Redo"><i class="fas fa-redo"></i></button>
   </div>
-  <div class="title-center"><span id="presNameDisplay">Presentation1</span> — PowerPoint</div>
+  <div class="title-center"><span id="presNameDisplay">Presentation1</span>  -  PowerPoint</div>
   <div class="title-right">
     <button onclick="startSlideShow()" title="Slide Show"><i class="fas fa-play"></i> Slide Show</button>
     <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
@@ -1030,7 +1030,7 @@ function toggleFileMenu(){ const m=document.getElementById('pptFileMenu'); m.sty
 function newPresentation(){ if(confirm('Create new presentation?')){ slides=[newSlide()]; currentSlideIdx=0; loadSlide(0); } document.getElementById('pptFileMenu').style.display='none'; }
 function savePresentation(){ localStorage.setItem('kairos_ppt',JSON.stringify(slides)); localStorage.setItem('kairos_ppt_name',presName); if(typeof showToast==='function') showToast('Presentation saved','success'); document.getElementById('pptFileMenu').style.display='none'; }
 function autoSavePres(){ localStorage.setItem('kairos_ppt_draft',JSON.stringify(slides)); }
-function renamePresentation(){ const n=prompt('Presentation name:',presName); if(n){presName=n;document.getElementById('presNameDisplay').textContent=n;document.title=n+' — PowerPoint';} document.getElementById('pptFileMenu').style.display='none'; }
+function renamePresentation(){ const n=prompt('Presentation name:',presName); if(n){presName=n;document.getElementById('presNameDisplay').textContent=n;document.title=n+'  -  PowerPoint';} document.getElementById('pptFileMenu').style.display='none'; }
 function downloadPresentation(fmt){
   let content='',mime='text/plain',ext=fmt;
   if(fmt==='txt') content=slides.map((s,i)=>'SLIDE '+(i+1)+'\n'+(s.elements.find(e=>e.type==='title')?.text||'')+'\n\n'+(s.elements.filter(e=>e.type==='body').map(e=>e.text).join('\n\n'))+'\n\nNotes:\n'+s.notes+'\n\n---\n\n').join('');
@@ -1050,7 +1050,7 @@ function downloadPresentation(fmt){
 }
 function goBack(){ window.location.href='dashboard.html'; }
 
-// ============ PYTHON BACKEND – PPTX IMPORT / EXPORT ============
+// ============ PYTHON BACKEND  -  PPTX IMPORT / EXPORT ============
 const _PPT_API = (typeof KAIROS_API_BASE !== 'undefined') ? KAIROS_API_BASE : 'http://localhost:5000/api';
 
 async function exportPptx(){
@@ -1099,7 +1099,7 @@ async function openPptx(){
         slides = data.slides;
         presName = data.name || file.name.replace(/\.pptx$/i,'');
         document.getElementById('presNameDisplay').textContent = presName;
-        document.title = presName + ' — PowerPoint';
+        document.title = presName + '  -  PowerPoint';
         currentSlideIdx = 0;
         renderCanvas();
         renderThumbs();
@@ -1152,7 +1152,7 @@ window.addEventListener('load',()=>{
   const savedName=localStorage.getItem('kairos_ppt_name');
   if(saved){ try{slides=JSON.parse(saved);}catch{slides=[newSlide()];} }
   else slides=[newSlide()];
-  if(savedName){presName=savedName;document.getElementById('presNameDisplay').textContent=presName;document.title=presName+' — PowerPoint';}
+  if(savedName){presName=savedName;document.getElementById('presNameDisplay').textContent=presName;document.title=presName+'  -  PowerPoint';}
   currentSlideIdx=0;
   renderCanvas();
   renderThumbs();

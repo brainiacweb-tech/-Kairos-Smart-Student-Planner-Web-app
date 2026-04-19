@@ -205,7 +205,7 @@ td.data-cell.align-right input{text-align:right}
     <button class="qat-btn" onclick="undoAction()" title="Undo"><i class="fas fa-undo"></i></button>
     <button class="qat-btn" onclick="redoAction()" title="Redo"><i class="fas fa-redo"></i></button>
   </div>
-  <div class="title-center"><span id="bookNameDisplay">Book1</span> — Excel</div>
+  <div class="title-center"><span id="bookNameDisplay">Book1</span>  -  Excel</div>
   <div class="title-right">
     <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
   </div>
@@ -422,7 +422,7 @@ td.data-cell.align-right input{text-align:right}
 
 <!-- FORMULA BAR -->
 <div class="formula-bar">
-  <input class="name-box" id="nameBox" value="A1" onchange="goToCell(this.value)" title="Name Box — cell reference">
+  <input class="name-box" id="nameBox" value="A1" onchange="goToCell(this.value)" title="Name Box  -  cell reference">
   <div class="fx-label">fx</div>
   <input class="formula-input" id="formulaBar" placeholder="Enter formula or value" onchange="formulaBarChange()" onkeydown="formulaBarKey(event)">
 </div>
@@ -1039,7 +1039,7 @@ function toggleFileMenu(){
 }
 function goBack(){ window.location.href='dashboard.html'; }
 
-// ============ PYTHON BACKEND – XLSX IMPORT / EXPORT ============
+// ============ PYTHON BACKEND  -  XLSX IMPORT / EXPORT ============
 const _XL_API = (typeof KAIROS_API_BASE !== 'undefined') ? KAIROS_API_BASE : 'http://localhost:5000/api';
 
 async function exportXlsx(){

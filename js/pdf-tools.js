@@ -1,5 +1,5 @@
 /* ===========================
-   PDF TOOLS – CLIENT-SIDE
+   PDF TOOLS  -  CLIENT-SIDE
    Uses pdf-lib (no backend required for most operations)
    Word→PDF / PPT→PDF still require the Python backend.
    =========================== */
@@ -61,7 +61,7 @@ function pickFile(accept, multiple = false) {
             resolve(multiple ? Array.from(input.files) : input.files[0]);
         });
 
-        // resolve on cancel (oncancel not supported everywhere – use focus trick)
+        // resolve on cancel (oncancel not supported everywhere  -  use focus trick)
         const onFocus = () => {
             window.removeEventListener('focus', onFocus);
             setTimeout(() => {
@@ -218,7 +218,7 @@ async function initConvertToImage(format) {
     if (!file) return;
     await withProgress(`Converting to ${format.toUpperCase()}`, async () => {
         const lib = window.pdfjsLib;
-        if (!lib) throw new Error('PDF.js not loaded – check your internet connection and reload.');
+        if (!lib) throw new Error('PDF.js not loaded  -  check your internet connection and reload.');
         lib.GlobalWorkerOptions.workerSrc =
             'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
@@ -332,8 +332,8 @@ async function initWordToPDF() {
         return;
     }
     await withProgress('Converting Word to PDF', async () => {
-        if (!window.mammoth)      throw new Error('mammoth.js not loaded – check your internet connection.');
-        if (!window.jspdf)        throw new Error('jsPDF not loaded – check your internet connection.');
+        if (!window.mammoth)      throw new Error('mammoth.js not loaded  -  check your internet connection.');
+        if (!window.jspdf)        throw new Error('jsPDF not loaded  -  check your internet connection.');
 
         // 1. DOCX → HTML
         const arrayBuffer = await readFileAsArrayBuffer(file);
@@ -428,7 +428,7 @@ async function initPPTToPDF() {
         return;
     }
     await withProgress('Converting PowerPoint to PDF', async () => {
-        if (!window.jspdf) throw new Error('jsPDF not loaded – check your internet connection.');
+        if (!window.jspdf) throw new Error('jsPDF not loaded  -  check your internet connection.');
 
         const bytes = await readFileAsArrayBuffer(file);
         const zip   = await JSZip.loadAsync(bytes);
@@ -482,7 +482,7 @@ async function initPPTToPDF() {
             const sf = zip.file(slidePaths[si]);
             if (!sf) continue;
             const sDoc = new DOMParser().parseFromString(await sf.async('string'), 'text/xml');
-            _pptxSlideToPDF(pdf, sDoc, PW, PH, slideWemu, slideHemu, q1, qa);
+            await _pptxSlideToPDF(pdf, sDoc, PW, PH, slideWemu, slideHemu, q1, qa, zip, slidePaths[si]);
         }
 
         triggerDownload(pdf.output('blob'), file.name.replace(/\.pptx?$/i, '.pdf'), 'application/pdf');
@@ -492,13 +492,9 @@ async function initPPTToPDF() {
 }
 
 /** Render one PPTX slide XML document onto the current jsPDF page. */
-function _pptxSlideToPDF(pdf, sDoc, PW, PH, SW, SH, q1, qa) {
+async function _pptxSlideToPDF(pdf, sDoc, PW, PH, SW, SH, q1, qa, zip, slidePath) {
     const emu2x = v => (+v / SW) * PW;
     const emu2y = v => (+v / SH) * PH;
-    const hex2rgb = h => h && h.length >= 6
-        ? [parseInt(h.slice(0,2),16), parseInt(h.slice(2,2),16), parseInt(h.slice(4,2),16)]
-        : null;
-    // fix: correct slice args
     const h2rgb = h => h && h.length >= 6
         ? [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]
         : null;
@@ -512,25 +508,45 @@ function _pptxSlideToPDF(pdf, sDoc, PW, PH, SW, SH, q1, qa) {
         if (rgb) { pdf.setFillColor(...rgb); pdf.rect(0, 0, PW, PH, 'F'); }
     }
 
-    // Shapes
+    // Build image rId -> zip path map from slide rels
+    const imgMap = {};
+    if (slidePath && zip) {
+        const slideDir = slidePath.replace(/\/[^/]+$/, '');
+        const slideFile = slidePath.replace(/.*\//, '');
+        const relsPath = `${slideDir}/_rels/${slideFile}.rels`;
+        const relsFile = zip.file(relsPath);
+        if (relsFile) {
+            const rDoc = new DOMParser().parseFromString(await relsFile.async('string'), 'text/xml');
+            for (const rel of [...rDoc.getElementsByTagName('Relationship')]) {
+                const type = rel.getAttribute('Type') || '';
+                if (type.includes('/image')) {
+                    let tgt = rel.getAttribute('Target') || '';
+                    if (!tgt.startsWith('/') && !tgt.includes('://'))
+                        tgt = `${slideDir}/${tgt}`.replace(/\/\.\//g, '/');
+                    imgMap[rel.getAttribute('Id')] = tgt.replace(/^\//, '');
+                }
+            }
+        }
+    }
+
     const spTree = q1(sDoc, 'spTree');
     if (!spTree) return;
 
-    for (const sp of qa(spTree, 'sp')) {
+    // Helper: render one <sp> node
+    function renderSp(sp) {
         const xfrm = q1(sp, 'xfrm');
-        if (!xfrm) continue;
+        if (!xfrm) return;
         const off = q1(xfrm, 'off'), ext = q1(xfrm, 'ext');
-        if (!off || !ext) continue;
-
+        if (!off || !ext) return;
         const x = emu2x(off.getAttribute('x') || 0);
         const y = emu2y(off.getAttribute('y') || 0);
         const w = emu2x(ext.getAttribute('cx') || 0);
         const h = emu2y(ext.getAttribute('cy') || 0);
-        if (w <= 0 || h <= 0) continue;
+        if (w <= 0 || h <= 0) return;
 
         // Shape fill
-        const spPr    = q1(sp, 'spPr');
-        const sfill   = q1(spPr ?? sp, 'solidFill');
+        const spPr  = q1(sp, 'spPr');
+        const sfill = q1(spPr ?? sp, 'solidFill');
         if (sfill) {
             const clrEl = q1(sfill, 'srgbClr');
             if (clrEl) {
@@ -541,47 +557,92 @@ function _pptxSlideToPDF(pdf, sDoc, PW, PH, SW, SH, q1, qa) {
 
         // Text
         const txBody = q1(sp, 'txBody');
-        if (!txBody) continue;
+        if (!txBody) return;
         let curY = y + 3;
-
         for (const para of qa(txBody, 'p')) {
             const runs = qa(para, 'r');
             if (!runs.length) { curY += 3; continue; }
-            if (curY >= y + h) break;
-
-            let text = '', fsz = 12, bold = false, clr = [0, 0, 0];
+            if (curY >= y + h + 2) break;
+            let text = '', fsz = 12, bold = false, italic = false, clr = [0, 0, 0];
             const pPr  = q1(para, 'pPr');
             const algn = pPr ? (pPr.getAttribute('algn') || 'l') : 'l';
-
+            // Paragraph-level font size from lstStyle / defRPr
+            const lstStyle = q1(txBody, 'lstStyle');
+            const defRpr = lstStyle ? q1(lstStyle, 'defRPr') : null;
+            if (defRpr) { const ds = defRpr.getAttribute('sz'); if (ds) fsz = Math.min(Math.max(parseInt(ds)/100,6),72); }
             for (const r of runs) {
                 text += q1(r, 't')?.textContent ?? '';
                 const rPr = q1(r, 'rPr');
                 if (rPr) {
                     const sz = rPr.getAttribute('sz');
-                    if (sz) fsz = Math.min(Math.max(parseInt(sz) / 100, 6), 72);
-                    bold = rPr.getAttribute('b') === '1';
+                    if (sz) fsz = Math.min(Math.max(parseInt(sz)/100, 6), 72);
+                    if (rPr.getAttribute('b') === '1') bold = true;
+                    if (rPr.getAttribute('i') === '1') italic = true;
                     const rc = q1(rPr, 'srgbClr');
                     if (rc) { const rgb = h2rgb(rc.getAttribute('val') || ''); if (rgb) clr = rgb; }
                 }
             }
-
             if (!text.trim()) { curY += fsz * 0.3528 * 1.3; continue; }
-
             pdf.setFontSize(fsz);
-            pdf.setFont('helvetica', bold ? 'bold' : 'normal');
+            const style = bold && italic ? 'bolditalic' : bold ? 'bold' : italic ? 'italic' : 'normal';
+            try { pdf.setFont('helvetica', style); } catch(e) { pdf.setFont('helvetica','normal'); }
             pdf.setTextColor(...clr);
-
-            const lh    = fsz * 0.3528 * 1.4;
+            const lh    = fsz * 0.3528 * 1.45;
             const align = algn === 'ctr' ? 'center' : algn === 'r' ? 'right' : 'left';
-            const tx    = algn === 'ctr' ? x + w / 2 : algn === 'r' ? x + w - 2 : x + 2;
-
+            const tx    = algn === 'ctr' ? x + w/2 : algn === 'r' ? x + w - 2 : x + 2;
             for (const line of pdf.splitTextToSize(text.trim(), w - 4)) {
-                if (curY >= y + h) break;
+                if (curY >= y + h + 2) break;
                 pdf.text(line, tx, curY, { align });
                 curY += lh;
             }
         }
     }
+
+    // Process all <sp> elements (including those inside <grpSp> groups)
+    for (const sp of [...spTree.getElementsByTagName('*')].filter(e => e.localName === 'sp')) {
+        renderSp(sp);
+    }
+
+    // Process images (<pic> elements)
+    const picPromises = [];
+    for (const pic of [...spTree.getElementsByTagName('*')].filter(e => e.localName === 'pic')) {
+        const xfrm = q1(pic, 'xfrm');
+        if (!xfrm) continue;
+        const off = q1(xfrm, 'off'), ext = q1(xfrm, 'ext');
+        if (!off || !ext) continue;
+        const x = emu2x(off.getAttribute('x') || 0);
+        const y = emu2y(off.getAttribute('y') || 0);
+        const w = emu2x(ext.getAttribute('cx') || 0);
+        const h = emu2y(ext.getAttribute('cy') || 0);
+        if (w <= 0 || h <= 0) continue;
+
+        // Get rId from blipFill > blip r:embed
+        const blip = q1(pic, 'blip');
+        const rId  = blip ? (blip.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','embed') || blip.getAttribute('r:embed')) : null;
+        const imgPath = rId ? imgMap[rId] : null;
+
+        if (imgPath && zip) {
+            picPromises.push((async () => {
+                try {
+                    const imgFile = zip.file(imgPath);
+                    if (!imgFile) return;
+                    const b64 = await imgFile.async('base64');
+                    const ext2 = imgPath.split('.').pop().toUpperCase().replace('JPG','JPEG');
+                    const fmt = ['JPEG','PNG','GIF','WEBP'].includes(ext2) ? ext2 : 'JPEG';
+                    pdf.addImage(`data:image/${fmt.toLowerCase()};base64,${b64}`, fmt, x, y, w, h);
+                } catch(e) {
+                    // Image failed - draw placeholder rect
+                    pdf.setDrawColor(180,180,180); pdf.setFillColor(240,240,240);
+                    pdf.rect(x, y, w, h, 'FD');
+                }
+            })());
+        } else {
+            // No image data - draw light grey placeholder
+            pdf.setDrawColor(180,180,180); pdf.setFillColor(240,240,240);
+            pdf.rect(x, y, w, h, 'FD');
+        }
+    }
+    await Promise.all(picPromises);
 }
 
 // ── init ──────────────────────────────────────────────────────────────────────

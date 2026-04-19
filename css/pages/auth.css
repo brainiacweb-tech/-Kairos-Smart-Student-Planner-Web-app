@@ -443,41 +443,75 @@
 
 @media (max-width: 480px) {
   .auth-card {
-    padding: var(--spacing-lg);
-    width: 95%;
+    padding: 1rem 1.1rem;
+    width: 94%;
+    max-width: 380px;
+    border-radius: 16px;
+  }
+
+  .auth-header {
+    margin-bottom: 1rem;
   }
 
   .auth-logo {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: 0.5rem;
+    gap: 6px;
   }
 
   .auth-logo-icon {
-    height: 45px;
+    height: 36px;
   }
 
   .auth-logo-icon img {
-    width: 45px;
-    height: 45px;
+    width: 36px;
+    height: 36px;
   }
 
   .auth-logo-text {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   .auth-title {
-    font-size: 1.3rem;
+    font-size: 1.15rem;
+    margin-bottom: 0.2rem;
   }
 
   .auth-subtitle {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
+  }
+
+  .auth-form-group {
+    margin-bottom: 0.65rem;
   }
 
   .auth-form-group input {
-    padding: var(--spacing-sm) var(--spacing-sm);
-    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    height: 40px;
   }
 
   .auth-form-group label {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
+    margin-bottom: 3px;
+  }
+
+  .btn-auth, .btn[type="submit"] {
+    padding: 0.6rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .oauth-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .auth-divider {
+    margin: 0.75rem 0;
+    font-size: 0.78rem;
+  }
+
+  .auth-footer {
+    font-size: 0.78rem;
+    margin-top: 0.75rem;
   }
 }

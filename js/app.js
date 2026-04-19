@@ -414,7 +414,7 @@ const motivationalQuotes = [
     "\"Success doesn't just find you. You have to go out and get it.\" - Unknown",
     "\"The expert in anything was once a beginner.\" - Helen Hayes",
     "\"No one is too busy. It's just a matter of priorities.\" - Unknown",
-    "\"Your limitation—it's only your imagination.\" - Unknown",
+    "\"Your limitation - it's only your imagination.\" - Unknown",
     "\"Great things never came from comfort zones.\" - Unknown",
     "\"Dream it. Believe it. Build it.\" - Unknown",
     "\"Do something today that your future self will thank you for.\" - Sean Patrick Flanery",
@@ -587,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkDeadlineNotifications();
 });
 
-// ── NOTIFICATION PANEL (global – works on any page) ───────────────────────────
+// ── NOTIFICATION PANEL (global  -  works on any page) ───────────────────────────
 
 function openNotificationPanel() {
     const panel = document.getElementById('notificationPanel');

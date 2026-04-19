@@ -297,7 +297,7 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;background:v
     <button class="qat-btn" onclick="document.execCommand('redo')" title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i></button>
   </div>
   <div class="title-center">
-    <span id="docNameDisplay">Document1</span> — Word
+    <span id="docNameDisplay">Document1</span>  -  Word
   </div>
   <div class="title-right">
     <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
@@ -313,10 +313,10 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;background:v
 <div class="ribbon">
   <div class="ribbon-tabs-row">
     <button class="ribbon-tab file-tab" onclick="toggleFileMenu()">File</button>
-    <button class="ribbon-tab active" onclick="switchTab('home')">Home</button>
-    <button class="ribbon-tab" onclick="switchTab('insert')">Insert</button>
-    <button class="ribbon-tab" onclick="switchTab('layout')">Layout</button>
-    <button class="ribbon-tab" onclick="switchTab('view')">View</button>
+    <button class="ribbon-tab active" onclick="switchTab('home',this)">Home</button>
+    <button class="ribbon-tab" onclick="switchTab('insert',this)">Insert</button>
+    <button class="ribbon-tab" onclick="switchTab('layout',this)">Layout</button>
+    <button class="ribbon-tab" onclick="switchTab('view',this)">View</button>
   </div>
 
   <!-- HOME TAB -->
@@ -647,17 +647,36 @@ const editor = document.getElementById('editor');
 let docName = 'Document1';
 let zoomLevel = 100;
 let currentView = 'print';
+let _savedSel = null;
+
+// Save selection when editor loses focus (mobile: tapping ribbon loses selection)
+document.addEventListener('DOMContentLoaded', () => {
+  editor.addEventListener('blur', () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) _savedSel = sel.getRangeAt(0).cloneRange();
+  });
+  editor.addEventListener('focus', () => { _savedSel = null; });
+});
+
+function _restoreSel() {
+  if (!_savedSel) return;
+  editor.focus();
+  const sel = window.getSelection();
+  if (sel) { sel.removeAllRanges(); sel.addRange(_savedSel); }
+  _savedSel = null;
+}
 
 // ============ RIBBON ============
-function switchTab(name){
+function switchTab(name, el){
   document.querySelectorAll('.ribbon-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.ribbon-content').forEach(c=>c.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
-  event.currentTarget.classList.add('active');
+  if(el) el.classList.add('active');
 }
 
 // ============ EDITOR COMMANDS ============
 function cmd(command, value){
+  _restoreSel();
   editor.focus();
   document.execCommand(command, false, value||null);
   updateToolbarState();
@@ -865,7 +884,7 @@ function renameDoc(){
 function updateDocName(){
   document.getElementById('docNameDisplay').textContent = docName;
   document.getElementById('fileDocName').textContent = docName;
-  document.title = docName+' — Word';
+  document.title = docName+'  -  Word';
 }
 function downloadDoc(fmt){
   let content, mime, ext;
@@ -884,7 +903,7 @@ function downloadDoc(fmt){
 function printDoc(){ window.print(); document.getElementById('fileMenu').style.display='none'; }
 function goBack(){ window.location.href='dashboard.html'; }
 
-// ============ PYTHON BACKEND – DOCX IMPORT / EXPORT ============
+// ============ PYTHON BACKEND  -  DOCX IMPORT / EXPORT ============
 const _WORD_API = (typeof KAIROS_API_BASE !== 'undefined') ? KAIROS_API_BASE : 'http://localhost:5000/api';
 
 async function exportDocx(){

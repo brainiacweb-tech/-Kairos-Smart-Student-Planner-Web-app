@@ -302,13 +302,13 @@
                         <div style="padding: var(--spacing-lg);">
                             <div class="result-box">
                                 <div class="result-label">GPA (4.0 Scale)</div>
-                                <div class="result-value" id="gpaResult">—</div>
+                                <div class="result-value" id="gpaResult"> - </div>
                                 <div class="result-description" id="gpaDescription">Enter a CWA value to see conversion</div>
                             </div>
 
                             <div class="result-box" style="margin-top: var(--spacing-md);">
                                 <div class="result-label">Degree Classification</div>
-                                <div class="result-value" style="color: #34A8E0;" id="degreeResult">—</div>
+                                <div class="result-value" style="color: #34A8E0;" id="degreeResult"> - </div>
                                 <div class="result-description" id="degreeDescription">Based on your GPA</div>
                             </div>
                         </div>
@@ -331,37 +331,37 @@
                             </thead>
                             <tbody>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(76, 175, 80, 0.1);">
-                                    <td style="padding: var(--spacing-md);">70.00 – 100.00</td>
+                                    <td style="padding: var(--spacing-md);">70.00  -  100.00</td>
                                     <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #4CAF50;">4.00</td>
                                     <td style="padding: var(--spacing-md);">First Class</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(52, 168, 224, 0.1);">
-                                    <td style="padding: var(--spacing-md);">65.00 – 69.99</td>
+                                    <td style="padding: var(--spacing-md);">65.00  -  69.99</td>
                                     <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #34A8E0;">3.50</td>
                                     <td style="padding: var(--spacing-md);">Second Class (Upper)</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(52, 168, 224, 0.05);">
-                                    <td style="padding: var(--spacing-md);">60.00 – 64.99</td>
+                                    <td style="padding: var(--spacing-md);">60.00  -  64.99</td>
                                     <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #34A8E0;">3.00</td>
                                     <td style="padding: var(--spacing-md);">Second Class (Upper)</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(255, 152, 0, 0.1);">
-                                    <td style="padding: var(--spacing-md);">55.00 – 59.99</td>
+                                    <td style="padding: var(--spacing-md);">55.00  -  59.99</td>
                                     <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #FF9800;">2.50</td>
                                     <td style="padding: var(--spacing-md);">Second Class (Lower)</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(255, 152, 0, 0.05);">
-                                    <td style="padding: var(--spacing-md);">50.00 – 54.99</td>
+                                    <td style="padding: var(--spacing-md);">50.00  -  54.99</td>
                                     <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #FF9800;">2.00</td>
                                     <td style="padding: var(--spacing-md);">Second Class (Lower)</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(255, 193, 7, 0.1);">
-                                    <td style="padding: var(--spacing-md);">45.00 – 49.99</td>
+                                    <td style="padding: var(--spacing-md);">45.00  -  49.99</td>
                                     <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #FFC107;">1.50</td>
                                     <td style="padding: var(--spacing-md);">Third Class</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid var(--border); background-color: rgba(255, 193, 7, 0.05);">
-                                    <td style="padding: var(--spacing-md);">40.00 – 44.99</td>
+                                    <td style="padding: var(--spacing-md);">40.00  -  44.99</td>
                                     <td style="padding: var(--spacing-md); text-align: center; font-weight: 600; color: #FFC107;">1.00</td>
                                     <td style="padding: var(--spacing-md);">Pass</td>
                                 </tr>
@@ -415,9 +415,9 @@
             const cwaInput = document.getElementById('cwaInput').value.trim();
             
             if (!cwaInput || isNaN(cwaInput)) {
-                document.getElementById('gpaResult').textContent = '—';
+                document.getElementById('gpaResult').textContent = ' - ';
                 document.getElementById('gpaDescription').textContent = 'Enter a CWA value to see conversion';
-                document.getElementById('degreeResult').textContent = '—';
+                document.getElementById('degreeResult').textContent = ' - ';
                 document.getElementById('degreeDescription').textContent = 'Based on your GPA';
                 return;
             }
