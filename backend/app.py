@@ -17,7 +17,7 @@ import tempfile
 import subprocess
 from pathlib import Path
 
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, send_file, send_from_directory, jsonify
 from flask_cors import CORS
 
 # PDF
@@ -58,15 +58,14 @@ FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 @app.route('/')
 def serve_index():
-    return send_file(os.path.join(FRONTEND_DIR, 'index.html'))
+    return send_from_directory(FRONTEND_DIR, 'index.html')
 
 @app.route('/<path:filename>')
 def serve_frontend(filename):
     filepath = os.path.join(FRONTEND_DIR, filename)
     if os.path.isfile(filepath):
-        return send_file(filepath)
-    # Fallback to index.html for SPA-style navigation
-    return send_file(os.path.join(FRONTEND_DIR, 'index.html'))
+        return send_from_directory(FRONTEND_DIR, filename)
+    return send_from_directory(FRONTEND_DIR, 'index.html')
 
 
 # ─────────────────────────────────────────────
