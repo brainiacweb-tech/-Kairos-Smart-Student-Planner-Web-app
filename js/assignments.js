@@ -134,15 +134,34 @@ function applyFilters() {
     const course = document.getElementById('courseFilter').value;
     const priority = document.getElementById('priorityFilter').value;
     const status = document.getElementById('statusFilter').value;
-    
+
     filteredAssignments = KairosStorage.getAssignments({
         search: search,
         course: course,
         priority: priority,
         status: status
     });
-    
+
+    updateStats();
     renderAssignments();
+}
+
+function updateStats() {
+    const all = KairosStorage.getAssignments();
+    const now = new Date();
+
+    let pending = 0, completed = 0, overdue = 0;
+    all.forEach(a => {
+        if (a.status === 'completed') { completed++; return; }
+        if (a.dueDate && new Date(a.dueDate) < now) overdue++;
+        else pending++;
+    });
+
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('totalAssignments', all.length);
+    set('pendingAssignments', pending);
+    set('completedAssignments', completed);
+    set('overdueAssignments', overdue);
 }
 
 function resetFilters() {

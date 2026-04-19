@@ -237,19 +237,18 @@ function checkAuth() {
 // Update user info in navbar
 function updateUserInfo() {
     const user = JSON.parse(localStorage.getItem('kairos_user') || '{}');
-    const avatarEl = document.querySelector('.user-avatar');
-    
-    if (avatarEl && user.name) {
-        const initials = user.name
-            .split(' ')
-            .map(n => n[0])
-            .join('')
-            .toUpperCase()
-            .slice(0, 2);
-        
-        avatarEl.textContent = initials;
+    const avatarEls = document.querySelectorAll('.user-avatar, .user-profile-avatar');
+
+    avatarEls.forEach(avatarEl => {
+        if (!user.name) return;
+        const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        if (user.avatarUrl) {
+            avatarEl.innerHTML = `<img src="${user.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block" alt="${initials}">`;
+        } else {
+            avatarEl.textContent = initials;
+        }
         avatarEl.title = user.name;
-    }
+    });
 }
 
 // Logout
@@ -346,6 +345,32 @@ function updateNotificationBadge() {
             badge.style.display = 'none';
         }
     }
+}
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+}
+
+// PWA Install Prompt
+let _deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    _deferredInstallPrompt = e;
+    const btn = document.getElementById('pwaInstallBtn');
+    if (btn) btn.style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+    _deferredInstallPrompt = null;
+    const btn = document.getElementById('pwaInstallBtn');
+    if (btn) btn.style.display = 'none';
+});
+function promptPWAInstall() {
+    if (!_deferredInstallPrompt) return;
+    _deferredInstallPrompt.prompt();
+    _deferredInstallPrompt.userChoice.then(() => { _deferredInstallPrompt = null; });
 }
 
 // Initialize on page load

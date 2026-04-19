@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6C63FF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kairos">
+    <link rel="apple-touch-icon" href="1000669890-Photoroom.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Presentation1 - PowerPoint</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -1031,7 +1037,13 @@ function downloadPresentation(fmt){
   else{
     mime='text/html';ext='html';
     const slideHtml=slides.map(s=>'<div class="slide" style="background:'+s.bg+'">'+s.elements.map(el=>'<div style="position:absolute;left:'+el.x+'px;top:'+el.y+'px;width:'+el.w+'px;font-size:'+el.fontSize+'px;font-weight:'+el.fontWeight+';color:'+el.color+';text-align:'+el.textAlign+';white-space:pre-wrap">'+el.text+'<\/div>').join('')+'<\/div>').join('');
-    content=['<!DOCTYPE html>','<html>','<head><meta charset="UTF-8"><title>',presName,'</title><style>body{font-family:sans-serif;margin:0}.slide{width:800px;height:450px;margin:20px auto;position:relative;page-break-after:always;overflow:hidden;}<\/style><\/head>','<body>',slideHtml,'<\/body>','<\/html>'].join('');
+    content=['<!DOCTYPE html>','<html>','<head><meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6C63FF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kairos">
+    <link rel="apple-touch-icon" href="1000669890-Photoroom.png"><title>',presName,'</title><style>body{font-family:sans-serif;margin:0}.slide{width:800px;height:450px;margin:20px auto;position:relative;page-break-after:always;overflow:hidden;}<\/style><\/head>','<body>',slideHtml,'<\/body>','<\/html>'].join('');
   }
   const blob=new Blob([content],{type:mime}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=presName+'.'+ext; a.click();
   document.getElementById('pptFileMenu').style.display='none';

@@ -113,11 +113,11 @@ class KairosStorage {
 
     static addCalendarEvent(event) {
         const events = this.getCalendarEvents();
-        
+
         const newEvent = {
-            id: events.length > 0 ? Math.max(...events.map(e => e.id)) + 1 : 1,
-            createdAt: new Date().toISOString(),
-            ...event
+            ...event,
+            id: 'evt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+            createdAt: new Date().toISOString()
         };
         
         events.push(newEvent);
@@ -144,7 +144,7 @@ class KairosStorage {
 
     static deleteCalendarEvent(id) {
         const events = this.getCalendarEvents();
-        const filtered = events.filter(e => e.id !== parseInt(id));
+        const filtered = events.filter(e => String(e.id) !== String(id));
         localStorage.setItem('kairos_events', JSON.stringify(filtered));
     }
 
@@ -230,7 +230,7 @@ class KairosStorage {
 
     // SETTINGS
     static getSettings() {
-        return JSON.parse(localStorage.getItem('kairos_settings') || {
+        return JSON.parse(localStorage.getItem('kairos_settings') || JSON.stringify({
             theme: 'dark',
             accentColor: '#6C63FF',
             notifications: {
@@ -241,7 +241,7 @@ class KairosStorage {
                 enabled1h: true
             },
             emailNotifications: true
-        });
+        }));
     }
 
     static updateSettings(updates) {
@@ -290,7 +290,7 @@ class KairosStorage {
         }
         
         return allCourses;
-    
+    }
 
     static getAllCourses() {
         return [

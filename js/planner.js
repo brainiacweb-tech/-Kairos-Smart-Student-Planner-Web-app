@@ -104,12 +104,11 @@ function deleteEvent(index, e) {
     if (e) {
         e.stopPropagation();
     }
-    
+
     const events = KairosStorage.getCalendarEvents();
     if (events[index]) {
         const eventTitle = events[index].title;
-        events.splice(index, 1);
-        localStorage.setItem('kairos_calendar_events', JSON.stringify(events));
+        KairosStorage.deleteCalendarEvent(events[index].id);
         showToast(`"${eventTitle}" removed from schedule`, 'info');
         renderTimetable();
     }
@@ -117,7 +116,7 @@ function deleteEvent(index, e) {
 
 function clearWeeklyPlanner() {
     if (confirm('Are you sure you want to clear all events from this week?')) {
-        localStorage.setItem('kairos_calendar_events', JSON.stringify([]));
+        localStorage.setItem('kairos_events', JSON.stringify([]));
         showToast('Weekly schedule cleared!', 'info');
         renderTimetable();
     }
@@ -187,7 +186,7 @@ function loadSchedule(scheduleId) {
         return;
     }
     
-    localStorage.setItem('kairos_calendar_events', JSON.stringify(schedule.events || []));
+    localStorage.setItem('kairos_events', JSON.stringify(schedule.events || []));
     showToast(`Loaded "${schedule.name}"!`, 'success');
     closeDrawer('manageSchedulesDrawer');
     renderTimetable();

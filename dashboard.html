@@ -3,6 +3,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6C63FF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kairos">
+    <link rel="apple-touch-icon" href="1000669890-Photoroom.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -99,7 +105,9 @@
                 </div>
 
                 <div class="navbar-right">
-                    
+                    <button id="pwaInstallBtn" class="btn-icon" onclick="promptPWAInstall()" title="Install Kairos App" style="display:none">
+                        <i class="fas fa-download"></i>
+                    </button>
                     <button class="btn-icon" onclick="openNotificationPanel()" title="Notifications">
                         <i class="fas fa-bell"></i>
                     </button>
