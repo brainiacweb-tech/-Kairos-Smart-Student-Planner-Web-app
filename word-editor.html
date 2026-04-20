@@ -897,13 +897,7 @@ function updateDocName(){
 function downloadDoc(fmt){
   let content, mime, ext;
   if(fmt==='txt'){ content=editor.innerText; mime='text/plain'; ext='txt'; }
-  else { content='<!DOCTYPE html><html><head><meta charset="UTF-8">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#6C63FF">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Kairos">
-    <link rel="apple-touch-icon" href="1000669890-Photoroom.png"><title>'+docName+'<\/title><\/head><body>'+editor.innerHTML+'<\/body><\/html>'; mime='text/html'; ext='html'; }
+  else { content=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${docName}</title></head><body>${editor.innerHTML}</body></html>`; mime='text/html'; ext='html'; }
   const blob=new Blob([content],{type:mime});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=docName+'.'+ext; a.click();
   document.getElementById('fileMenu').style.display='none';
