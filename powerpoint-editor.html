@@ -1166,23 +1166,49 @@ async function openPptx(){
 }
 
 // ============ RIBBON TABS ============
-function switchTab(name,btn){
-  // Close file menu when switching tabs
-  document.getElementById('pptFileMenu').style.display='none';
-  
-  // Remove active class from all tabs and contents
-  document.querySelectorAll('.ribbon-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.ribbon-content').forEach(c=>c.classList.remove('active'));
-  
-  // Add active class to clicked tab and corresponding content
-  document.getElementById('tab-'+name).classList.add('active');
-  if(btn) btn.classList.add('active');
-  
-  // Build theme gallery if switching to design tab
-  if(name==='design') buildThemeGallery();
-  
-  // Debug log to verify switching is working
-  console.log('Switched to tab:', name);
+function switchTab(name, btn){
+  try {
+    // Close file menu when switching tabs
+    const fileMenu = document.getElementById('pptFileMenu');
+    if(fileMenu) fileMenu.style.display='none';
+    
+    // Remove active class from all tabs and contents
+    document.querySelectorAll('.ribbon-tab').forEach(t => {
+      t.classList.remove('active');
+    });
+    document.querySelectorAll('.ribbon-content').forEach(c => {
+      c.classList.remove('active');
+    });
+    
+    // Add active class to corresponding content
+    const contentId = 'tab-' + name;
+    const content = document.getElementById(contentId);
+    if(content) {
+      content.classList.add('active');
+      console.log('✓ Activated content:', contentId);
+    } else {
+      console.error('✗ Content not found:', contentId);
+    }
+    
+    // Add active class to the clicked button
+    if(btn) {
+      btn.classList.add('active');
+      console.log('✓ Activated button');
+    }
+    
+    // Build theme gallery if switching to design tab
+    if(name === 'design') {
+      try {
+        buildThemeGallery();
+      } catch(e) {
+        console.warn('Theme gallery build failed:', e);
+      }
+    }
+    
+    console.log('✓ Switched to tab:', name);
+  } catch(e) {
+    console.error('Error in switchTab:', e);
+  }
 }
 
 // ============ KEYBOARD ============

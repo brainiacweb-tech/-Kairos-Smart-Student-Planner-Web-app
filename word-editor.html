@@ -688,19 +688,39 @@ function _restoreSel() {
 
 // ============ RIBBON ============
 function switchTab(name, el){
-  // Close file menu when switching tabs
-  document.getElementById('fileMenu').style.display='none';
-  
-  // Remove active class from all tabs and contents
-  document.querySelectorAll('.ribbon-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.ribbon-content').forEach(c=>c.classList.remove('active'));
-  
-  // Add active class to clicked tab and corresponding content
-  document.getElementById('tab-'+name).classList.add('active');
-  if(el) el.classList.add('active');
-  
-  // Debug log to verify switching is working
-  console.log('Switched to tab:', name);
+  try {
+    // Close file menu when switching tabs
+    const fileMenu = document.getElementById('fileMenu');
+    if(fileMenu) fileMenu.style.display='none';
+    
+    // Remove active class from all tabs and contents
+    document.querySelectorAll('.ribbon-tab').forEach(t => {
+      t.classList.remove('active');
+    });
+    document.querySelectorAll('.ribbon-content').forEach(c => {
+      c.classList.remove('active');
+    });
+    
+    // Add active class to corresponding content
+    const contentId = 'tab-' + name;
+    const content = document.getElementById(contentId);
+    if(content) {
+      content.classList.add('active');
+      console.log('✓ Activated content:', contentId);
+    } else {
+      console.error('✗ Content not found:', contentId);
+    }
+    
+    // Add active class to clicked tab
+    if(el) {
+      el.classList.add('active');
+      console.log('✓ Activated button');
+    }
+    
+    console.log('✓ Switched to tab:', name);
+  } catch(e) {
+    console.error('Error in switchTab:', e);
+  }
 }
 
 // ============ EDITOR COMMANDS ============
