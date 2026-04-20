@@ -655,14 +655,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0) _savedSel = sel.getRangeAt(0).cloneRange();
   });
-  // Prevent ribbon buttons from stealing focus (but allow tab clicks to work)
-  document.querySelector('.ribbon').addEventListener('mousedown', (e) => {
-    if (!e.target.closest('.ribbon-tab') &&
-        e.target.tagName !== 'SELECT' &&
-        e.target.tagName !== 'INPUT') {
-      e.preventDefault();
+  // On desktop only: prevent ribbon buttons from stealing focus (keeps selection alive)
+  // Skip on touch devices so onclick events fire correctly
+  if (!('ontouchstart' in window)) {
+    document.querySelector('.ribbon').addEventListener('mousedown', (e) => {
+      if (!e.target.closest('.ribbon-tab') &&
+          e.target.tagName !== 'SELECT' &&
+          e.target.tagName !== 'INPUT') {
+        e.preventDefault();
+      }
+    });
+  }
+  // Mobile: save selection on touchstart of ribbon buttons
+  document.querySelector('.ribbon').addEventListener('touchstart', (e) => {
+    if (!e.target.closest('.ribbon-tab')) {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
+        _savedSel = sel.getRangeAt(0).cloneRange();
+      }
     }
-  });
+  }, { passive: true });
 });
 
 function _restoreSel() {
