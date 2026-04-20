@@ -124,180 +124,94 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0;
-            padding: 20px 0 40px;
+            gap: 40px;
+            padding: 40px 20px;
+            flex-wrap: wrap;
         }
 
-        /* iPhone 17 Pro Max */
+        /* iPhone 17 Frame */
         .iphone17-frame {
             position: relative;
             z-index: 3;
             flex-shrink: 0;
+            animation: float-up 3s ease-in-out infinite;
         }
+        @keyframes float-up { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        
         .iphone17-body {
-            width: 230px;
-            background: linear-gradient(160deg, #c8c3be 0%, #a8a39d 35%, #8e8a85 70%, #9d9892 100%);
+            width: 260px;
+            background: #000;
             border-radius: 50px;
-            padding: 9px;
+            padding: 12px;
             box-shadow:
-                0 50px 100px rgba(0,0,0,0.45),
-                0 20px 40px rgba(0,0,0,0.22),
-                inset 0 1px 0 rgba(255,255,255,0.45),
-                inset 0 -1px 0 rgba(0,0,0,0.18),
-                inset 1px 0 0 rgba(255,255,255,0.2),
+                0 50px 100px rgba(0,0,0,0.4),
+                0 20px 40px rgba(0,0,0,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.3),
                 inset -1px 0 0 rgba(0,0,0,0.1);
             position: relative;
-            transition: transform 0.35s ease, box-shadow 0.35s ease;
+            transition: transform 0.3s ease;
         }
         .iphone17-body:hover {
-            transform: translateY(-6px) rotate(1deg);
-            box-shadow: 0 65px 120px rgba(0,0,0,0.5), 0 25px 50px rgba(0,0,0,0.25),
-                inset 0 1px 0 rgba(255,255,255,0.45);
-        }
-        /* Left volume buttons */
-        .iphone17-body::before {
-            content: '';
-            position: absolute;
-            left: -4px; top: 108px;
-            width: 4px; height: 26px;
-            background: linear-gradient(180deg, #c0bbb5 0%, #9a9590 100%);
-            border-radius: 3px 0 0 3px;
-            box-shadow: 0 40px 0 #b0aba5, 0 80px 0 #b0aba5;
-        }
-        /* Right power button */
-        .iphone17-body::after {
-            content: '';
-            position: absolute;
-            right: -4px; top: 130px;
-            width: 4px; height: 58px;
-            background: linear-gradient(180deg, #c0bbb5 0%, #9a9590 100%);
-            border-radius: 0 3px 3px 0;
+            transform: translateY(-8px);
         }
         .iphone17-inner {
             width: 100%;
             background: #000;
-            border-radius: 42px;
+            border-radius: 45px;
             overflow: hidden;
             position: relative;
+            aspect-ratio: 9/19.5;
         }
         .iphone17-island {
             position: absolute;
-            top: 14px;
+            top: 10px;
             left: 50%;
             transform: translateX(-50%);
-            width: 96px; height: 30px;
+            width: 120px; height: 28px;
             background: #000;
-            border-radius: 15px;
+            border-radius: 18px;
             z-index: 5;
-            box-shadow: 0 0 0 1.5px rgba(255,255,255,0.06), 0 2px 10px rgba(0,0,0,0.9);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
         }
         .iphone17-screen-img {
             width: 100%;
+            height: 100%;
             display: block;
-            border-radius: 42px;
+            border-radius: 45px;
+            object-fit: cover;
         }
 
-        /* Samsung S26 Ultra */
+        /* Samsung S26 Ultra Frame */
         .samsung-s26-frame {
             position: relative;
             z-index: 2;
             flex-shrink: 0;
-            transform: rotate(-5deg) translateY(28px) translateX(-18px);
+            animation: float-down 3.5s ease-in-out infinite;
+            animation-delay: 0.2s;
         }
+        @keyframes float-down { 0%, 100% { transform: translateY(0px) rotate(-3deg); } 50% { transform: translateY(-6px) rotate(-3deg); } }
+        
         .samsung-s26-body {
-            width: 196px;
-            background: linear-gradient(175deg, #1c1c1c 0%, #0e0e0e 60%, #080808 100%);
-            border-radius: 30px 30px 32px 32px;
+            width: 240px;
+            background: #1a1a1a;
+            border-radius: 35px 35px 38px 38px;
             overflow: hidden;
             box-shadow:
-                0 45px 90px rgba(0,0,0,0.65),
-                0 18px 36px rgba(0,0,0,0.35),
-                inset 0 0 0 1px rgba(255,255,255,0.09),
-                inset 0 1px 0 rgba(255,255,255,0.14);
+                0 45px 90px rgba(0,0,0,0.5),
+                0 18px 36px rgba(0,0,0,0.3),
+                inset 0 0 0 1px rgba(255,255,255,0.08);
             position: relative;
-            transition: transform 0.35s ease;
+            transition: transform 0.3s ease;
         }
-        .samsung-s26-body:hover { transform: translateY(-4px); }
-        /* Volume buttons right */
-        .samsung-s26-body::before {
-            content: '';
-            position: absolute;
-            right: -3px; top: 70px;
-            width: 3px; height: 52px;
-            background: #1a1a1a;
-            border-radius: 0 2px 2px 0;
-        }
-        /* Power left */
-        .samsung-s26-body::after {
-            content: '';
-            position: absolute;
-            left: -3px; top: 85px;
-            width: 3px; height: 30px;
-            background: #1a1a1a;
-            border-radius: 2px 0 0 2px;
-        }
-        .samsung-top-bar {
-            height: 24px;
-            background: #070707;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .samsung-cam {
-            width: 9px; height: 9px;
-            background: #0c0c0c;
-            border-radius: 50%;
-            border: 1.5px solid rgba(255,255,255,0.13);
-            box-shadow: 0 0 6px rgba(100,180,255,0.28), inset 0 0 3px rgba(0,0,80,0.4);
-        }
+        .samsung-s26-body:hover { transform: translateY(-6px); }
         .samsung-screen-img {
             width: 100%;
+            height: 100%;
             display: block;
-        }
-        .samsung-bottom-bar {
-            height: 18px;
-            background: #070707;
-            display: flex; align-items: center; justify-content: flex-end;
-            padding-right: 6px;
-        }
-        .samsung-spen {
-            width: 3px; height: 11px;
-            background: linear-gradient(180deg, #1e3a6e, #0d1f3c);
-            border-radius: 2px;
+            aspect-ratio: 9/19.5;
+            object-fit: cover;
         }
 
-        /* ── MINI DASHBOARD INSIDE MOCKUP ── */
-        .mini-app { display: flex; height: 340px; }
-        .mini-sidebar {
-            width: 54px; background: #1e1e2e; flex-shrink: 0;
-            display: flex; flex-direction: column; align-items: center;
-            padding: 12px 0; gap: 16px;
-        }
-        .mini-sidebar-logo {
-            width: 30px; height: 30px; border-radius: 8px; overflow: hidden; margin-bottom: 6px;
-        }
-        .mini-sidebar-logo img { width: 100%; height: 100%; object-fit: cover; }
-        .mini-nav-icon {
-            width: 32px; height: 32px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            color: #8888aa; font-size: 0.75rem; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .mini-nav-icon.active { background: rgba(108,99,255,0.2); color: #a39bff; }
-        .mini-main { flex: 1; overflow: hidden; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-        .mini-topbar {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 2px;
-        }
-        .mini-title { font-weight: 700; font-size: 0.85rem; color: #1a1a2e; font-family: 'Poppins', sans-serif; }
-        .mini-avatar {
-            width: 24px; height: 24px; border-radius: 50%;
-            background: linear-gradient(135deg, #6C63FF, #a39bff);
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; font-size: 0.6rem; font-weight: 700;
-        }
-        .mini-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .mini-stat {
-            background: #fff; border-radius: 8px; padding: 8px;
-            border: 1px solid #e5e7eb;
         }
         .mini-stat-num { font-weight: 700; font-size: 1rem; color: #6C63FF; font-family: 'Poppins', sans-serif; }
         .mini-stat-lbl { font-size: 0.58rem; color: #6b7280; }
@@ -591,6 +505,21 @@
         .footer-logo-row img { width: 44px; height: 44px; border-radius: 10px; }
         .footer-logo-row span { font-family:'Poppins',sans-serif; font-weight:700; color:#fff; font-size:1.1rem; }
         .footer-desc { font-size:0.84rem; line-height:1.75; color:rgba(255,255,255,0.45); margin-bottom:22px; max-width:260px; }
+        .footer-contact { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
+        .footer-email-link {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.3);
+            padding: 10px 16px; border-radius: 10px;
+            color: rgba(255,255,255,0.75); font-size: 0.85rem; text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .footer-email-link:hover {
+            background: rgba(108,99,255,0.25);
+            border-color: rgba(108,99,255,0.5);
+            color: #fff;
+        }
+        .footer-email-link i { font-size: 0.95rem; }
         .footer-social { display:flex; gap:9px; }
         .footer-social a {
             width:36px; height:36px; border-radius:9px;
@@ -640,17 +569,9 @@
             .nav-cta .btn { padding: 7px 13px; font-size: 0.78rem; border-radius: 8px; }
             .nav-links { display: none; }
             .hero { grid-template-columns: 1fr; padding: 60px 20px 20px; gap: 20px; }
-            .mockup-wrap { padding: 0 0 32px; }
-            .iphone17-body { width: 170px; border-radius: 40px; padding: 7px; }
-            .iphone17-inner { border-radius: 34px; }
-            .iphone17-screen-img { border-radius: 34px; }
-            .iphone17-body::before { left: -3px; width: 3px; top: 80px; height: 20px; box-shadow: 0 30px 0 #b0aba5, 0 60px 0 #b0aba5; }
-            .iphone17-body::after { right: -3px; width: 3px; top: 96px; height: 44px; }
-            .iphone17-island { width: 72px; height: 22px; top: 10px; }
-            .samsung-s26-frame { transform: rotate(-5deg) translateY(22px) translateX(-14px); }
-            .samsung-s26-body { width: 148px; border-radius: 24px 24px 26px 26px; }
-            .samsung-s26-body::before { display: none; }
-            .samsung-s26-body::after { display: none; }
+            .mockup-wrap { padding: 20px 10px 32px; gap: 20px; }
+            .iphone17-body { width: 200px; }
+            .samsung-s26-body { width: 180px; }
             .features-grid { grid-template-columns: 1fr 1fr; }
             .showcase { padding: 0 20px 60px; gap: 60px; }
             .showcase-row { grid-template-columns: 1fr; gap: 32px; }
@@ -667,10 +588,17 @@
         @media (max-width: 600px) {
             .features-grid { grid-template-columns: 1fr; }
             .hero h1 { font-size: 2rem; }
-            .hero-stats { gap: 20px; }
+            .hero-stats { gap: 20px; flex-wrap: wrap; }
+            .mockup-wrap { gap: 10px; padding: 15px 0; }
+            .iphone17-body { width: 150px; padding: 8px; }
+            .iphone17-inner { border-radius: 35px; }
+            .iphone17-island { width: 90px; height: 22px; }
+            .samsung-s26-body { width: 140px; border-radius: 28px 28px 32px 32px; }
             .platforms-grid { gap: 12px; }
             .platform-card { padding: 20px 24px; min-width: 110px; }
             .footer-grid { grid-template-columns: 1fr; }
+            .footer-contact { flex-direction: column; }
+            .footer-email-link { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -762,20 +690,18 @@
 
     <!-- Phone Mockups -->
     <div class="mockup-wrap">
-        <!-- Samsung S26 Ultra (behind, tilted) -->
+        <!-- Samsung S26 Ultra (behind) -->
         <div class="samsung-s26-frame">
             <div class="samsung-s26-body">
-                <div class="samsung-top-bar"><div class="samsung-cam"></div></div>
-                <img src="phone-screen-2.png" alt="Kairos PDF Tools" class="samsung-screen-img">
-                <div class="samsung-bottom-bar"><div class="samsung-spen"></div></div>
+                <img src="assets/phone-mockup-samsung.png" alt="Kairos on Samsung S26 Ultra" class="samsung-screen-img">
             </div>
         </div>
-        <!-- iPhone 17 Pro Max (front) -->
+        <!-- iPhone 17 (front) -->
         <div class="iphone17-frame">
             <div class="iphone17-body">
                 <div class="iphone17-inner">
                     <div class="iphone17-island"></div>
-                    <img src="phone-screen-1.png" alt="Kairos Dashboard" class="iphone17-screen-img">
+                    <img src="assets/phone-mockup-iphone.png" alt="Kairos on iPhone 17" class="iphone17-screen-img">
                 </div>
             </div>
         </div>
@@ -1188,8 +1114,8 @@
                     <span>Kairos</span>
                 </div>
                 <p class="footer-desc">Smart academic planner built for students who want to stay organised, track grades, and graduate stronger.</p>
-                <div class="footer-social">
-                    <a href="mailto:studykairos32@gmail.com" title="Email us" style="width:auto;padding:0 14px;gap:8px;font-size:0.8rem;">
+                <div class="footer-contact">
+                    <a href="mailto:studykairos32@gmail.com" class="footer-email-link">
                         <i class="fas fa-envelope"></i>
                         <span>studykairos32@gmail.com</span>
                     </a>

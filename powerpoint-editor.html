@@ -1167,11 +1167,22 @@ async function openPptx(){
 
 // ============ RIBBON TABS ============
 function switchTab(name,btn){
+  // Close file menu when switching tabs
+  document.getElementById('pptFileMenu').style.display='none';
+  
+  // Remove active class from all tabs and contents
   document.querySelectorAll('.ribbon-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.ribbon-content').forEach(c=>c.classList.remove('active'));
+  
+  // Add active class to clicked tab and corresponding content
   document.getElementById('tab-'+name).classList.add('active');
   if(btn) btn.classList.add('active');
+  
+  // Build theme gallery if switching to design tab
   if(name==='design') buildThemeGallery();
+  
+  // Debug log to verify switching is working
+  console.log('Switched to tab:', name);
 }
 
 // ============ KEYBOARD ============
