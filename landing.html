@@ -45,7 +45,7 @@
             border-bottom: 1px solid var(--border);
         }
         .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .nav-logo img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
+        .nav-logo img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; }
         .nav-logo span { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.15rem; color: var(--primary); }
         .nav-links { display: flex; align-items: center; gap: 28px; }
         .nav-links a { text-decoration: none; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
@@ -106,7 +106,7 @@
             user-select: none;
             min-width: 150px;
         }
-        .store-badge-icon { font-size: 1.6rem; line-height: 1; }
+        .store-badge-icon { font-size: 1.7rem; line-height: 1; color: #fff; display: flex; align-items: center; }
         .store-badge-text { display: flex; flex-direction: column; }
         .store-badge-soon { font-size: 0.6rem; letter-spacing: 0.08em; color: #aaa; text-transform: uppercase; }
         .store-badge-name { font-size: 0.88rem; font-weight: 700; font-family: 'Poppins', sans-serif; line-height: 1.2; }
@@ -232,136 +232,20 @@
         .mini-mobile-item-title { font-size: 0.55rem; font-weight: 600; color: #1a1a2e; }
         .mini-mobile-item-sub { font-size: 0.48rem; color: #6b7280; }
 
-        /* ── iPHONE 17 PRO MAX MOCKUP ── */
-        .iphone17-mockup {
-            position: absolute; bottom: -40px; right: -52px;
-            width: 152px;
-            /* Titanium Natural finish */
-            background: linear-gradient(170deg,
-                #d4d4d4 0%, #b8b8b8 15%, #a0a0a0 35%,
-                #969696 55%, #acacac 75%, #c8c8c8 100%);
-            border-radius: 54px;
-            box-shadow:
-                0 40px 90px rgba(0,0,0,0.65),
-                0 8px 24px rgba(0,0,0,0.4),
-                inset 0 0 0 1px rgba(255,255,255,0.35),
-                inset 0 2px 0 rgba(255,255,255,0.5);
-            padding: 4px;
-            z-index: 10;
+        /* ── REAL PHONE IMAGES ── */
+        .phone-real-img {
+            position: absolute;
+            filter: drop-shadow(0 24px 60px rgba(0,0,0,0.55));
+            object-fit: contain;
+            pointer-events: none;
         }
-        /* Inner glass bezel */
-        .iphone17-inner-wrap {
-            background: #000;
-            border-radius: 50px;
-            overflow: hidden;
-            position: relative;
+        .iphone-real-img {
+            bottom: -50px; right: -60px;
+            width: 165px; z-index: 10;
         }
-        .iphone17-topbar {
-            height: 30px; background: #000;
-            display: flex; align-items: center; justify-content: center;
-            position: relative;
-        }
-        /* Dynamic Island */
-        .iphone17-island {
-            width: 58px; height: 16px; background: #0a0a0a;
-            border-radius: 20px;
-            box-shadow:
-                0 0 0 1px rgba(255,255,255,0.06),
-                inset 0 0 8px rgba(0,0,0,0.9);
-            display: flex; align-items: center; justify-content: flex-end;
-            padding-right: 5px; gap: 3px;
-        }
-        /* Camera lens inside Dynamic Island */
-        .iphone17-island::after {
-            content: '';
-            width: 7px; height: 7px;
-            background: radial-gradient(circle at 35% 35%, #2a3a5a, #050518);
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 0 4px rgba(100,140,255,0.25);
-        }
-        .iphone17-screen { background: #f8f9ff; padding: 8px; }
-        .iphone17-home {
-            height: 18px; background: #000;
-            display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px;
-        }
-        .iphone17-indicator { width: 40px; height: 4px; background: rgba(255,255,255,0.38); border-radius: 4px; }
-        /* Action button (left, top) + Volume buttons */
-        .iphone17-mockup::before {
-            content: ''; position: absolute; left: 0px; top: 76px;
-            width: 3.5px; height: 10px; /* Action button */
-            background: linear-gradient(to right, #888, #aaa);
-            border-radius: 2px 0 0 2px;
-            box-shadow:
-                0 20px 0 14px linear-gradient(to right,#888,#aaa),
-                0 46px 0 14px linear-gradient(to right,#888,#aaa);
-        }
-        /* Power / Side button right */
-        .iphone17-mockup::after {
-            content: ''; position: absolute; right: 0px; top: 90px;
-            width: 3.5px; height: 54px;
-            background: linear-gradient(to left, #888, #aaa);
-            border-radius: 0 2px 2px 0;
-        }
-
-        /* ── SAMSUNG GALAXY S26 ULTRA MOCKUP ── */
-        .samsung-s26-mockup {
-            position: absolute; bottom: -28px; left: -46px;
-            width: 132px;
-            /* Titanium Black - flat matte finish */
-            background: linear-gradient(175deg, #2a2a2a 0%, #141414 40%, #101010 70%, #1c1c1c 100%);
-            border-radius: 20px 20px 22px 22px; /* Ultra's flatter corners */
-            box-shadow:
-                0 40px 90px rgba(0,0,0,0.7),
-                0 8px 24px rgba(0,0,0,0.45),
-                inset 0 0 0 1px rgba(255,255,255,0.07),
-                inset 0 1px 0 rgba(255,255,255,0.12);
-            border: 1px solid #0a0a0a;
-            padding: 3px;
-            z-index: 10;
-        }
-        .samsung-s26-inner-wrap {
-            background: #050505;
-            border-radius: 17px 17px 19px 19px;
-            overflow: hidden;
-            position: relative;
-        }
-        .samsung-s26-topbar {
-            height: 24px; background: #050505;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .samsung-s26-camera {
-            width: 9px; height: 9px; background: #0a0a0a; border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow:
-                0 0 0 1.5px rgba(255,255,255,0.04),
-                0 0 8px rgba(80,150,255,0.2),
-                inset 0 0 4px rgba(0,0,80,0.6);
-        }
-        .samsung-s26-screen { background: #f8f9ff; padding: 7px; }
-        .samsung-s26-bottom {
-            height: 18px; background: #050505;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 8px;
-        }
-        /* Gesture bar */
-        .samsung-s26-bar { width: 36px; height: 3px; background: rgba(255,255,255,0.25); border-radius: 2px; }
-        /* S Pen slot */
-        .samsung-s26-spen { width: 3px; height: 10px; background: linear-gradient(to bottom, #2255aa, #1a3a80); border-radius: 1.5px; box-shadow: 0 0 4px rgba(50,100,255,0.4); }
-        /* Volume buttons right */
-        .samsung-s26-mockup::before {
-            content: ''; position: absolute; right: 0px; top: 56px;
-            width: 3px; height: 48px;
-            background: linear-gradient(to left, #222, #333);
-            border-radius: 0 2px 2px 0;
-            box-shadow: 0 62px 0 -14px linear-gradient(to left,#222,#333);
-        }
-        /* Power button right (below volume) */
-        .samsung-s26-mockup::after {
-            content: ''; position: absolute; right: 0px; top: 112px;
-            width: 3px; height: 28px;
-            background: linear-gradient(to left, #222, #333);
-            border-radius: 0 2px 2px 0;
+        .samsung-real-img {
+            bottom: -36px; left: -60px;
+            width: 148px; z-index: 10;
         }
 
         /* ── PLATFORM BADGE ICONS ── */
@@ -566,23 +450,95 @@
         .btn-white-outline { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.5); }
         .btn-white-outline:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
 
-        /* ── FOOTER ── */
-        footer { background: #0f0f1a; color: rgba(255,255,255,0.55); padding: 60px 48px 32px; }
+        /* ── HERO BACKGROUND DECORATIONS ── */
+        .hero-bg-wrap {
+            background: linear-gradient(135deg, #f0eeff 0%, #f8f9ff 60%, #e8f4ff 100%);
+            padding: 0; position: relative; overflow: hidden;
+        }
+        .hero-blob {
+            position: absolute; border-radius: 50%;
+            pointer-events: none; z-index: 0;
+        }
+        .hero-blob-1 {
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(108,99,255,0.13) 0%, transparent 70%);
+            top: -280px; right: -180px;
+        }
+        .hero-blob-2 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(59,130,246,0.09) 0%, transparent 70%);
+            bottom: -180px; left: -120px;
+        }
+        .hero-dots {
+            position: absolute; inset: 0;
+            background-image: radial-gradient(circle, rgba(108,99,255,0.07) 1.5px, transparent 1.5px);
+            background-size: 30px 30px;
+            pointer-events: none; z-index: 0;
+        }
+        .hero { position: relative; z-index: 1; }
+
+        /* ── FOOTER  -  KNUST-INSPIRED ── */
+        footer { background: #0f0e23; color: rgba(255,255,255,0.55); padding: 0; position: relative; overflow: hidden; }
+        .footer-accent { height: 5px; background: linear-gradient(90deg,#6C63FF,#a78bfa,#3b82f6,#6C63FF); background-size:300%; animation:grad-shift 6s linear infinite; }
+        @keyframes grad-shift { 0%{background-position:0%} 100%{background-position:300%} }
+        .footer-main { padding: 60px 48px 44px; }
         .footer-inner { max-width: 1200px; margin: 0 auto; }
-        .footer-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 32px; margin-bottom: 48px; }
-        .footer-brand { display: flex; align-items: center; gap: 10px; }
-        .footer-brand img { width: 30px; height: 30px; border-radius: 7px; object-fit: cover; }
-        .footer-brand span { font-family: 'Poppins', sans-serif; font-weight: 700; color: #fff; font-size: 1rem; }
-        .footer-brand-sub { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 6px; max-width: 220px; line-height: 1.5; }
-        .footer-links { display: flex; gap: 40px; flex-wrap: wrap; }
-        .footer-col h5 { font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
-        .footer-col a { display: block; text-decoration: none; color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 10px; transition: color 0.2s; }
-        .footer-col a:hover { color: #fff; }
-        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; flex-wrap: wrap; gap: 12px; }
+        .footer-grid {
+            display: grid; grid-template-columns: 2.2fr 1fr 1fr 1fr;
+            gap: 48px; padding-bottom: 48px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .footer-logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .footer-logo-row img { width: 44px; height: 44px; border-radius: 10px; }
+        .footer-logo-row span { font-family:'Poppins',sans-serif; font-weight:700; color:#fff; font-size:1.1rem; }
+        .footer-desc { font-size:0.84rem; line-height:1.75; color:rgba(255,255,255,0.45); margin-bottom:22px; max-width:260px; }
+        .footer-social { display:flex; gap:9px; }
+        .footer-social a {
+            width:36px; height:36px; border-radius:9px;
+            background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1);
+            display:flex; align-items:center; justify-content:center;
+            color:rgba(255,255,255,0.55); font-size:0.9rem; text-decoration:none;
+            transition:all 0.2s;
+        }
+        .footer-social a:hover { background:var(--primary); border-color:var(--primary); color:#fff; transform:translateY(-2px); }
+        .footer-nav-col h5 {
+            font-size:0.7rem; font-weight:700; color:rgba(255,255,255,0.9);
+            text-transform:uppercase; letter-spacing:0.1em;
+            margin-bottom:16px; padding-bottom:10px;
+            border-bottom:2px solid rgba(108,99,255,0.5);
+        }
+        .footer-nav-col a {
+            display:block; text-decoration:none; color:rgba(255,255,255,0.48);
+            font-size:0.82rem; margin-bottom:11px; transition:all 0.2s;
+        }
+        .footer-nav-col a:hover { color:#fff; padding-left:5px; }
+        .footer-bottom-bar {
+            background:rgba(0,0,0,0.35); padding:16px 48px;
+        }
+        .footer-bottom-inner {
+            max-width:1200px; margin:0 auto;
+            display:flex; justify-content:space-between; align-items:center;
+            flex-wrap:wrap; gap:10px; font-size:0.78rem; color:rgba(255,255,255,0.35);
+        }
+        .footer-bottom-inner a { color:rgba(255,255,255,0.5); text-decoration:none; }
+        .footer-bottom-inner a:hover { color:#fff; }
+        /* footer decor */
+        footer::before {
+            content:''; position:absolute; width:600px; height:600px;
+            border-radius:50%; background:radial-gradient(circle,rgba(108,99,255,0.06) 0%,transparent 70%);
+            top:-200px; right:-100px; pointer-events:none;
+        }
+        footer::after {
+            content:''; position:absolute; width:400px; height:400px;
+            border-radius:50%; background:radial-gradient(circle,rgba(59,130,246,0.04) 0%,transparent 70%);
+            bottom:-100px; left:-80px; pointer-events:none;
+        }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 900px) {
-            nav { padding: 12px 20px; }
+            nav { padding: 10px 16px; }
+            .nav-cta { gap: 6px; }
+            .nav-cta .btn { padding: 7px 13px; font-size: 0.78rem; border-radius: 8px; }
             .nav-links { display: none; }
             .hero { grid-template-columns: 1fr; padding: 60px 20px; gap: 40px; }
             .mockup-wrap { display: none; }
@@ -595,7 +551,9 @@
             .section { padding: 70px 20px; }
             .how-section { padding: 70px 20px; }
             .platforms-section { padding: 60px 20px; }
-            footer { padding: 48px 20px 24px; }
+            .footer-main { padding: 40px 20px 32px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+            .footer-bottom-bar { padding: 14px 20px; }
         }
         @media (max-width: 600px) {
             .features-grid { grid-template-columns: 1fr; }
@@ -603,6 +561,7 @@
             .hero-stats { gap: 20px; }
             .platforms-grid { gap: 12px; }
             .platform-card { padding: 20px 24px; min-width: 110px; }
+            .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -627,7 +586,11 @@
 </nav>
 
 <!-- HERO -->
-<div style="background: linear-gradient(135deg, #f0eeff 0%, #f8f9ff 60%, #e8f4ff 100%); padding: 0;">
+<div class="hero-bg-wrap">
+<!-- decorative blobs -->
+<div class="hero-blob hero-blob-1"></div>
+<div class="hero-blob hero-blob-2"></div>
+<div class="hero-dots"></div>
 <div class="hero">
     <div class="hero-text">
         <div class="hero-badge"><i class="fas fa-bolt"></i> Smart Academic Planning</div>
@@ -643,17 +606,17 @@
         <!-- App Store Badges -->
         <div class="store-badges">
             <div class="store-badge">
-                <div class="store-badge-icon">🍎</div>
+                <div class="store-badge-icon"><i class="fab fa-apple" style="font-size:1.9rem"></i></div>
                 <div class="store-badge-text">
-                    <span class="store-badge-soon">Download on the</span>
+                    <span class="store-badge-soon">DOWNLOAD ON THE</span>
                     <span class="store-badge-name">App Store</span>
                 </div>
                 <span class="store-badge-pill">Coming Soon</span>
             </div>
             <div class="store-badge">
-                <div class="store-badge-icon">▶</div>
+                <div class="store-badge-icon"><i class="fab fa-google-play" style="font-size:1.5rem"></i></div>
                 <div class="store-badge-text">
-                    <span class="store-badge-soon">Get it on</span>
+                    <span class="store-badge-soon">GET IT ON</span>
                     <span class="store-badge-name">Google Play</span>
                 </div>
                 <span class="store-badge-pill">Coming Soon</span>
@@ -742,47 +705,17 @@
                 </div>
             </div>
         </div>
-        <!-- iPhone 17 Pro Max -->
-        <div class="iphone17-mockup">
-            <div class="iphone17-inner-wrap">
-                <div class="iphone17-topbar"><div class="iphone17-island"></div></div>
-                <div class="iphone17-screen">
-                    <div style="font-size:0.6rem;font-weight:700;color:#6C63FF;margin-bottom:5px;font-family:'Poppins',sans-serif;">📋 Assignments</div>
-                    <div class="mini-mobile-stat">
-                        <div class="mini-mobile-card"><div class="mini-mobile-card-num">8</div><div class="mini-mobile-card-lbl">Total</div></div>
-                        <div class="mini-mobile-card"><div class="mini-mobile-card-num" style="color:#2ED573">4</div><div class="mini-mobile-card-lbl">Done</div></div>
-                    </div>
-                    <div class="mini-mobile-list">
-                        <div class="mini-mobile-item"><div class="mini-mobile-item-title">Fin. Statements</div><div class="mini-mobile-item-sub">ACC301 · 2 days</div></div>
-                        <div class="mini-mobile-item" style="border-left-color:#FFA502"><div class="mini-mobile-item-title">Strategic Mgmt</div><div class="mini-mobile-item-sub">BUS401 · 5 days</div></div>
-                        <div class="mini-mobile-item" style="border-left-color:#2ED573"><div class="mini-mobile-item-title">Marketing Pres.</div><div class="mini-mobile-item-sub">Completed ✓</div></div>
-                    </div>
-                </div>
-                <div class="iphone17-home"><div class="iphone17-indicator"></div></div>
-            </div>
-        </div>
-        <!-- Samsung Galaxy S26 Ultra -->
-        <div class="samsung-s26-mockup">
-            <div class="samsung-s26-inner-wrap">
-                <div class="samsung-s26-topbar"><div class="samsung-s26-camera"></div></div>
-                <div class="samsung-s26-screen">
-                    <div style="font-size:0.58rem;font-weight:700;color:#6C63FF;margin-bottom:5px;font-family:'Poppins',sans-serif;">📊 CWA Overview</div>
-                    <div style="text-align:center;margin-bottom:5px;">
-                        <div style="font-family:'Poppins',sans-serif;font-size:1.5rem;font-weight:700;color:#6C63FF;line-height:1">80</div>
-                        <div style="font-size:0.5rem;color:#6b7280">CWA Score</div>
-                    </div>
-                    <div class="mini-mobile-list">
-                        <div class="mini-mobile-item" style="border-left-color:#2ED573"><div class="mini-mobile-item-title">ACC301 Financial</div><div class="mini-mobile-item-sub">Score: 85/100</div></div>
-                        <div class="mini-mobile-item" style="border-left-color:#6C63FF"><div class="mini-mobile-item-title">MKT201 Marketing</div><div class="mini-mobile-item-sub">Score: 92/100</div></div>
-                        <div class="mini-mobile-item" style="border-left-color:#FFA502"><div class="mini-mobile-item-title">BUS401 Strategy</div><div class="mini-mobile-item-sub">Score: 78/100</div></div>
-                    </div>
-                </div>
-                <div class="samsung-s26-bottom">
-                    <div class="samsung-s26-bar"></div>
-                    <div class="samsung-s26-spen"></div>
-                </div>
-            </div>
-        </div>
+        <!-- iPhone 17 Pro Max - real image -->
+        <img src="https://cdn.pacdora.com/render/1742799635442/11866704.jpg"
+             alt="iPhone 17 Pro Max with Kairos"
+             class="phone-real-img iphone-real-img"
+             loading="lazy">
+        <!-- Samsung S26 Ultra - real image -->
+        <img src="https://tint.creativemarket.com/NfCsfMDa0CQDgGl9TIkcXKV97isWSnTc_ferdwPBWLs/width:1200/height:800/gravity:nowe/rt:fill-down/el:1/czM6Ly9maWxlcy5jcmVhdGl2ZW1hcmtldC5jb20vaW1hZ2VzL3NjcmVlbnNob3RzL3Byb2R1Y3RzLzUyNzkvNTI3OTUvNTI3OTU5MzcvMF80LW8ucG5nIzE3Mzk0NzQ3NjY%3D?1739474766"
+             alt="Samsung Galaxy S26 Ultra with Kairos"
+             class="phone-real-img samsung-real-img"
+             loading="lazy"
+             onerror="this.style.display='none'">
     </div>
 </div>
 </div>
@@ -1182,43 +1115,54 @@
 
 <!-- FOOTER -->
 <footer>
+    <div class="footer-accent"></div>
+    <div class="footer-main">
     <div class="footer-inner">
-        <div class="footer-top">
+        <div class="footer-grid">
             <div>
-                <div class="footer-brand">
+                <div class="footer-logo-row">
                     <img src="1000669890-Photoroom.png" alt="Kairos">
                     <span>Kairos</span>
                 </div>
-                <div class="footer-brand-sub">Smart academic planner for students who want to stay organised and succeed.</div>
+                <p class="footer-desc">Smart academic planner built for students who want to stay organised, track grades, and graduate stronger.</p>
+                <div class="footer-social">
+                    <a href="#" title="Twitter / X"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+                </div>
             </div>
-            <div class="footer-links">
-                <div class="footer-col">
-                    <h5>App</h5>
-                    <a href="dashboard.html">Dashboard</a>
-                    <a href="assignments.html">Assignments</a>
-                    <a href="planner.html">Planner</a>
-                    <a href="timetable.html">Timetable</a>
-                    <a href="gpa-calculator.html">GPA Calculator</a>
-                </div>
-                <div class="footer-col">
-                    <h5>Tools</h5>
-                    <a href="pdf-tools.html">PDF Tools</a>
-                    <a href="word-editor.html">Word Editor</a>
-                    <a href="excel-editor.html">Excel Editor</a>
-                    <a href="lecture-tools.html">Lecture Tools</a>
-                </div>
-                <div class="footer-col">
-                    <h5>Legal</h5>
-                    <a href="privacy.html">Privacy Policy</a>
-                    <a href="terms.html">Terms of Service</a>
-                    <a href="index.html">Log In</a>
-                    <a href="signup.html">Sign Up</a>
-                </div>
+            <div class="footer-nav-col">
+                <h5>App</h5>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="assignments.html">Assignments</a>
+                <a href="planner.html">Planner</a>
+                <a href="timetable.html">Timetable</a>
+                <a href="gpa-calculator.html">GPA Calculator</a>
+                <a href="analytics.html">Analytics</a>
+            </div>
+            <div class="footer-nav-col">
+                <h5>Tools</h5>
+                <a href="pdf-tools.html">PDF Tools</a>
+                <a href="word-editor.html">Word Editor</a>
+                <a href="excel-editor.html">Excel Editor</a>
+                <a href="powerpoint-editor.html">PPT Editor</a>
+                <a href="lecture-tools.html">Lecture Tools</a>
+            </div>
+            <div class="footer-nav-col">
+                <h5>Account</h5>
+                <a href="index.html">Log In</a>
+                <a href="signup.html">Sign Up</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
             </div>
         </div>
-        <div class="footer-bottom">
+    </div>
+    </div>
+    <div class="footer-bottom-bar">
+        <div class="footer-bottom-inner">
             <span>&copy; 2026 Kairos Smart Student Planner. All rights reserved.</span>
-            <span>Built for students, by students.</span>
+            <span>Built for students, by students &nbsp;·&nbsp; <a href="privacy.html">Privacy</a> &nbsp;·&nbsp; <a href="terms.html">Terms</a></span>
         </div>
     </div>
 </footer>
