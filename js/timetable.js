@@ -78,7 +78,7 @@ class TimetableManager {
                 const room   = parts[2] || 'TBA';
                 const daysRaw = parts[3] || 'Mon,Tue,Wed,Thu,Fri';
 
-                const timeParts = time.split(/[-–]/);
+                const timeParts = time.split(/[-]/);
                 const startTime = timeParts[0]?.trim() || '';
                 const endTime   = timeParts[1]?.trim() || '';
 
@@ -710,7 +710,7 @@ class TimetableManager {
         this.showToast(`🔔 ${lecture.course} starts at ${lecture.startTime} (${lecture.room})`, 'info');
         if (this.settings.soundNotif) this.playAlertSound();
         if (Notification.permission === 'granted') {
-            new Notification('Lecture Alert – Kairos', {
+            new Notification('Lecture Alert - Kairos', {
                 body: `${lecture.course} starts at ${lecture.startTime} in ${lecture.room}`,
                 icon: '1000669890-Photoroom.png',
                 tag:  `lec_${lecture.id}`
@@ -843,7 +843,7 @@ class TimetableManager {
         return `<div class="lecture-item">
             <div style="display:flex;justify-content:space-between;align-items:start;">
                 <div>
-                    <div class="lecture-time">${l.startTime || '?'} – ${l.endTime || '?'}</div>
+                    <div class="lecture-time">${l.startTime || '?'} - ${l.endTime || '?'}</div>
                     <p class="lecture-course">${l.course}</p>
                     <p class="lecture-room"><i class="fas fa-map-marker-alt" style="margin-right:4px;"></i>${l.room}</p>
                     <p style="font-size:0.8rem;color:var(--text-secondary);margin:4px 0 0 0;">${(l.days || []).join(', ')}</p>

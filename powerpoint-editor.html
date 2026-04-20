@@ -47,7 +47,7 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex
 /* ===== RIBBON ===== */
 .ribbon{background:var(--ribbon-bg);border-bottom:1px solid var(--ribbon-border);flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 .ribbon-tabs-row{display:flex;align-items:flex-end;padding:0 8px;border-bottom:1px solid #e0e0e0}
-.ribbon-tab{padding:8px 14px 7px;background:transparent;border:none;font-size:12px;font-weight:400;color:#555;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;font-family:inherit}
+.ribbon-tab{padding:8px 14px 7px;background:transparent;border:none;font-size:12px;font-weight:400;color:#555;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;font-family:inherit;touch-action:manipulation}
 .ribbon-tab:hover{color:#111}
 .ribbon-tab.active{color:var(--ppt-red);border-bottom-color:var(--ppt-red);font-weight:600}
 .ribbon-tab.file-tab{background:var(--ppt-red);color:white;border-radius:2px 2px 0 0;padding:8px 16px 7px;font-weight:600;margin-right:4px}
@@ -58,7 +58,7 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex
 .ribbon-group:last-child{border-right:none}
 .ribbon-group-btns{display:flex;align-items:flex-end;gap:1px;flex-wrap:wrap}
 .ribbon-group-label{font-size:10px;color:#888;padding:3px 0 4px;text-align:center;width:100%}
-.rb{background:transparent;border:1px solid transparent;cursor:pointer;border-radius:2px;transition:all .12s;font-family:inherit;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:3px 5px;min-width:36px;height:58px;font-size:11px}
+.rb{background:transparent;border:1px solid transparent;cursor:pointer;border-radius:2px;transition:all .12s;font-family:inherit;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:3px 5px;min-width:36px;height:58px;font-size:11px;touch-action:manipulation}
 .rb:hover{background:#e8e8e8;border-color:#c8c8c8}
 .rb.pressed{background:#fde8e4;border-color:#f0a898}
 .rb i{font-size:18px;color:#444}
@@ -546,6 +546,7 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex
   <button class="file-menu-item" onclick="openPptx()"><i class="fas fa-folder-open" style="color:#D04423"></i> Open PowerPoint (.pptx)</button>
   <button class="file-menu-item" onclick="exportPptx()"><i class="fas fa-file-powerpoint" style="color:#D04423"></i> Export as PowerPoint (.pptx)</button>
   <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="exportPdf()"><i class="fas fa-file-pdf" style="color:#FF4757"></i> Export as PDF</button>
   <button class="file-menu-item" onclick="downloadPresentation('html')"><i class="fas fa-download"></i> Export as HTML</button>
   <button class="file-menu-item" onclick="downloadPresentation('txt')"><i class="fas fa-file-alt"></i> Export as Text</button>
   <div style="border-top:1px solid #eee;margin:4px 0"></div>
@@ -1049,6 +1050,54 @@ function downloadPresentation(fmt){
   document.getElementById('pptFileMenu').style.display='none';
 }
 function goBack(){ window.location.href='dashboard.html'; }
+
+// ============ PDF EXPORT ============
+async function exportPdf(){
+  document.getElementById('pptFileMenu').style.display='none';
+  saveCurrentSlide();
+  if(typeof showToast==='function') showToast('⏳ Generating PDF…','info');
+  try {
+    if(!window.html2canvas){
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+    }
+    if(!window.jspdf){
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+    }
+    const {jsPDF}=window.jspdf;
+    const W=800,H=450;
+    const pdf=new jsPDF({orientation:'landscape',unit:'px',format:[W,H],hotfixes:['px_scaling']});
+    const offscreen=document.createElement('div');
+    offscreen.style.cssText=`position:fixed;left:-9999px;top:-9999px;width:${W}px;height:${H}px;overflow:hidden;z-index:-1;`;
+    document.body.appendChild(offscreen);
+    for(let i=0;i<slides.length;i++){
+      const s=slides[i];
+      offscreen.style.background=s.bg||'#ffffff';
+      offscreen.innerHTML='';
+      s.elements.forEach(el=>{
+        const wrap=document.createElement('div');
+        wrap.style.cssText=`position:absolute;left:${el.x}px;top:${el.y}px;width:${el.w}px;height:${el.h||60}px;`;
+        const inner=document.createElement('div');
+        inner.style.cssText=`font-size:${el.fontSize||14}px;font-weight:${el.fontWeight||'400'};font-style:${el.fontStyle||'normal'};text-decoration:${el.textDecoration||'none'};text-align:${el.textAlign||'left'};color:${el.color||'#333'};white-space:pre-wrap;width:100%;height:100%;overflow:hidden;box-sizing:border-box;`;
+        if(el.fontFamily) inner.style.fontFamily=el.fontFamily;
+        if(el.type==='shape'){inner.style.background=el.fill||'#c44529';if(el.shape==='ellipse')inner.style.borderRadius='50%';}
+        inner.textContent=el.text||'';
+        wrap.appendChild(inner);
+        offscreen.appendChild(wrap);
+      });
+      const canvas=await html2canvas(offscreen,{scale:2,useCORS:true,allowTaint:true,backgroundColor:s.bg||'#ffffff',width:W,height:H,windowWidth:W,windowHeight:H});
+      const img=canvas.toDataURL('image/jpeg',0.92);
+      if(i>0) pdf.addPage([W,H],'landscape');
+      pdf.addImage(img,'JPEG',0,0,W,H);
+    }
+    document.body.removeChild(offscreen);
+    const fname=(presName.endsWith('.pdf')?presName:presName+'.pdf');
+    pdf.save(fname);
+    if(typeof showToast==='function') showToast('✅ PDF exported: '+fname,'success');
+  } catch(e){
+    console.error(e);
+    if(typeof showToast==='function') showToast('❌ PDF export failed: '+e.message,'error');
+  }
+}
 
 // ============ PYTHON BACKEND  -  PPTX IMPORT / EXPORT ============
 const _PPT_API = (typeof KAIROS_API_BASE !== 'undefined') ? KAIROS_API_BASE : 'http://localhost:5000/api';

@@ -28,12 +28,12 @@ function renderTimetable() {
                  </div>`;
     }
     
-    // Time slots
+    // Time slots — clicking an empty cell pre-fills time & day
     HOURS.forEach((hour, hourIdx) => {
         html += `<div class="timetable-time-slot">${hour}</div>`;
         for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
             const hasEvent = events.some(e => e.hourIndex === hourIdx && e.dayIndex === dayIdx);
-            html += `<div class="timetable-cell ${hasEvent ? 'has-event' : ''}" ondrop="dropEvent(event)" ondragover="allowDrop(event)"></div>`;
+            html += `<div class="timetable-cell ${hasEvent ? 'has-event' : ''}" ondrop="dropEvent(event)" ondragover="allowDrop(event)" onclick="openAddEventModalAt(${dayIdx},${hourIdx})"></div>`;
         }
     });
     
@@ -72,6 +72,19 @@ function openAddEventModal() {
     document.getElementById('eventDay').value = '1';
     document.getElementById('eventStartTime').value = '09:00';
     document.getElementById('eventEndTime').value = '10:00';
+    openDrawer('addEventDrawer');
+}
+
+function openAddEventModalAt(dayIdx, hourIdx) {
+    const actualHour = hourIdx + 6;
+    const pad = n => String(n).padStart(2, '0');
+    const startTime = pad(actualHour) + ':00';
+    const endTime   = pad(Math.min(23, actualHour + 1)) + ':00';
+    document.getElementById('eventTitle').value = '';
+    document.getElementById('eventType').value = 'study';
+    document.getElementById('eventDay').value = String(dayIdx);
+    document.getElementById('eventStartTime').value = startTime;
+    document.getElementById('eventEndTime').value = endTime;
     openDrawer('addEventDrawer');
 }
 

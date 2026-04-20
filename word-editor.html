@@ -87,7 +87,7 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;background:v
   font-size:12px;font-weight:400;color:#555;
   cursor:pointer;border-bottom:2px solid transparent;
   margin-bottom:-1px;transition:color .15s;
-  font-family:inherit;
+  font-family:inherit;touch-action:manipulation;
 }
 .ribbon-tab:hover{color:#111}
 .ribbon-tab.active{color:var(--word-blue);border-bottom-color:var(--word-blue);font-weight:600}
@@ -114,7 +114,7 @@ body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;background:v
   display:flex;flex-direction:column;align-items:center;
   justify-content:flex-end;gap:2px;
   padding:3px 5px;min-width:36px;height:58px;
-  font-size:11px;
+  font-size:11px;touch-action:manipulation;
 }
 .rb:hover{background:var(--btn-hover);border-color:#c8c8c8}
 .rb.pressed{background:var(--btn-active);border-color:#90c8f0}
@@ -655,15 +655,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0) _savedSel = sel.getRangeAt(0).cloneRange();
   });
-  editor.addEventListener('focus', () => { _savedSel = null; });
+  // Prevent ribbon buttons from stealing focus (but allow tab clicks to work)
+  document.querySelector('.ribbon').addEventListener('mousedown', (e) => {
+    if (!e.target.closest('.ribbon-tab') &&
+        e.target.tagName !== 'SELECT' &&
+        e.target.tagName !== 'INPUT') {
+      e.preventDefault();
+    }
+  });
 });
 
 function _restoreSel() {
   if (!_savedSel) return;
+  const range = _savedSel;
+  _savedSel = null;
   editor.focus();
   const sel = window.getSelection();
-  if (sel) { sel.removeAllRanges(); sel.addRange(_savedSel); }
-  _savedSel = null;
+  if (sel && range) { sel.removeAllRanges(); sel.addRange(range); }
 }
 
 // ============ RIBBON ============
@@ -889,13 +897,7 @@ function updateDocName(){
 function downloadDoc(fmt){
   let content, mime, ext;
   if(fmt==='txt'){ content=editor.innerText; mime='text/plain'; ext='txt'; }
-  else { content='<!DOCTYPE html><html><head><meta charset="UTF-8">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#6C63FF">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Kairos">
-    <link rel="apple-touch-icon" href="1000669890-Photoroom.png"><title>'+docName+'<\/title><\/head><body>'+editor.innerHTML+'<\/body><\/html>'; mime='text/html'; ext='html'; }
+  else { content=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${docName}</title></head><body>${editor.innerHTML}</body></html>`; mime='text/html'; ext='html'; }
   const blob=new Blob([content],{type:mime});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=docName+'.'+ext; a.click();
   document.getElementById('fileMenu').style.display='none';

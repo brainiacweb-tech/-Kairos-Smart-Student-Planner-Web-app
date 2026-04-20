@@ -197,11 +197,6 @@
                 created_at: new Date().toISOString()
             }));
 
-            // Initialize mock data for new user
-            if (!localStorage.getItem('kairos_assignments')) {
-                initializeMockData();
-            }
-
             showToast('Account created successfully! Welcome to Kairos!', 'success');
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
@@ -216,51 +211,6 @@
             }
         });
 
-        function initializeMockData() {
-            const mockAssignments = [
-                {
-                    id: 1,
-                    title: 'Financial Statements Analysis',
-                    course: 'ACC301',
-                    dueDate: new Date(Date.now() + 2*24*60*60*1000).toISOString(),
-                    priority: 'high',
-                    status: 'in-progress',
-                    estimatedHours: 5,
-                    completed: 40
-                },
-                {
-                    id: 2,
-                    title: 'Strategic Management Project',
-                    course: 'BUS401',
-                    dueDate: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
-                    priority: 'medium',
-                    status: 'pending',
-                    estimatedHours: 8,
-                    completed: 0
-                },
-                {
-                    id: 3,
-                    title: 'Marketing Campaign Presentation',
-                    course: 'MKT201',
-                    dueDate: new Date(Date.now() + 4*24*60*60*1000).toISOString(),
-                    priority: 'medium',
-                    status: 'pending',
-                    estimatedHours: 4,
-                    completed: 0
-                },
-                {
-                    id: 4,
-                    title: 'Human Resource Policies Case Study',
-                    course: 'HRM301',
-                    dueDate: new Date(Date.now() - 1*24*60*60*1000).toISOString(),
-                    priority: 'high',
-                    status: 'pending',
-                    estimatedHours: 3,
-                    completed: 0
-                }
-            ];
-            localStorage.setItem('kairos_assignments', JSON.stringify(mockAssignments));
-        }
     </script>
 </body>
 </html>

@@ -143,7 +143,7 @@ function calculateGPA() {
         document.getElementById('currentGPA').textContent = '0.00';
         document.getElementById('equivalentGPA').textContent = '0.00';
         document.getElementById('cwaGrade').textContent = 'No courses added';
-        document.getElementById('degreeClass').textContent = '—';
+        document.getElementById('degreeClass').textContent = '-';
         return;
     }
     
