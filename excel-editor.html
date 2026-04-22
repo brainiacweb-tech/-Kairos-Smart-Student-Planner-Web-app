@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6C63FF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kairos">
+    <link rel="apple-touch-icon" href="1000669890-Photoroom.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book1 - Excel</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --xl-green:#217346;
+  --xl-green-dark:#185a34;
+  --xl-green-light:#e2efda;
+  --ribbon-bg:#fff;
+  --ribbon-border:#d1d1d1;
+  --cell-border:#d0d7de;
+  --header-bg:#f2f2f2;
+  --selected-bg:#e8f4fe;
+  --selected-border:#2196F3;
+  --formula-bg:#fff;
+  --sheet-tab-bg:#e6e6e6;
+  --text:#333;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex;flex-direction:column;background:#fff;color:var(--text)}
+
+/* TITLE BAR */
+.title-bar{background:var(--xl-green);color:white;height:36px;display:flex;align-items:center;padding:0 8px;gap:0;flex-shrink:0;user-select:none}
+.title-app-icon{width:28px;height:28px;background:white;color:var(--xl-green);font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;border-radius:2px;margin-right:8px;flex-shrink:0;font-family:'Times New Roman',serif}
+.qat{display:flex;align-items:center;gap:2px;margin-right:12px}
+.qat-btn{width:26px;height:26px;background:transparent;border:none;color:white;cursor:pointer;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:12px;transition:background .15s}
+.qat-btn:hover{background:rgba(255,255,255,.2)}
+.title-center{flex:1;text-align:center;font-size:13px;font-weight:400;opacity:.95;pointer-events:none}
+.title-right{display:flex;align-items:center;gap:4px}
+.title-right button{background:rgba(255,255,255,.15);border:none;color:white;padding:4px 10px;cursor:pointer;font-size:12px;border-radius:3px;transition:background .15s;display:flex;align-items:center;gap:5px;font-weight:500;font-family:inherit}
+.title-right button:hover{background:rgba(255,255,255,.28)}
+.winctrls{display:flex;gap:0;margin-left:8px}
+.winctrl{width:32px;height:32px;background:transparent;border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:background .15s}
+.winctrl:hover{background:rgba(255,255,255,.2)}
+.winctrl.close:hover{background:#e81123}
+
+/* RIBBON */
+.ribbon{background:var(--ribbon-bg);border-bottom:1px solid var(--ribbon-border);flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.ribbon-tabs-row{display:flex;align-items:flex-end;padding:0 8px;border-bottom:1px solid #e0e0e0}
+.ribbon-tab{padding:8px 14px 7px;background:transparent;border:none;font-size:12px;font-weight:400;color:#555;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;font-family:inherit;touch-action:manipulation}
+.ribbon-tab:hover{color:#111}
+.ribbon-tab.active{color:var(--xl-green);border-bottom-color:var(--xl-green);font-weight:600}
+.ribbon-tab.file-tab{background:var(--xl-green);color:white;border-radius:2px 2px 0 0;padding:8px 16px 7px;font-weight:600;margin-right:4px}
+.ribbon-tab.file-tab:hover{background:var(--xl-green-dark)}
+.ribbon-content{display:none;padding:4px 8px 0;align-items:flex-end;gap:2px;min-height:72px}
+.ribbon-content.active{display:flex}
+.ribbon-group{display:flex;flex-direction:column;align-items:center;border-right:1px solid var(--ribbon-border);padding:2px 6px 0;min-width:0}
+.ribbon-group:last-child{border-right:none}
+.ribbon-group-btns{display:flex;align-items:flex-end;gap:1px;flex-wrap:wrap}
+.ribbon-group-label{font-size:10px;color:#888;padding:3px 0 4px;text-align:center;width:100%}
+.rb{background:transparent;border:1px solid transparent;cursor:pointer;border-radius:2px;transition:all .12s;font-family:inherit;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:3px 5px;min-width:36px;height:58px;font-size:11px;touch-action:manipulation}
+.rb:hover{background:#e8e8e8;border-color:#c8c8c8}
+.rb.pressed{background:#cce4f7;border-color:#90c8f0}
+.rb i{font-size:18px;color:#444}
+.rb span{font-size:10px;color:#444;white-space:nowrap;line-height:1}
+.rb-sm{background:transparent;border:1px solid transparent;cursor:pointer;border-radius:2px;transition:all .12s;font-family:inherit;color:var(--text);display:flex;align-items:center;justify-content:center;padding:4px 6px;height:24px;min-width:24px;font-size:12px}
+.rb-sm:hover{background:#e8e8e8;border-color:#c8c8c8}
+.rb-sm.pressed{background:#cce4f7;border-color:#90c8f0}
+.rb-col{display:flex;flex-direction:column;gap:1px}
+.rb-row{display:flex;align-items:center;gap:2px}
+.font-combo{height:24px;padding:0 4px;border:1px solid #bbb;background:white;font-size:11px;border-radius:2px;cursor:pointer;font-family:inherit;color:var(--text);outline:none}
+.font-combo:focus,.font-combo:hover{border-color:#999}
+#xlFontName{width:110px}
+#xlFontSize{width:44px}
+
+/* FORMULA BAR */
+.formula-bar{height:28px;border-bottom:1px solid var(--ribbon-border);display:flex;align-items:center;flex-shrink:0;background:#fff;padding:0 4px;gap:0}
+.name-box{width:72px;height:100%;border:none;border-right:1px solid #d1d1d1;padding:0 8px;font-size:12px;font-family:inherit;text-align:center;font-weight:600;outline:none;background:#fff;flex-shrink:0}
+.name-box:focus{background:#e8f4fe}
+.fx-label{width:28px;text-align:center;font-size:13px;color:#888;font-style:italic;flex-shrink:0;border-right:1px solid #d1d1d1;height:100%;display:flex;align-items:center;justify-content:center}
+.formula-input{flex:1;height:100%;border:none;padding:0 8px;font-size:12px;font-family:inherit;outline:none;background:#fff;color:var(--text)}
+.formula-input:focus{background:#fffbe6}
+
+/* GRID */
+.grid-wrap{flex:1;overflow:auto;position:relative}
+.grid-container{display:flex;flex-direction:column;min-width:max-content}
+table.sheet{border-collapse:collapse;table-layout:fixed}
+table.sheet th,table.sheet td{padding:0;height:22px;border:1px solid var(--cell-border);position:relative;user-select:none}
+table.sheet th{background:var(--header-bg);font-weight:600;font-size:11px;text-align:center;color:#444;cursor:default;min-width:22px}
+th.col-header{min-width:80px;cursor:pointer;user-select:none}
+th.col-header:hover{background:#ddd}
+th.row-header-cell{width:44px;min-width:44px;cursor:pointer}
+th.row-header-cell:hover{background:#ddd}
+td.data-cell{background:#fff;min-width:80px;cursor:cell;padding:0}
+td.data-cell.selected{background:var(--selected-bg)!important;outline:2px solid var(--selected-border);outline-offset:-1px;z-index:2}
+td.data-cell.in-range{background:#e3f0fb}
+td.data-cell input{width:100%;height:100%;border:none;padding:1px 4px;font-size:12px;font-family:inherit;background:transparent;outline:none;color:var(--text)}
+td.data-cell input:focus{background:#fff9c4;outline:none}
+td.data-cell.bold input{font-weight:700}
+td.data-cell.italic input{font-style:italic}
+td.data-cell.underline input{text-decoration:underline}
+td.data-cell.align-center input{text-align:center}
+td.data-cell.align-right input{text-align:right}
+.selected-row-header,.selected-col-header{background:#bedcfc!important;color:var(--xl-green);font-weight:700}
+.col-resize-handle{position:absolute;right:0;top:0;width:4px;height:100%;cursor:col-resize;z-index:5}
+
+/* SHEET TABS */
+.sheet-tabs-bar{height:28px;background:#f0f0f0;border-top:1px solid #d1d1d1;display:flex;align-items:flex-end;padding:0 4px;flex-shrink:0;gap:0}
+.sheet-tab{padding:4px 14px;background:var(--sheet-tab-bg);border:1px solid #bbb;border-bottom:none;border-radius:3px 3px 0 0;font-size:11px;cursor:pointer;color:#555;margin-right:2px;transition:background .12s;font-family:inherit}
+.sheet-tab:hover{background:#d8d8d8}
+.sheet-tab.active{background:#fff;color:var(--xl-green);font-weight:600;border-bottom:2px solid var(--xl-green);border-color:#bbb;border-bottom-color:var(--xl-green)}
+.sheet-tab-add{background:none;border:none;cursor:pointer;padding:4px 8px;font-size:14px;color:#888;transition:color .12s}
+.sheet-tab-add:hover{color:var(--xl-green)}
+
+/* STATUS BAR */
+.status-bar{height:22px;background:#f0f0f0;border-top:1px solid #d1d1d1;display:flex;align-items:center;padding:0 12px;gap:16px;font-size:11px;color:#666;flex-shrink:0}
+.status-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.zoom-slider{-webkit-appearance:none;width:80px;height:3px;border-radius:2px;background:#ccc;outline:none;cursor:pointer}
+.zoom-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--xl-green);cursor:pointer}
+
+/* COLOR PICKERS */
+.color-bar{display:flex;gap:2px;flex-wrap:wrap;max-width:130px;padding:4px}
+.cp-swatch{width:16px;height:16px;border:1px solid #bbb;cursor:pointer;border-radius:2px;flex-shrink:0}
+.cp-swatch:hover{outline:2px solid #333}
+
+/* FILE MENU */
+.file-menu-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 16px;border:none;background:none;cursor:pointer;font-size:12px;font-family:inherit;color:#333;text-align:left}
+.file-menu-item:hover{background:#f0f0f0}
+.file-menu-item i{width:16px;color:#666}
+
+/* MOBILE TOOLBAR */
+.mobile-toolbar{display:none}
+
+@media(max-width:768px){
+  #xlFontName{width:70px}
+  .rb span{display:none}
+  .rb{min-width:28px}
+  th.col-header{min-width:60px}
+  td.data-cell{min-width:60px}
+}
+
+@media(max-width:600px){
+  /* Title bar */
+  .winctrls{display:none}
+  .qat{margin-right:4px}
+  .title-app-icon{width:26px;height:26px;font-size:13px;margin-right:4px}
+  .title-center{font-size:11px}
+  .title-right button{padding:4px 10px;font-size:11px}
+
+  /* Ribbon: scrollable on mobile */
+  .ribbon{display:block}
+  .ribbon-tabs-row{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+  .ribbon-tabs-row::-webkit-scrollbar{display:none}
+  .ribbon-content.active{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+  .ribbon-content::-webkit-scrollbar{display:none}
+  .ribbon-group{flex-shrink:0;padding:2px 4px 0}
+  .rb{min-width:38px;height:48px;padding:2px 4px}
+  .rb i{font-size:16px}
+  #xlFontName{width:75px}
+  #xlFontSize{width:34px}
+
+  /* Mobile quick-access toolbar */
+  .mobile-toolbar{
+    display:flex;align-items:center;overflow-x:auto;
+    background:#f8f8f8;border-bottom:1px solid #d1d1d1;
+    padding:3px 6px;gap:2px;flex-shrink:0;
+    -webkit-overflow-scrolling:touch;
+  }
+  .mobile-toolbar::-webkit-scrollbar{display:none}
+  .mtb-btn{
+    background:transparent;border:1px solid transparent;border-radius:4px;
+    width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+    font-size:13px;cursor:pointer;flex-shrink:0;color:#333;font-family:inherit;
+  }
+  .mtb-btn:active,.mtb-btn.pressed{background:#d5e8d5;border-color:#82c882}
+  .mtb-sep{width:1px;height:20px;background:#d1d1d1;margin:0 2px;flex-shrink:0}
+
+  /* Formula bar */
+  .formula-bar{height:32px}
+  .name-box{width:52px;font-size:11px}
+  .formula-input{font-size:12px}
+
+  /* Grid */
+  th.col-header{min-width:52px}
+  td.data-cell{min-width:52px}
+  table.sheet th,table.sheet td{height:26px;font-size:11px}
+
+  /* Sheet tabs */
+  .sheet-tab{padding:3px 10px;font-size:11px}
+
+  /* Status bar */
+  .status-bar{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- TITLE BAR -->
+<div class="title-bar">
+  <div class="title-app-icon">X</div>
+  <div class="qat">
+    <button class="qat-btn" onclick="saveSheet()" title="Save"><i class="fas fa-save"></i></button>
+    <button class="qat-btn" onclick="undoAction()" title="Undo"><i class="fas fa-undo"></i></button>
+    <button class="qat-btn" onclick="redoAction()" title="Redo"><i class="fas fa-redo"></i></button>
+  </div>
+  <div class="title-center"><span id="bookNameDisplay">Book1</span>  -  Excel</div>
+  <div class="title-right">
+    <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
+  </div>
+  <div class="winctrls">
+    <button class="winctrl">&#x2212;</button>
+    <button class="winctrl">&#x25A1;</button>
+    <button class="winctrl close" onclick="goBack()">&#x2715;</button>
+  </div>
+</div>
+
+<!-- RIBBON -->
+<div class="ribbon">
+  <div class="ribbon-tabs-row">
+    <button class="ribbon-tab file-tab" onclick="toggleFileMenu()">File</button>
+    <button class="ribbon-tab active" onclick="switchTab('home',this)">Home</button>
+    <button class="ribbon-tab" onclick="switchTab('insert',this)">Insert</button>
+    <button class="ribbon-tab" onclick="switchTab('formulas',this)">Formulas</button>
+    <button class="ribbon-tab" onclick="switchTab('data',this)">Data</button>
+    <button class="ribbon-tab" onclick="switchTab('view2',this)">View</button>
+  </div>
+
+  <!-- HOME TAB -->
+  <div class="ribbon-content active" id="tab-home">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns rb-col">
+        <div class="rb-row">
+          <select class="font-combo" id="xlFontName" onchange="applyStyle('font',this.value)">
+            <option>Calibri</option><option>Arial</option><option>Times New Roman</option>
+            <option>Georgia</option><option>Verdana</option><option>Courier New</option><option>Segoe UI</option>
+          </select>
+          <select class="font-combo" id="xlFontSize" onchange="applyStyle('size',this.value)">
+            <option>8</option><option>9</option><option>10</option><option>11</option>
+            <option selected>11</option><option>12</option><option>14</option>
+            <option>16</option><option>18</option><option>20</option><option>24</option>
+          </select>
+        </div>
+        <div class="rb-row">
+          <button class="rb-sm bold-btn" id="btn-B" onclick="toggleStyle('bold')" title="Bold"><b>B</b></button>
+          <button class="rb-sm italic-btn" id="btn-I" onclick="toggleStyle('italic')" title="Italic"><i>I</i></button>
+          <button class="rb-sm" id="btn-U" onclick="toggleStyle('underline')" title="Underline"><u>U</u></button>
+          <div class="rb-sm" title="Fill Color" style="position:relative">
+            <div style="display:flex;flex-direction:column;align-items:center;padding:2px 4px;cursor:pointer" onclick="openColorPicker('fill')">
+              <i class="fas fa-fill-drip" style="font-size:11px"></i>
+              <div id="fillColorBar" style="width:16px;height:4px;background:#FFFF00;border-radius:1px;margin-top:1px"></div>
+            </div>
+          </div>
+          <div class="rb-sm" title="Font Color" style="position:relative">
+            <div style="display:flex;flex-direction:column;align-items:center;padding:2px 4px;cursor:pointer" onclick="openColorPicker('font')">
+              <span style="font-weight:700;font-size:12px">A</span>
+              <div id="fontColorBar" style="width:16px;height:4px;background:#FF0000;border-radius:1px;margin-top:1px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ribbon-group-label">Font</div>
+    </div>
+
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns rb-col">
+        <div class="rb-row">
+          <button class="rb-sm" onclick="applyStyle('align','left')" title="Align Left"><i class="fas fa-align-left"></i></button>
+          <button class="rb-sm" onclick="applyStyle('align','center')" title="Center"><i class="fas fa-align-center"></i></button>
+          <button class="rb-sm" onclick="applyStyle('align','right')" title="Align Right"><i class="fas fa-align-right"></i></button>
+        </div>
+        <div class="rb-row">
+          <button class="rb-sm" onclick="mergeSelected()" title="Merge Cells"><i class="fas fa-object-group"></i> Merge</button>
+          <button class="rb-sm" onclick="wrapText()" title="Wrap Text"><i class="fas fa-align-justify"></i> Wrap</button>
+        </div>
+      </div>
+      <div class="ribbon-group-label">Alignment</div>
+    </div>
+
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns rb-col">
+        <div class="rb-row">
+          <select class="font-combo" id="numFormat" onchange="applyNumFormat()" style="width:100px">
+            <option value="general">General</option>
+            <option value="number">Number</option>
+            <option value="currency">Currency (₵)</option>
+            <option value="percent">Percentage</option>
+            <option value="date">Short Date</option>
+            <option value="text">Text</option>
+          </select>
+        </div>
+        <div class="rb-row">
+          <button class="rb-sm" onclick="applyNumFormat('currency')" title="Currency">₵</button>
+          <button class="rb-sm" onclick="applyNumFormat('percent')" title="Percent">%</button>
+          <button class="rb-sm" onclick="decimalPlaces(1)" title="Increase Decimal">.0→.00</button>
+          <button class="rb-sm" onclick="decimalPlaces(-1)" title="Decrease Decimal">.00→.0</button>
+        </div>
+      </div>
+      <div class="ribbon-group-label">Number</div>
+    </div>
+
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="addRow()" title="Insert Row"><i class="fas fa-plus-square"></i><span>Insert Row</span></button>
+        <button class="rb" onclick="addCol()" title="Insert Column"><i class="fas fa-plus-circle"></i><span>Insert Col</span></button>
+        <button class="rb" onclick="deleteRow()" title="Delete Row"><i class="fas fa-minus-square"></i><span>Delete Row</span></button>
+        <button class="rb" onclick="deleteCol()" title="Delete Column"><i class="fas fa-minus-circle"></i><span>Delete Col</span></button>
+      </div>
+      <div class="ribbon-group-label">Cells</div>
+    </div>
+
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="autoSum()" title="AutoSum"><i class="fas fa-sigma" style="font-size:20px">Σ</i><span>AutoSum</span></button>
+        <button class="rb" onclick="sortAsc()" title="Sort A→Z"><i class="fas fa-sort-alpha-down"></i><span>Sort A→Z</span></button>
+        <button class="rb" onclick="sortDesc()" title="Sort Z→A"><i class="fas fa-sort-alpha-up"></i><span>Sort Z→A</span></button>
+      </div>
+      <div class="ribbon-group-label">Editing</div>
+    </div>
+  </div>
+
+  <!-- INSERT TAB -->
+  <div class="ribbon-content" id="tab-insert">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="insertChartBasic('bar')"><i class="fas fa-chart-bar"></i><span>Bar Chart</span></button>
+        <button class="rb" onclick="insertChartBasic('line')"><i class="fas fa-chart-line"></i><span>Line Chart</span></button>
+        <button class="rb" onclick="insertChartBasic('pie')"><i class="fas fa-chart-pie"></i><span>Pie Chart</span></button>
+      </div>
+      <div class="ribbon-group-label">Charts</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="addSheet()"><i class="fas fa-plus"></i><span>New Sheet</span></button>
+      </div>
+      <div class="ribbon-group-label">Sheets</div>
+    </div>
+  </div>
+
+  <!-- FORMULAS TAB -->
+  <div class="ribbon-content" id="tab-formulas">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="insertFormula('=SUM()')"><i class="fas fa-plus-circle"></i><span>SUM</span></button>
+        <button class="rb" onclick="insertFormula('=AVERAGE()')"><i class="fas fa-calculator"></i><span>AVERAGE</span></button>
+        <button class="rb" onclick="insertFormula('=COUNT()')"><i class="fas fa-hashtag"></i><span>COUNT</span></button>
+        <button class="rb" onclick="insertFormula('=MAX()')"><i class="fas fa-arrow-up"></i><span>MAX</span></button>
+        <button class="rb" onclick="insertFormula('=MIN()')"><i class="fas fa-arrow-down"></i><span>MIN</span></button>
+        <button class="rb" onclick="insertFormula('=IF(,,)')"><i class="fas fa-code-branch"></i><span>IF</span></button>
+        <button class="rb" onclick="insertFormula('=VLOOKUP(,,,)')"><i class="fas fa-search"></i><span>VLOOKUP</span></button>
+      </div>
+      <div class="ribbon-group-label">Function Library</div>
+    </div>
+  </div>
+
+  <!-- DATA TAB -->
+  <div class="ribbon-content" id="tab-data">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="sortAsc()"><i class="fas fa-sort-alpha-down"></i><span>Sort A→Z</span></button>
+        <button class="rb" onclick="sortDesc()"><i class="fas fa-sort-alpha-up"></i><span>Sort Z→A</span></button>
+      </div>
+      <div class="ribbon-group-label">Sort &amp; Filter</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="downloadSheet('csv')"><i class="fas fa-file-csv"></i><span>Export CSV</span></button>
+        <button class="rb" onclick="downloadSheet('tsv')"><i class="fas fa-file-alt"></i><span>Export TSV</span></button>
+      </div>
+      <div class="ribbon-group-label">Get &amp; Transform</div>
+    </div>
+  </div>
+
+  <!-- VIEW TAB -->
+  <div class="ribbon-content" id="tab-view2">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" id="btn-freeze" onclick="toggleFreeze()"><i class="fas fa-lock"></i><span>Freeze Panes</span></button>
+        <button class="rb" id="btn-gridlines" onclick="toggleGridlines()" class="pressed"><i class="fas fa-border-all"></i><span>Gridlines</span></button>
+        <button class="rb" onclick="toggleHeaders()"><i class="fas fa-heading"></i><span>Headings</span></button>
+      </div>
+      <div class="ribbon-group-label">View</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb-sm" onclick="zoomSheet(-10)">−</button>
+        <input type="range" class="zoom-slider" id="xlZoomSlider" min="60" max="200" value="100" oninput="zoomSheet(0,this.value)" style="width:60px;vertical-align:middle">
+        <button class="rb-sm" onclick="zoomSheet(10)">+</button>
+        <span id="xlZoomLabel" style="font-size:11px;color:#555;margin-left:4px">100%</span>
+      </div>
+      <div class="ribbon-group-label">Zoom</div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE TOOLBAR -->
+<div class="mobile-toolbar" id="mobileToolbar">
+  <button class="mtb-btn" onclick="toggleStyle('bold')" title="Bold"><b>B</b></button>
+  <button class="mtb-btn" onclick="toggleStyle('italic')" title="Italic"><i style="font-style:italic">I</i></button>
+  <button class="mtb-btn" onclick="toggleStyle('underline')" title="Underline"><u>U</u></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="applyStyle('align','left')" title="Left"><i class="fas fa-align-left"></i></button>
+  <button class="mtb-btn" onclick="applyStyle('align','center')" title="Center"><i class="fas fa-align-center"></i></button>
+  <button class="mtb-btn" onclick="applyStyle('align','right')" title="Right"><i class="fas fa-align-right"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="applyNumFormat('currency')" title="Currency" style="font-size:12px">₵</button>
+  <button class="mtb-btn" onclick="applyNumFormat('percent')" title="Percent" style="font-size:12px">%</button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="mergeSelected()" title="Merge"><i class="fas fa-object-group"></i></button>
+  <button class="mtb-btn" onclick="wrapText()" title="Wrap"><i class="fas fa-align-justify"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="addRow()" title="Insert Row"><i class="fas fa-plus-square"></i></button>
+  <button class="mtb-btn" onclick="addCol()" title="Insert Column"><i class="fas fa-plus-circle"></i></button>
+  <button class="mtb-btn" onclick="deleteRow()" title="Delete Row"><i class="fas fa-minus-square"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="autoSum()" title="AutoSum" style="font-weight:700">Σ</button>
+  <button class="mtb-btn" onclick="sortAsc()" title="Sort A→Z"><i class="fas fa-sort-alpha-down"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="saveSheet()" title="Save"><i class="fas fa-save"></i></button>
+</div>
+
+<!-- FORMULA BAR -->
+<div class="formula-bar">
+  <input class="name-box" id="nameBox" value="A1" onchange="goToCell(this.value)" title="Name Box  -  cell reference">
+  <div class="fx-label">fx</div>
+  <input class="formula-input" id="formulaBar" placeholder="Enter formula or value" onchange="formulaBarChange()" onkeydown="formulaBarKey(event)">
+</div>
+
+<!-- GRID -->
+<div class="grid-wrap" id="gridWrap">
+  <table class="sheet" id="sheet"></table>
+</div>
+
+<!-- SHEET TABS BAR -->
+<div class="sheet-tabs-bar">
+  <div id="sheetTabsList" style="display:flex;align-items:flex-end;gap:2px"></div>
+  <button class="sheet-tab-add" onclick="addSheet()" title="Add Sheet"><i class="fas fa-plus"></i></button>
+  <div class="status-right" style="margin-left:auto;margin-right:0;display:flex;align-items:center;gap:12px;padding-right:8px;font-size:11px;color:#555">
+    <span id="xlSumStatus"></span>
+    <span id="xlAvgStatus"></span>
+    <span id="xlCountStatus"></span>
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <span id="xlModeStatus">Ready</span>
+  <div class="sep" style="width:1px;height:14px;background:#bbb"></div>
+  <span id="xlCellStatus">A1</span>
+  <div class="status-right">
+    <button class="rb-sm" onclick="zoomSheet(-10)">−</button>
+    <input type="range" class="zoom-slider" id="xlZoomSlider2" min="60" max="200" value="100" oninput="zoomSheet(0,this.value)">
+    <button class="rb-sm" onclick="zoomSheet(10)">+</button>
+    <span id="xlZoomLabel2">100%</span>
+  </div>
+</div>
+
+<!-- FILE MENU -->
+<div id="xlFileMenu" style="display:none;position:fixed;top:36px;left:0;width:240px;background:white;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:3000;border:1px solid #ddd">
+  <div style="background:var(--xl-green);color:white;padding:12px 16px;font-size:14px;font-weight:600">File</div>
+  <button class="file-menu-item" onclick="newBook()"><i class="fas fa-file"></i> New</button>
+  <button class="file-menu-item" onclick="saveSheet()"><i class="fas fa-save"></i> Save</button>
+  <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="openXlsx()"><i class="fas fa-folder-open" style="color:#217346"></i> Open Excel (.xlsx / .csv)</button>
+  <button class="file-menu-item" onclick="exportXlsx()"><i class="fas fa-file-excel" style="color:#217346"></i> Export as Excel (.xlsx)</button>
+  <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="downloadSheet('csv')"><i class="fas fa-download"></i> Download CSV</button>
+  <button class="file-menu-item" onclick="downloadSheet('tsv')"><i class="fas fa-file-alt"></i> Download TSV</button>
+  <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+</div>
+
+<!-- COLOR PICKER POPUP -->
+<div id="colorPickerPopup" style="display:none;position:fixed;background:white;border:1px solid #ccc;border-radius:4px;padding:8px;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:4000;flex-wrap:wrap;gap:3px;width:160px">
+  <div id="colorSwatches" style="display:flex;flex-wrap:wrap;gap:3px"></div>
+  <div style="margin-top:6px;display:flex;align-items:center;gap:6px">
+    <label style="font-size:11px;color:#666">Custom:</label>
+    <input type="color" id="customColorInput" style="width:32px;height:22px;padding:0;border:1px solid #bbb;border-radius:2px;cursor:pointer" onchange="applyCustomColor()">
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/app.js?v=4"></script>
+<script>
+// ============ STATE ============
+const ROWS = 50, COLS = 26;
+let sheets = [];
+let currentSheetIdx = 0;
+let selectedRow = 0, selectedCol = 0;
+let zoomLevel = 100;
+let showGridlines = true;
+let showHeadersFlag = true;
+let freezeRow = 0;
+let colorPickerTarget = null;
+let undoStack = [], redoStack = [];
+
+const COLORS = [
+  '#FF0000','#FF4500','#FF8C00','#FFD700','#FFFF00',
+  '#ADFF2F','#00FF00','#00FA9A','#00FFFF','#1E90FF',
+  '#0000FF','#8A2BE2','#FF69B4','#FF1493','#FFFFFF',
+  '#F0F0F0','#D3D3D3','#A9A9A9','#696969','#000000',
+  '#FFF3CD','#D1ECF1','#D4EDDA','#F8D7DA','#CCE5FF',
+  '#FFEEBA','#BEE5EB','#C3E6CB','#F5C6CB','#B8DAFF',
+];
+
+// ============ SHEET DATA ============
+function newSheetData(name){
+  return {
+    name: name||'Sheet1',
+    data: Array.from({length:ROWS},()=>Array(COLS).fill('')),
+    styles: Array.from({length:ROWS},()=>Array.from({length:COLS},()=>({}))),
+    colWidths: Array(COLS).fill(80),
+    rowHeights: Array(ROWS).fill(22),
+  };
+}
+
+function getSheet(){ return sheets[currentSheetIdx]; }
+function getCell(r,c){ return getSheet().data[r]?.[c]??''; }
+function setCell(r,c,v){ pushUndo(); getSheet().data[r][c]=v; }
+function getStyle(r,c){ return getSheet().styles[r]?.[c]||{}; }
+function setStyle(r,c,prop,val){ getSheet().styles[r][c]=Object.assign(getStyle(r,c),{[prop]:val}); }
+
+// ============ UNDO/REDO ============
+function pushUndo(){
+  undoStack.push(JSON.stringify(getSheet().data));
+  redoStack=[];
+}
+function undoAction(){
+  if(!undoStack.length) return;
+  redoStack.push(JSON.stringify(getSheet().data));
+  getSheet().data = JSON.parse(undoStack.pop());
+  render();
+}
+function redoAction(){
+  if(!redoStack.length) return;
+  undoStack.push(JSON.stringify(getSheet().data));
+  getSheet().data = JSON.parse(redoStack.pop());
+  render();
+}
+
+// ============ RENDER ============
+function render(){
+  const sh = getSheet();
+  const table = document.getElementById('sheet');
+  table.innerHTML='';
+
+  // Column headers row
+  const headerTr = document.createElement('tr');
+  const cornerTh = document.createElement('th');
+  cornerTh.className='row-header-cell';
+  cornerTh.style.width='44px';
+  headerTr.appendChild(cornerTh);
+  for(let c=0;c<COLS;c++){
+    const th = document.createElement('th');
+    th.className='col-header';
+    th.textContent = colLetter(c);
+    th.style.width=(sh.colWidths[c]||80)+'px';
+    th.id='colh-'+c;
+    if(c===selectedCol) th.classList.add('selected-col-header');
+    th.onclick=()=>selectCol(c);
+    const resizer=document.createElement('div');
+    resizer.className='col-resize-handle';
+    resizer.onmousedown=e=>startColResize(e,c);
+    th.appendChild(resizer);
+    headerTr.appendChild(th);
+  }
+  table.appendChild(headerTr);
+
+  // Data rows
+  for(let r=0;r<sh.data.length;r++){
+    const tr=document.createElement('tr');
+    const rh=document.createElement('th');
+    rh.className='row-header-cell';
+    rh.textContent=r+1;
+    rh.id='rowh-'+r;
+    if(r===selectedRow) rh.classList.add('selected-row-header');
+    rh.onclick=()=>selectRow(r);
+    tr.appendChild(rh);
+    for(let c=0;c<COLS;c++){
+      const td=document.createElement('td');
+      td.className='data-cell';
+      td.id='cell-'+r+'-'+c;
+      if(r===selectedRow&&c===selectedCol) td.classList.add('selected');
+      const st=getStyle(r,c);
+      if(st.bold) td.classList.add('bold');
+      if(st.italic) td.classList.add('italic');
+      if(st.underline) td.classList.add('underline');
+      if(st.align==='center') td.classList.add('align-center');
+      if(st.align==='right') td.classList.add('align-right');
+      if(st.bg) td.style.backgroundColor=st.bg;
+      const inp=document.createElement('input');
+      inp.type='text';
+      inp.value=sh.data[r][c];
+      if(st.color) inp.style.color=st.color;
+      if(st.fontSize) inp.style.fontSize=st.fontSize;
+      if(st.fontFamily) inp.style.fontFamily=st.fontFamily;
+      inp.onmousedown=e=>{if(!e.shiftKey){selectCell(r,c,true);}};
+      inp.onfocus=()=>onCellFocus(r,c,inp);
+      inp.onchange=()=>onCellChange(r,c,inp.value);
+      inp.onkeydown=e=>onCellKeyDown(e,r,c);
+      td.appendChild(inp);
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+  }
+  updateNameBox();
+  updateFormulaBar();
+  updateStatusSelectionStats();
+}
+
+// ============ NAVIGATION ============
+function colLetter(c){ return String.fromCharCode(65+c); }
+function cellRef(r,c){ return colLetter(c)+(r+1); }
+
+function selectCell(r,c,focus){
+  document.querySelectorAll('td.selected').forEach(el=>el.classList.remove('selected'));
+  document.querySelectorAll('.selected-row-header').forEach(el=>el.classList.remove('selected-row-header'));
+  document.querySelectorAll('.selected-col-header').forEach(el=>el.classList.remove('selected-col-header'));
+  selectedRow=Math.max(0,Math.min(getSheet().data.length-1,r));
+  selectedCol=Math.max(0,Math.min(COLS-1,c));
+  const td=document.getElementById('cell-'+selectedRow+'-'+selectedCol);
+  if(td){td.classList.add('selected');if(focus){const inp=td.querySelector('input');if(inp)inp.focus();}}
+  const rh=document.getElementById('rowh-'+selectedRow);
+  const ch=document.getElementById('colh-'+selectedCol);
+  if(rh) rh.classList.add('selected-row-header');
+  if(ch) ch.classList.add('selected-col-header');
+  updateNameBox();
+  updateFormulaBar();
+  updateStatusSelectionStats();
+}
+
+function selectRow(r){ selectCell(r,selectedCol,false); }
+function selectCol(c){ selectCell(selectedRow,c,false); }
+
+function onCellFocus(r,c,inp){
+  selectCell(r,c,false);
+  document.getElementById('xlModeStatus').textContent='Edit';
+}
+
+function onCellChange(r,c,val){
+  setCell(r,c,val);
+  // Evaluate if formula
+  if(val.startsWith('=')){
+    const result = evalFormula(val, r, c);
+    const td = document.getElementById('cell-'+r+'-'+c);
+    if(td){ const inp=td.querySelector('input'); if(inp && result!==undefined) inp.value=result; }
+  }
+  autoSaveSheet();
+  updateStatusSelectionStats();
+  document.getElementById('xlModeStatus').textContent='Ready';
+}
+
+function onCellKeyDown(e,r,c){
+  const map={ArrowDown:[1,0],ArrowUp:[-1,0],ArrowRight:[0,1],ArrowLeft:[0,-1],Tab:[0,1],Enter:[1,0]};
+  if(map[e.key]){
+    e.preventDefault();
+    const [dr,dc]=map[e.key];
+    selectCell(r+dr,c+dc,true);
+  } else if(e.key==='Delete'||e.key==='Backspace'){
+    if(e.target.value===''){setCell(r,c,'');render();}
+  } else if(e.key==='Escape'){
+    const td=document.getElementById('cell-'+r+'-'+c);
+    if(td){const inp=td.querySelector('input');if(inp)inp.value=getCell(r,c);}
+    document.getElementById('xlModeStatus').textContent='Ready';
+  } else if(e.key==='F2'){
+    const td=document.getElementById('cell-'+r+'-'+c);
+    if(td){const inp=td.querySelector('input');if(inp){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}}
+  }
+}
+
+function goToCell(ref){
+  ref=ref.trim().toUpperCase();
+  const m=ref.match(/^([A-Z]+)(\d+)$/);
+  if(m){
+    const c=m[1].charCodeAt(0)-65;
+    const r=parseInt(m[2])-1;
+    selectCell(r,c,true);
+  }
+}
+
+// ============ FORMULA BAR ============
+function updateNameBox(){ document.getElementById('nameBox').value=cellRef(selectedRow,selectedCol); }
+function updateFormulaBar(){ document.getElementById('formulaBar').value=getCell(selectedRow,selectedCol)||''; }
+function formulaBarChange(){
+  const val=document.getElementById('formulaBar').value;
+  setCell(selectedRow,selectedCol,val);
+  if(val.startsWith('=')){
+    const result=evalFormula(val,selectedRow,selectedCol);
+    if(result!==undefined){
+      const td=document.getElementById('cell-'+selectedRow+'-'+selectedCol);
+      if(td){const inp=td.querySelector('input');if(inp)inp.value=result;}
+    }
+  } else {
+    const td=document.getElementById('cell-'+selectedRow+'-'+selectedCol);
+    if(td){const inp=td.querySelector('input');if(inp)inp.value=val;}
+  }
+  autoSaveSheet();
+}
+function formulaBarKey(e){ if(e.key==='Enter'){formulaBarChange();selectCell(selectedRow+1,selectedCol,true);} }
+
+// ============ FORMULA EVALUATION ============
+function evalFormula(formula, row, col){
+  try {
+    const expr = formula.slice(1).trim().toUpperCase();
+
+    // Range resolver
+    function resolveRange(ref){
+      const m = ref.match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
+      if(m){
+        const c1=m[1].charCodeAt(0)-65, r1=parseInt(m[2])-1;
+        const c2=m[3].charCodeAt(0)-65, r2=parseInt(m[4])-1;
+        const vals=[];
+        for(let r=r1;r<=r2;r++) for(let c=c1;c<=c2;c++){
+          const v=getCell(r,c); const n=parseFloat(v);
+          if(!isNaN(n)) vals.push(n);
+        }
+        return vals;
+      }
+      // Single cell
+      const sm=ref.match(/([A-Z]+)(\d+)/);
+      if(sm){const v=getCell(parseInt(sm[2])-1,sm[1].charCodeAt(0)-65);const n=parseFloat(v);return isNaN(n)?[v]:[n];}
+      return [];
+    }
+
+    if(expr.startsWith('SUM(')){
+      const arg=expr.slice(4,-1); return resolveRange(arg).reduce((a,b)=>a+b,0).toString();
+    }
+    if(expr.startsWith('AVERAGE(')){
+      const vals=resolveRange(expr.slice(8,-1)); return vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2).toString():'#DIV/0!';
+    }
+    if(expr.startsWith('COUNT(')){
+      return resolveRange(expr.slice(6,-1)).filter(v=>typeof v==='number'&&!isNaN(v)).length.toString();
+    }
+    if(expr.startsWith('MAX(')){
+      const vals=resolveRange(expr.slice(4,-1)); return vals.length?Math.max(...vals).toString():'';
+    }
+    if(expr.startsWith('MIN(')){
+      const vals=resolveRange(expr.slice(4,-1)); return vals.length?Math.min(...vals).toString():'';
+    }
+    if(expr.startsWith('COUNTA(')){
+      const arg=expr.slice(7,-1); const sh=getSheet();
+      const m=arg.match(/([A-Z]+)(\d+):([A-Z]+)(\d+)/);
+      if(m){let cnt=0;const c1=m[1].charCodeAt(0)-65,r1=parseInt(m[2])-1,c2=m[3].charCodeAt(0)-65,r2=parseInt(m[4])-1;for(let r=r1;r<=r2;r++)for(let c=c1;c<=c2;c++)if(getCell(r,c)!=='')cnt++;return cnt.toString();}
+    }
+    if(expr.startsWith('IF(')){
+      const inner=expr.slice(3,-1);
+      const parts=splitArgs(inner);
+      if(parts.length>=2){
+        const cond=evalCondition(parts[0].trim());
+        return cond ? (parts[1].trim().replace(/"/g,'')) : (parts[2]?parts[2].trim().replace(/"/g,''):'');
+      }
+    }
+    if(expr.startsWith('CONCATENATE(')){
+      const inner=expr.slice(12,-1);
+      return splitArgs(inner).map(a=>a.trim().replace(/"/g,'')).join('');
+    }
+    if(expr.startsWith('LEN(')){
+      const ref=expr.slice(4,-1).trim();
+      const sm=ref.match(/([A-Z]+)(\d+)/);
+      if(sm){const v=getCell(parseInt(sm[2])-1,sm[1].charCodeAt(0)-65);return String(v).length.toString();}
+    }
+    if(expr.startsWith('UPPER(')){const ref=expr.slice(6,-1).trim();const sm=ref.match(/([A-Z]+)(\d+)/);if(sm)return String(getCell(parseInt(sm[2])-1,sm[1].charCodeAt(0)-65)).toUpperCase();}
+    if(expr.startsWith('LOWER(')){const ref=expr.slice(6,-1).trim();const sm=ref.match(/([A-Z]+)(\d+)/);if(sm)return String(getCell(parseInt(sm[2])-1,sm[1].charCodeAt(0)-65)).toLowerCase();}
+    // Basic math expressions (single cell references)
+    const jsExpr=expr.replace(/([A-Z]+)(\d+)/g,(_,col,rowN)=>{
+      const v=getCell(parseInt(rowN)-1,col.charCodeAt(0)-65);
+      return isNaN(parseFloat(v))?'0':parseFloat(v);
+    });
+    // eslint-disable-next-line no-new-func
+    const result = new Function('return '+jsExpr)();
+    return typeof result==='number'?result.toString():String(result);
+  } catch(e){ return '#ERROR!'; }
+}
+
+function splitArgs(s){
+  const args=[]; let depth=0, cur='';
+  for(const ch of s){if(ch==='('||ch==='[')depth++;else if(ch===')'||ch===']')depth--;else if(ch===','&&depth===0){args.push(cur);cur='';continue;}cur+=ch;}
+  if(cur) args.push(cur);
+  return args;
+}
+function evalCondition(cond){
+  try{
+    const c=cond.replace(/([A-Z]+)(\d+)/g,(_,col,r)=>{const v=getCell(parseInt(r)-1,col.charCodeAt(0)-65);return isNaN(parseFloat(v))?'"'+v+'"':parseFloat(v);});
+    // eslint-disable-next-line no-new-func
+    return new Function('return '+c)();
+  }catch{return false;}
+}
+
+// ============ STYLES ============
+function applyStyle(type, val){
+  pushUndo();
+  const st=getSheet().styles[selectedRow][selectedCol]||{};
+  if(type==='font') st.fontFamily=val;
+  else if(type==='size') st.fontSize=val+'px';
+  else if(type==='align') st.align=val;
+  else if(type==='bg') st.bg=val;
+  else if(type==='color') st.color=val;
+  getSheet().styles[selectedRow][selectedCol]=st;
+  render(); selectCell(selectedRow,selectedCol,true);
+}
+
+function toggleStyle(prop){
+  const st=getStyle(selectedRow,selectedCol);
+  st[prop]=!st[prop];
+  getSheet().styles[selectedRow][selectedCol]=st;
+  document.getElementById('btn-'+prop[0].toUpperCase())?.classList.toggle('pressed',st[prop]);
+  render(); selectCell(selectedRow,selectedCol,true);
+}
+
+function applyNumFormat(fmt){
+  if(!fmt) fmt=document.getElementById('numFormat').value;
+  applyStyle('numFmt', fmt);
+}
+function decimalPlaces(d){ /* visual decimal adjustment */ }
+function mergeSelected(){ alert('Merge Cells: select a range first (multi-cell merge coming soon).'); }
+function wrapText(){ const st=getStyle(selectedRow,selectedCol); st.wrap=!st.wrap; getSheet().styles[selectedRow][selectedCol]=st; render(); }
+
+// ============ COLOR PICKER ============
+function openColorPicker(target){
+  colorPickerTarget=target;
+  const popup=document.getElementById('colorPickerPopup');
+  const swatches=document.getElementById('colorSwatches');
+  swatches.innerHTML='';
+  COLORS.forEach(c=>{
+    const el=document.createElement('div');
+    el.className='cp-swatch';
+    el.style.background=c;
+    el.onclick=()=>applyColorChoice(c);
+    swatches.appendChild(el);
+  });
+  document.getElementById('customColorInput').value = target==='fill'?
+    (getStyle(selectedRow,selectedCol).bg||'#FFFFFF'):
+    (getStyle(selectedRow,selectedCol).color||'#000000');
+  const btn=event.currentTarget.getBoundingClientRect();
+  popup.style.left=btn.left+'px';
+  popup.style.top=(btn.bottom+4)+'px';
+  popup.style.display='flex';
+  popup.style.flexWrap='wrap';
+}
+function applyColorChoice(color){
+  if(colorPickerTarget==='fill'){
+    applyStyle('bg',color);
+    document.getElementById('fillColorBar').style.background=color;
+  } else {
+    applyStyle('color',color);
+    document.getElementById('fontColorBar').style.background=color;
+  }
+  document.getElementById('colorPickerPopup').style.display='none';
+}
+function applyCustomColor(){ applyColorChoice(document.getElementById('customColorInput').value); }
+document.addEventListener('click',e=>{
+  const pop=document.getElementById('colorPickerPopup');
+  if(!pop.contains(e.target)&&!e.target.closest('[onclick*="openColorPicker"]')) pop.style.display='none';
+  const fm=document.getElementById('xlFileMenu');
+  if(!fm.contains(e.target)&&!e.target.classList.contains('file-tab')) fm.style.display='none';
+});
+
+// ============ ROWS / COLS ============
+function addRow(){
+  pushUndo();
+  const sh=getSheet();
+  sh.data.splice(selectedRow+1,0,Array(COLS).fill(''));
+  sh.styles.splice(selectedRow+1,0,Array.from({length:COLS},()=>({})));
+  render();
+}
+function addCol(){
+  pushUndo();
+  const sh=getSheet();
+  sh.data.forEach((r,ri)=>{r.splice(selectedCol+1,0,'');sh.styles[ri].splice(selectedCol+1,0,{});});
+  render();
+}
+function deleteRow(){
+  if(getSheet().data.length<=1) return;
+  pushUndo();
+  const sh=getSheet();
+  sh.data.splice(selectedRow,1);
+  sh.styles.splice(selectedRow,1);
+  selectCell(Math.max(0,selectedRow-1),selectedCol,false);
+  render();
+}
+function deleteCol(){
+  pushUndo();
+  const sh=getSheet();
+  sh.data.forEach((r,ri)=>{r.splice(selectedCol,1);sh.styles[ri].splice(selectedCol,1);});
+  render();
+}
+
+// ============ AUTO SUM ============
+function autoSum(){
+  let sum=0;
+  for(let r=0;r<selectedRow;r++){
+    const v=parseFloat(getCell(r,selectedCol));
+    if(!isNaN(v)) sum+=v;
+  }
+  const ref='=SUM('+colLetter(selectedCol)+'1:'+colLetter(selectedCol)+selectedRow+')';
+  setCell(selectedRow,selectedCol,ref);
+  const result=sum.toString();
+  const td=document.getElementById('cell-'+selectedRow+'-'+selectedCol);
+  if(td){const inp=td.querySelector('input');if(inp)inp.value=result;}
+  autoSaveSheet();
+}
+
+// ============ INSERT FORMULA ============
+function insertFormula(f){
+  const td=document.getElementById('cell-'+selectedRow+'-'+selectedCol);
+  if(td){const inp=td.querySelector('input');if(inp){inp.value=f;inp.focus();inp.setSelectionRange(f.length-1,f.length-1);}}
+  document.getElementById('formulaBar').value=f;
+}
+
+// ============ SORT ============
+function sortAsc(){ sortCol(selectedCol,true); }
+function sortDesc(){ sortCol(selectedCol,false); }
+function sortCol(c,asc){
+  pushUndo();
+  const sh=getSheet();
+  const paired=sh.data.map((r,i)=>({row:r,style:sh.styles[i]}));
+  paired.sort((a,b)=>{
+    const va=a.row[c]||'', vb=b.row[c]||'';
+    const na=parseFloat(va), nb=parseFloat(vb);
+    if(!isNaN(na)&&!isNaN(nb)) return asc?na-nb:nb-na;
+    return asc?va.localeCompare(vb):vb.localeCompare(va);
+  });
+  sh.data=paired.map(p=>p.row);
+  sh.styles=paired.map(p=>p.style);
+  render();
+}
+
+// ============ CHART PLACEHOLDER ============
+function insertChartBasic(type){ alert('Chart ('+type+'): Select a data range, then chart generation will be available in the full version.'); }
+
+// ============ VIEW ============
+let zoomLvl=100;
+function zoomSheet(delta,val){
+  if(val!==undefined) zoomLvl=parseInt(val);
+  else zoomLvl=Math.max(60,Math.min(200,zoomLvl+delta));
+  document.getElementById('sheet').style.transform='scale('+zoomLvl/100+')';
+  document.getElementById('sheet').style.transformOrigin='top left';
+  document.getElementById('xlZoomLabel').textContent=zoomLvl+'%';
+  document.getElementById('xlZoomLabel2').textContent=zoomLvl+'%';
+  document.getElementById('xlZoomSlider').value=zoomLvl;
+  document.getElementById('xlZoomSlider2').value=zoomLvl;
+}
+function toggleGridlines(){
+  showGridlines=!showGridlines;
+  document.getElementById('sheet').style.borderCollapse=showGridlines?'collapse':'separate';
+  document.querySelectorAll('td.data-cell').forEach(td=>{td.style.borderColor=showGridlines?'var(--cell-border)':'transparent';});
+}
+function toggleHeaders(){
+  showHeadersFlag=!showHeadersFlag;
+  document.querySelectorAll('th.col-header,th.row-header-cell').forEach(th=>{th.style.visibility=showHeadersFlag?'visible':'hidden';});
+}
+function toggleFreeze(){
+  freezeRow=freezeRow?0:selectedRow;
+  document.getElementById('btn-freeze').classList.toggle('pressed',!!freezeRow);
+}
+
+// ============ RESIZE COLUMNS ============
+function startColResize(e,c){
+  e.preventDefault();
+  const startX=e.clientX;
+  const startW=getSheet().colWidths[c]||80;
+  function onMove(e2){
+    const newW=Math.max(20,startW+(e2.clientX-startX));
+    getSheet().colWidths[c]=newW;
+    document.getElementById('colh-'+c).style.width=newW+'px';
+    document.querySelectorAll('#sheet tr').forEach(tr=>{
+      const cells=tr.querySelectorAll('td,th');
+      if(cells[c+1]) cells[c+1].style.width=newW+'px';
+    });
+  }
+  function onUp(){ document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',onUp); }
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onUp);
+}
+
+// ============ SHEETS ============
+function renderSheetTabs(){
+  const list=document.getElementById('sheetTabsList');
+  list.innerHTML='';
+  sheets.forEach((s,i)=>{
+    const btn=document.createElement('button');
+    btn.className='sheet-tab'+(i===currentSheetIdx?' active':'');
+    btn.textContent=s.name;
+    btn.onclick=()=>switchSheet(i);
+    btn.ondblclick=()=>renameSheet(i);
+    list.appendChild(btn);
+  });
+}
+function switchSheet(i){
+  currentSheetIdx=i;
+  selectedRow=0;selectedCol=0;
+  render();
+  renderSheetTabs();
+}
+function addSheet(){
+  sheets.push(newSheetData('Sheet'+(sheets.length+1)));
+  switchSheet(sheets.length-1);
+}
+function renameSheet(i){
+  const name=prompt('Sheet name:',sheets[i].name);
+  if(name){sheets[i].name=name;renderSheetTabs();}
+}
+
+// ============ STATUS BAR STATS ============
+function updateStatusSelectionStats(){
+  const v=parseFloat(getCell(selectedRow,selectedCol));
+  document.getElementById('xlSumStatus').textContent=isNaN(v)?'':'Sum: '+v;
+  document.getElementById('xlAvgStatus').textContent=isNaN(v)?'':'Avg: '+v;
+  document.getElementById('xlCountStatus').textContent=getCell(selectedRow,selectedCol)!==''?'Count: 1':'';
+  document.getElementById('xlCellStatus').textContent=cellRef(selectedRow,selectedCol);
+}
+
+// ============ FILE OPS ============
+function newBook(){
+  if(confirm('Create new workbook?')){ sheets=[newSheetData('Sheet1')]; currentSheetIdx=0; selectedRow=0; selectedCol=0; render(); renderSheetTabs(); }
+  document.getElementById('xlFileMenu').style.display='none';
+}
+function saveSheet(){
+  localStorage.setItem('kairos_excel_sheets', JSON.stringify(sheets));
+  if(typeof showToast==='function') showToast('Workbook saved','success');
+  document.getElementById('xlFileMenu').style.display='none';
+}
+function autoSaveSheet(){ localStorage.setItem('kairos_excel_draft', JSON.stringify(sheets)); }
+function downloadSheet(fmt){
+  const sh=getSheet();
+  let content='', mime, ext;
+  const sep=fmt==='tsv'?'\t':',';
+  content=sh.data.map(r=>r.map(c=>fmt==='csv'?'"'+(c||'')+'"':(c||'')).join(sep)).join('\n');
+  mime=fmt==='tsv'?'text/tab-separated-values':'text/csv';
+  ext=fmt;
+  const blob=new Blob([content],{type:mime});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=sh.name+'.'+ext; a.click();
+  document.getElementById('xlFileMenu').style.display='none';
+}
+function toggleFileMenu(){
+  const m=document.getElementById('xlFileMenu');
+  m.style.display=m.style.display==='none'?'block':'none';
+}
+function goBack(){ window.location.href='dashboard.html'; }
+
+// ============ PYTHON BACKEND  -  XLSX IMPORT / EXPORT ============
+const _XL_API = (typeof KAIROS_API_BASE !== 'undefined') ? KAIROS_API_BASE : 'http://localhost:5000/api';
+
+async function exportXlsx(){
+  document.getElementById('xlFileMenu').style.display='none';
+  if(typeof showToast==='function') showToast('⏳ Exporting as Excel…','info');
+  try {
+    const res = await fetch(`${_XL_API}/excel/export`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({sheets, name: getSheet().name})
+    });
+    if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error||`HTTP ${res.status}`); }
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = getSheet().name + '.xlsx';
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    if(typeof showToast==='function') showToast('✅ Excel workbook exported!','success');
+  } catch(e){
+    // Fallback: export the active sheet as CSV locally.
+    downloadSheet('csv');
+    if(typeof showToast==='function') showToast('⚠️ Backend unavailable. Exported as CSV fallback.','info');
+  }
+}
+
+async function openXlsx(){
+  document.getElementById('xlFileMenu').style.display='none';
+  const input = document.createElement('input');
+  input.type='file'; input.accept='.xlsx,.csv'; input.style.display='none';
+  document.body.appendChild(input);
+  input.onchange = async ()=>{
+    document.body.removeChild(input);
+    const file = input.files[0];
+    if(!file) return;
+    if(typeof showToast==='function') showToast('⏳ Opening spreadsheet…','info');
+    try {
+      const fd = new FormData(); fd.append('file', file);
+      const res = await fetch(`${_XL_API}/excel/import`,{method:'POST',body:fd});
+      if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error||`HTTP ${res.status}`); }
+      const data = await res.json();
+      if(data.sheets && data.sheets.length){
+        sheets = data.sheets;
+        currentSheetIdx = 0; selectedRow = 0; selectedCol = 0;
+        render(); renderSheetTabs();
+        autoSaveSheet();
+        if(typeof showToast==='function') showToast('✅ Spreadsheet opened!','success');
+      }
+    } catch(e){
+      const msg = e.name==='TypeError'
+        ? '❌ Backend not running. Start backend/start_server.bat'
+        : `❌ ${e.message}`;
+      if(typeof showToast==='function') showToast(msg,'error');
+    }
+  };
+  input.click();
+}
+
+// ============ RIBBON TAB SWITCH ============
+function switchTab(name, btn){
+  document.querySelectorAll('.ribbon-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ribbon-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+// ============ KEYBOARD SHORTCUTS ============
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveSheet();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undoAction();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='y'){e.preventDefault();redoAction();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='b'){e.preventDefault();toggleStyle('bold');}
+  if((e.ctrlKey||e.metaKey)&&e.key==='i'){e.preventDefault();toggleStyle('italic');}
+});
+
+// ============ INIT ============
+window.addEventListener('load',()=>{
+  const saved=localStorage.getItem('kairos_excel_sheets');
+  if(saved){ try{sheets=JSON.parse(saved);}catch{sheets=[newSheetData('Sheet1')];} }
+  else sheets=[newSheetData('Sheet1')];
+  currentSheetIdx=0; selectedRow=0; selectedCol=0;
+  render();
+  renderSheetTabs();
+});
+</script>
+</body>
+</html>

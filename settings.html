@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6C63FF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kairos">
+    <link rel="apple-touch-icon" href="1000669890-Photoroom.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kairos - Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css?v=4">
+    <link rel="stylesheet" href="css/components.css?v=4">
+    <link rel="stylesheet" href="css/pages/dashboard.css?v=4">
+    <link rel="stylesheet" href="css/pages/settings.css?v=4">
+</head>
+<body class="light-mode">
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header" onclick="window.location.href='dashboard.html'"><div class="sidebar-logo-icon"><img src="1000669890-Photoroom.png" alt="Kairos Logo"></div></div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span><span class="nav-label">Dashboard</span></a>
+                <a href="assignments.html" class="nav-item"><span class="nav-icon"><i class="fas fa-tasks"></i></span><span class="nav-label">Assignments</span></a>
+                <a href="planner.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calendar"></i></span><span class="nav-label">Planner</span></a>
+                <a href="timetable.html" class="nav-item"><span class="nav-icon"><i class="fas fa-table"></i></span><span class="nav-label">Timetable</span></a>
+                <a href="analytics.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-bar"></i></span><span class="nav-label">Analytics</span></a>
+                <a href="gpa-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator"></i></span><span class="nav-label">GPA Calc</span></a>
+                <a href="cwa-to-gpa.html" class="nav-item"><span class="nav-icon"><i class="fas fa-exchange-alt"></i></span><span class="nav-label">CWA→GPA</span></a>
+                <a href="lecture-tools.html" class="nav-item"><span class="nav-icon"><i class="fas fa-microphone"></i></span><span class="nav-label">Lecture Tools</span></a>
+                <a href="pdf-tools.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-pdf"></i></span><span class="nav-label">PDF Tools</span></a>
+                <a href="word-editor-v5.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-word"></i></span><span class="nav-label">Word</span></a>
+                <a href="excel-editor.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel"></i></span><span class="nav-label">Excel</span></a>
+                <a href="powerpoint-editor-v2.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-powerpoint"></i></span><span class="nav-label">PowerPoint</span></a>
+                <a href="settings.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-cog"></i></span><span class="nav-label">Settings</span></a>
+            </nav>
+            <div class="sidebar-footer"><button class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span><span class="nav-label">Logout</span></button></div>
+        </aside>
+        <div style="flex: 1; display: flex; flex-direction: column;">
+            <nav class="navbar">
+                <div class="navbar-left"><button class="navbar-toggle"><i class="fas fa-bars"></i></button><h1 class="navbar-title">Settings</h1></div>
+                <div class="navbar-right"><button class="btn-icon" onclick="openNotificationPanel()"><i class="fas fa-bell"></i></button><!-- Profile Dropdown Menu --><div class="user-profile-menu"><button class="user-profile-btn" onclick="toggleProfileMenu()" title="User Profile"><div class="user-profile-avatar">👤</div><span class="user-profile-name" id="userNameDisplay">User</span><i class="fas fa-chevron-down"></i></button><div class="user-profile-dropdown" id="profileDropdown"><div class="user-profile-header"><div class="user-profile-avatar">👤</div><div><div class="user-profile-title" id="userNameDisplay2">User</div><div class="user-profile-subtitle" id="userEmailDisplay">user@example.com</div></div></div><a href="settings.html#profile" class="user-profile-item"><i class="fas fa-user"></i> Profile</a><a href="settings.html#account" class="user-profile-item"><i class="fas fa-lock"></i> Account</a><a href="settings.html" class="user-profile-item"><i class="fas fa-cog"></i> Settings</a><div class="user-profile-divider"></div><button class="user-profile-item danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></div></div></div>
+            </nav>
+            <main class="main-content" style="max-width: 900px;">
+                <div class="settings-header">
+                    <h1 class="settings-title">Settings</h1>
+                    <p class="settings-subtitle">Customize your Kairos experience</p>
+                </div>
+                <div class="settings-tabs">
+                    <button class="settings-tab active" onclick="showSettingTab('profile')"><i class="fas fa-user"></i> Profile</button>
+                    <button class="settings-tab" onclick="showSettingTab('notifications')"><i class="fas fa-bell"></i> Notifications</button>
+                    <button class="settings-tab" onclick="showSettingTab('appearance')"><i class="fas fa-palette"></i> Appearance</button>
+                    <button class="settings-tab" onclick="showSettingTab('semester')"><i class="fas fa-calendar-alt"></i> Semester</button>
+                    <button class="settings-tab" onclick="showSettingTab('google')"><i class="fab fa-google"></i> Drive</button>
+                    <button class="settings-tab danger" onclick="showSettingTab('danger')"><i class="fas fa-exclamation"></i> Danger Zone</button>
+                </div>
+                <div id="profileTab" class="settings-section">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">Profile Settings</div>
+                            <div class="section-description">Manage your account information</div>
+                        </div>
+                    </div>
+                    <div class="profile-section">
+                        <div class="profile-avatar-upload">
+                            <div class="profile-avatar" id="profileAvatar">👤</div>
+                            <button type="button" class="avatar-upload-btn" onclick="document.getElementById('avatarInput').click()">Upload Photo</button>
+                            <input type="file" id="avatarInput" class="avatar-upload-input" accept="image/*">
+                            <p class="avatar-help-text">JPG, PNG or GIF (Max 5MB)</p>
+                        </div>
+                        <div class="profile-form">
+                            <div class="profile-form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="fullName" placeholder="Your full name">
+                            </div>
+                            <div class="profile-form-group">
+                                <label>Email</label>
+                                <input type="email" id="emailName" placeholder="your@email.com">
+                            </div>
+                            <div class="profile-form-group full" style="grid-column: 1/-1;">
+                                <label>Institution</label>
+                                <input type="text" id="institution" placeholder="Your university">
+                            </div>
+                            <div style="grid-column: 1/-1;">
+                                <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="notificationsTab" class="settings-section hidden">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">Notification Preferences</div>
+                            <div class="section-description">Control when you receive reminders</div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="requestBrowserNotificationPermission(()=>showToast('Notifications enabled!','success'))" style="flex-shrink:0">
+                            <i class="fas fa-bell"></i> Enable Browser Notifications
+                        </button>
+                    </div>
+                    <div class="notification-settings">
+                        <div class="notification-group">
+                            <div class="notification-info">
+                                <div class="notification-title">48 Hours Before</div>
+                                <div class="notification-description">Get reminded 2 days before deadline</div>
+                            </div>
+                            <div class="notification-toggle active" onclick="toggleNotification(this)"></div>
+                        </div>
+                        <div class="notification-group">
+                            <div class="notification-info">
+                                <div class="notification-title">24 Hours Before</div>
+                                <div class="notification-description">Get reminded 1 day before deadline</div>
+                            </div>
+                            <div class="notification-toggle active" onclick="toggleNotification(this)"></div>
+                        </div>
+                        <div class="notification-group">
+                            <div class="notification-info">
+                                <div class="notification-title">12 Hours Before</div>
+                                <div class="notification-description">Get reminded 12 hours before deadline</div>
+                            </div>
+                            <div class="notification-toggle active" onclick="toggleNotification(this)"></div>
+                        </div>
+                        <div class="notification-group">
+                            <div class="notification-info">
+                                <div class="notification-title">3 Hours Before</div>
+                                <div class="notification-description">Get reminded 3 hours before deadline</div>
+                            </div>
+                            <div class="notification-toggle" onclick="toggleNotification(this)"></div>
+                        </div>
+                        <div class="notification-group">
+                            <div class="notification-info">
+                                <div class="notification-title">1 Hour Before</div>
+                                <div class="notification-description">Get reminded 1 hour before deadline</div>
+                            </div>
+                            <div class="notification-toggle" onclick="toggleNotification(this)"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="appearanceTab" class="settings-section hidden">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">Appearance</div>
+                            <div class="section-description">Customize your interface</div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: var(--spacing-lg);">
+                        <div style="font-weight: 600; margin-bottom: var(--spacing-md);">Theme</div>
+                        <div class="appearance-options">
+                            <div class="appearance-option selected" onclick="applyTheme('dark')">
+                                <div class="appearance-option-icon">🌙</div>
+                                <div class="appearance-option-label">Dark</div>
+                            </div>
+                            <div class="appearance-option" onclick="applyTheme('light')">
+                                <div class="appearance-option-icon">☀️</div>
+                                <div class="appearance-option-label">Light</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="color-picker-section">
+                        <div class="color-picker-title">Accent Color</div>
+                        <div class="color-picker-grid">
+                            <div class="color-option selected" style="background: #6C63FF;" onclick="changeAccentColor('#6C63FF')"></div>
+                            <div class="color-option" style="background: #FF6B6B;" onclick="changeAccentColor('#FF6B6B')"></div>
+                            <div class="color-option" style="background: #4ECDC4;" onclick="changeAccentColor('#4ECDC4')"></div>
+                            <div class="color-option" style="background: #FFE66D;" onclick="changeAccentColor('#FFE66D')"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="semesterTab" class="settings-section hidden">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">Semester Management</div>
+                            <div class="section-description">Organize your academic terms</div>
+                        </div>
+                    </div>
+                    <div class="semester-management">
+                        <div class="semester-actions">
+                            <button class="btn btn-primary" onclick="startNewSemester()"><i class="fas fa-plus"></i> Start New Semester</button>
+                            <button class="btn btn-secondary" onclick="archiveSemester()"><i class="fas fa-archive"></i> Archive Semester</button>
+                        </div>
+                        <div class="semester-list">
+                            <div class="semester-item">
+                                <div class="semester-info">
+                                    <div class="semester-name">First Semester 2026</div>
+                                    <div class="semester-dates">Jan 15 - May 10, 2026</div>
+                                </div>
+                                <div class="semester-actions-group">
+                                    <button class="btn btn-sm btn-secondary">Active</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="googleTab" class="settings-section hidden">
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">Google Cloud Integration</div>
+                            <div class="section-description">Connect your Google Drive and Calendar</div>
+                        </div>
+                    </div>
+
+                    <!-- Google Integration Status -->
+                    <div id="googleIntegrationStatus" style="margin-bottom: var(--spacing-lg);"></div>
+
+                    <!-- Google Drive Options -->
+                    <div id="googleDriveOptions" style="display: none; margin-bottom: var(--spacing-lg);">
+                        <div class="integration-card">
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                                <i class="fab fa-google" style="font-size: 1.8rem; color: #34A8E0;"></i>
+                                <div>
+                                    <div style="font-weight: 600;">Drive Backup</div>
+                                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Auto-backup your data to Drive</div>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md);">
+                                <button class="btn btn-secondary" onclick="uploadAssignmentsToDrive()" style="text-align: left;">
+                                    <i class="fas fa-tasks"></i> Export Assignments
+                                </button>
+                                <button class="btn btn-secondary" onclick="uploadNotesToDrive()" style="text-align: left;">
+                                    <i class="fas fa-sticky-note"></i> Export Notes
+                                </button>
+                                <button class="btn btn-secondary" onclick="uploadRecordingsToDrive()" style="text-align: left;">
+                                    <i class="fas fa-microphone"></i> Upload Recordings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Google Calendar Options -->
+                    <div id="googleCalendarOptions" style="display: none; margin-bottom: var(--spacing-lg);">
+                        <div class="integration-card">
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                                <i class="fas fa-calendar" style="font-size: 1.8rem; color: #FF6B6B;"></i>
+                                <div>
+                                    <div style="font-weight: 600;">Google Calendar Sync</div>
+                                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Keep your assignments synchronized</div>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md);">
+                                <button class="btn btn-secondary" onclick="syncAssignmentsToCalendar()" style="text-align: left;">
+                                    <i class="fas fa-sync"></i> Sync Assignments
+                                </button>
+                                <button class="btn btn-secondary" onclick="importCalendarEvents()" style="text-align: left;">
+                                    <i class="fas fa-download"></i> Import Events
+                                </button>
+                                <button class="btn btn-secondary" onclick="toggleCalendarSync()" style="text-align: left;">
+                                    <i class="fas fa-exchange-alt"></i> Toggle Auto-Sync
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integration Help -->
+                    <div style="padding: var(--spacing-md); background: rgba(100, 100, 100, 0.05); border-radius: var(--radius-lg); border-left: 3px solid #6C63FF;">
+                        <div style="font-weight: 600; margin-bottom: var(--spacing-sm);">
+                            <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i> Setup Instructions
+                        </div>
+                        <ol style="margin-left: 1rem; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+                            <li>Sign in with your Google account above</li>
+                            <li>For each service, click the button to enable integration</li>
+                            <li>Your data will be automatically backed up to Google Drive</li>
+                            <li>Calendar events will sync bi-directionally</li>
+                            <li>You can disconnect at any time</li>
+                        </ol>
+                    </div>
+                </div>
+                <div id="dangerTab" class="settings-section hidden">
+                    <div class="danger-zone">
+                        <div class="danger-zone-header">
+                            <div class="danger-zone-title">Danger Zone</div>
+                            <div class="danger-zone-description">Irreversible and destructive actions</div>
+                        </div>
+                        <div class="danger-zone-actions">
+                            <button class="btn-danger-action" onclick="clearAllData()">
+                                <i class="fas fa-trash"></i> Clear All Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="js/app.js?v=4"></script>
+    <script src="js/storage.js?v=4"></script>
+    <script src="js/settings.js?v=4"></script>
+    <script src="js/google-integration.js?v=4"></script>
+</body>
+</html>
+
+
+
+
+

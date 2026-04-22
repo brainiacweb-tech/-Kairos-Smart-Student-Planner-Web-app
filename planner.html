@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6C63FF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kairos">
+    <link rel="apple-touch-icon" href="1000669890-Photoroom.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kairos - Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css?v=4">
+    <link rel="stylesheet" href="css/components.css?v=4">
+    <link rel="stylesheet" href="css/pages/dashboard.css?v=4">
+    <link rel="stylesheet" href="css/pages/planner.css?v=4">
+</head>
+<body class="light-mode">
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header" onclick="window.location.href='dashboard.html'"><div class="sidebar-logo-icon"><img src="1000669890-Photoroom.png" alt="Kairos Logo"></div></div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-pie"></i></span><span class="nav-label">Dashboard</span></a>
+                <a href="assignments.html" class="nav-item"><span class="nav-icon"><i class="fas fa-tasks"></i></span><span class="nav-label">Assignments</span></a>
+                <a href="planner.html" class="nav-item active"><span class="nav-icon"><i class="fas fa-calendar"></i></span><span class="nav-label">Planner</span></a>
+                <a href="timetable.html" class="nav-item"><span class="nav-icon"><i class="fas fa-table"></i></span><span class="nav-label">Timetable</span></a>
+                <a href="analytics.html" class="nav-item"><span class="nav-icon"><i class="fas fa-chart-bar"></i></span><span class="nav-label">Analytics</span></a>
+                <a href="gpa-calculator.html" class="nav-item"><span class="nav-icon"><i class="fas fa-calculator"></i></span><span class="nav-label">GPA Calc</span></a>
+                <a href="cwa-to-gpa.html" class="nav-item"><span class="nav-icon"><i class="fas fa-exchange-alt"></i></span><span class="nav-label">CWA→GPA</span></a>
+                <a href="lecture-tools.html" class="nav-item"><span class="nav-icon"><i class="fas fa-microphone"></i></span><span class="nav-label">Lecture Tools</span></a>
+                <a href="pdf-tools.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-pdf"></i></span><span class="nav-label">PDF Tools</span></a>
+                <a href="word-editor-v5.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-word"></i></span><span class="nav-label">Word</span></a>
+                <a href="excel-editor.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-excel"></i></span><span class="nav-label">Excel</span></a>
+                <a href="powerpoint-editor-v2.html" class="nav-item"><span class="nav-icon"><i class="fas fa-file-powerpoint"></i></span><span class="nav-label">PowerPoint</span></a>
+                <a href="settings.html" class="nav-item"><span class="nav-icon"><i class="fas fa-cog"></i></span><span class="nav-label">Settings</span></a>
+            </nav>
+            <div class="sidebar-footer"><button class="nav-item" onclick="logout()"><span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span><span class="nav-label">Logout</span></button></div>
+        </aside>
+        <div style="flex: 1; display: flex; flex-direction: column;">
+            <nav class="navbar">
+                <div class="navbar-left"><button class="navbar-toggle"><i class="fas fa-bars"></i></button><h1 class="navbar-title">Planner</h1></div>
+                <div class="navbar-right"><button class="btn-icon" onclick="openNotificationPanel()"><i class="fas fa-bell"></i></button><!-- Profile Dropdown Menu --><div class="user-profile-menu"><button class="user-profile-btn" onclick="toggleProfileMenu()" title="User Profile"><div class="user-profile-avatar">👤</div><span class="user-profile-name" id="userNameDisplay">User</span><i class="fas fa-chevron-down"></i></button><div class="user-profile-dropdown" id="profileDropdown"><div class="user-profile-header"><div class="user-profile-avatar">👤</div><div><div class="user-profile-title" id="userNameDisplay2">User</div><div class="user-profile-subtitle" id="userEmailDisplay">user@example.com</div></div></div><a href="settings.html#profile" class="user-profile-item"><i class="fas fa-user"></i> Profile</a><a href="settings.html#account" class="user-profile-item"><i class="fas fa-lock"></i> Account</a><a href="settings.html" class="user-profile-item"><i class="fas fa-cog"></i> Settings</a><div class="user-profile-divider"></div><button class="user-profile-item danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></div></div></div>
+            </nav>
+            <main class="main-content" style="max-width: 1400px; width: 100%;">
+                <div class="planner-header">
+                    <h1 class="planner-title">Weekly Planner</h1>
+                    <div class="planner-actions">
+                        <button class="btn btn-primary" onclick="openAddEventModal()"><i class="fas fa-plus"></i> Add Event</button>
+                        <button class="btn btn-secondary" onclick="openManageSchedules()"><i class="fas fa-folder-open"></i> Manage Schedules</button>
+                        <button class="btn btn-secondary" onclick="clearWeeklyPlanner()" title="Clear current schedule"><i class="fas fa-trash"></i> Clear Week</button>
+                    </div>
+                </div>
+                <div class="conflict-warning hidden" id="conflictWarning" style="display: none;">
+                    <div class="conflict-warning-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="conflict-warning-content">
+                        <strong>Schedule Conflict Detected!</strong> You have overlapping events. Please adjust your schedule.
+                    </div>
+                </div>
+                <div class="timetable">
+                    <div class="timetable-container">
+                        <div class="timetable-grid" id="timetableGrid">
+                            <!-- Generated by JS -->
+                        </div>
+                    </div>
+                </div>
+                <div class="planner-legend">
+                    <div class="legend-title">Legend</div>
+                    <div class="legend-items">
+                        <div class="legend-item"><div class="legend-color class"></div><span class="legend-label">Classes</span></div>
+                        <div class="legend-item"><div class="legend-color study"></div><span class="legend-label">Study Time</span></div>
+                        <div class="legend-item"><div class="legend-color personal"></div><span class="legend-label">Personal Time</span></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ADD EVENT MODAL -->
+    <div class="drawer" id="addEventDrawer">
+        <div class="drawer-header">
+            <h2 class="drawer-header-title">Add Event to Schedule</h2>
+            <button class="modal-close" onclick="closeDrawer('addEventDrawer')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="drawer-body">
+            <form id="addEventForm" onsubmit="handleAddEvent(event)">
+                <div class="form-group">
+                    <label>Event Title *</label>
+                    <input type="text" id="eventTitle" placeholder="e.g., Math Class, Study Session" required>
+                </div>
+                <div class="form-group">
+                    <label>Event Type *</label>
+                    <select id="eventType" required>
+                        <option value="class">Class</option>
+                        <option value="study">Study Time</option>
+                        <option value="personal">Personal Time</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Day *</label>
+                    <select id="eventDay" required>
+                        <option value="0">Sunday</option>
+                        <option value="1">Monday</option>
+                        <option value="2">Tuesday</option>
+                        <option value="3">Wednesday</option>
+                        <option value="4">Thursday</option>
+                        <option value="5">Friday</option>
+                        <option value="6">Saturday</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Start Time *</label>
+                    <input type="time" id="eventStartTime" required value="09:00">
+                </div>
+                <div class="form-group">
+                    <label>End Time</label>
+                    <input type="time" id="eventEndTime" value="10:00">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeDrawer('addEventDrawer')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MANAGE SCHEDULES DRAWER -->
+    <div class="drawer" id="manageSchedulesDrawer">
+        <div class="drawer-header">
+            <h2 class="drawer-header-title">Manage Weekly Schedules</h2>
+            <button class="modal-close" onclick="closeDrawer('manageSchedulesDrawer')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="drawer-body">
+            <div class="manage-schedules-top">
+                <button class="btn btn-primary" onclick="saveCurrentSchedule()" style="width: 100%;"><i class="fas fa-save"></i> Save Current Schedule</button>
+            </div>
+            <div class="schedules-divider">Saved Schedules</div>
+            <div id="savedSchedulesList" style="max-height: 400px; overflow-y: auto;">
+                <!-- Populated by JS -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDrawer('manageSchedulesDrawer')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING ACTION BUTTON -->
+    <button class="fab hidden" title="Click an event to delete it"><i class="fas fa-info"></i></button>
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="js/app.js?v=4"></script>
+    <script src="js/storage.js?v=4"></script>
+    <script src="js/planner.js?v=4"></script>
+</body>
+</html>
+
+
+
+
+

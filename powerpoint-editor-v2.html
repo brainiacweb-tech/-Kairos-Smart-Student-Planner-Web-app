@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6C63FF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kairos">
+    <link rel="apple-touch-icon" href="1000669890-Photoroom.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presentation1 - PowerPoint</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ppt-red:#C44529;
+  --ppt-red-dark:#a33820;
+  --ppt-orange:#D04500;
+  --ribbon-bg:#fff;
+  --ribbon-border:#d1d1d1;
+  --slide-bg:#f0f0f0;
+  --panel-bg:#2d2d2d;
+  --thumb-border:#555;
+  --thumb-active:#c44529;
+  --text:#333;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter','Segoe UI',Arial,sans-serif;font-size:12px;display:flex;flex-direction:column;background:#fff;color:var(--text)}
+
+/* ===== TITLE BAR ===== */
+.title-bar{background:var(--ppt-red);color:white;height:36px;display:flex;align-items:center;padding:0 8px;flex-shrink:0;user-select:none;gap:0}
+.title-app-icon{width:28px;height:28px;background:white;color:var(--ppt-red);font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;border-radius:2px;margin-right:8px;font-family:'Times New Roman',serif}
+.qat{display:flex;align-items:center;gap:2px;margin-right:12px}
+.qat-btn{width:26px;height:26px;background:transparent;border:none;color:white;cursor:pointer;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:12px;transition:background .15s}
+.qat-btn:hover{background:rgba(255,255,255,.2)}
+.title-center{flex:1;text-align:center;font-size:13px;font-weight:400;opacity:.95;pointer-events:none}
+.title-right{display:flex;align-items:center;gap:4px}
+.title-right button{background:rgba(255,255,255,.15);border:none;color:white;padding:4px 10px;cursor:pointer;font-size:12px;border-radius:3px;font-weight:500;font-family:inherit;transition:background .15s;display:flex;align-items:center;gap:5px}
+.title-right button:hover{background:rgba(255,255,255,.28)}
+.winctrls{display:flex;gap:0;margin-left:8px}
+.winctrl{width:32px;height:32px;background:transparent;border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:background .15s}
+.winctrl:hover{background:rgba(255,255,255,.2)}
+.winctrl.close:hover{background:#e81123}
+
+/* ===== RIBBON ===== */
+.ribbon{background:var(--ribbon-bg);border-bottom:1px solid var(--ribbon-border);flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.ribbon-tabs-row{display:flex;align-items:flex-end;padding:0 8px;border-bottom:1px solid #e0e0e0}
+.ribbon-tab{padding:8px 14px 7px;background:transparent;border:none;font-size:12px;font-weight:400;color:#555;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;font-family:inherit;touch-action:manipulation}
+.ribbon-tab:hover{color:#111}
+.ribbon-tab.active{color:var(--ppt-red);border-bottom-color:var(--ppt-red);font-weight:600}
+.ribbon-tab.file-tab{background:var(--ppt-red);color:white;border-radius:2px 2px 0 0;padding:8px 16px 7px;font-weight:600;margin-right:4px}
+.ribbon-tab.file-tab:hover{background:var(--ppt-red-dark)}
+.ribbon-content{display:none;padding:4px 8px 0;align-items:flex-end;gap:2px;min-height:72px}
+.ribbon-content.active{display:flex}
+.ribbon-group{display:flex;flex-direction:column;align-items:center;border-right:1px solid var(--ribbon-border);padding:2px 6px 0;min-width:0}
+.ribbon-group:last-child{border-right:none}
+.ribbon-group-btns{display:flex;align-items:flex-end;gap:1px;flex-wrap:wrap}
+.ribbon-group-label{font-size:10px;color:#888;padding:3px 0 4px;text-align:center;width:100%}
+.rb{background:transparent;border:1px solid transparent;cursor:pointer;border-radius:2px;transition:all .12s;font-family:inherit;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:3px 5px;min-width:36px;height:58px;font-size:11px;touch-action:manipulation}
+.rb:hover{background:#e8e8e8;border-color:#c8c8c8}
+.rb.pressed{background:#fde8e4;border-color:#f0a898}
+.rb i{font-size:18px;color:#444}
+.rb span{font-size:10px;color:#444;white-space:nowrap;line-height:1}
+.rb-sm{background:transparent;border:1px solid transparent;cursor:pointer;border-radius:2px;transition:all .12s;font-family:inherit;color:var(--text);display:flex;align-items:center;justify-content:center;padding:4px 6px;height:24px;min-width:24px;font-size:12px}
+.rb-sm:hover{background:#e8e8e8;border-color:#c8c8c8}
+.rb-sm.pressed{background:#fde8e4;border-color:#f0a898}
+.rb-row{display:flex;align-items:center;gap:1px}
+.rb-col{display:flex;flex-direction:column;gap:1px}
+.font-combo{height:24px;padding:0 4px;border:1px solid #bbb;background:white;font-size:11px;border-radius:2px;cursor:pointer;font-family:inherit;color:var(--text);outline:none}
+.font-combo:hover,.font-combo:focus{border-color:#999}
+#pptFont{width:110px}
+#pptSize{width:44px}
+
+/* ===== MAIN AREA ===== */
+.editor-body{flex:1;display:flex;overflow:hidden}
+
+/* ===== SLIDE PANEL ===== */
+.slide-panel{width:180px;background:#3c3c3c;border-right:2px solid #222;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}
+.slide-panel-header{padding:8px 10px;font-size:11px;color:#aaa;font-weight:600;border-bottom:1px solid #555;display:flex;align-items:center;justify-content:space-between}
+.slide-panel-header button{background:none;border:none;color:#aaa;cursor:pointer;font-size:13px;transition:color .15s}
+.slide-panel-header button:hover{color:white}
+.slide-list{flex:1;padding:8px 8px;display:flex;flex-direction:column;gap:8px}
+.slide-thumb-wrap{position:relative;cursor:pointer}
+.slide-thumb-num{position:absolute;left:-18px;top:50%;transform:translateY(-50%);font-size:10px;color:#888;width:14px;text-align:right}
+.slide-thumb{
+  width:160px;height:90px;
+  border:2px solid var(--thumb-border);
+  border-radius:2px;
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;
+  font-size:9px;color:#555;
+  transition:border-color .15s,box-shadow .15s;
+  position:relative;
+  flex-shrink:0;
+}
+.slide-thumb:hover{border-color:#999;box-shadow:0 0 6px rgba(255,255,255,.1)}
+.slide-thumb.active{border-color:var(--thumb-active);box-shadow:0 0 0 2px rgba(196,69,41,.4)}
+.slide-thumb .thumb-title{font-size:10px;font-weight:700;text-align:center;padding:4px 6px;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#222}
+.slide-thumb .thumb-body{font-size:7.5px;text-align:center;padding:2px 6px;width:100%;overflow:hidden;color:#444;max-height:48px}
+.slide-thumb-actions{display:flex;gap:4px;margin-top:4px;justify-content:center}
+.thumb-action-btn{background:none;border:none;color:#999;cursor:pointer;font-size:11px;padding:2px 4px;border-radius:2px;transition:color .15s}
+.thumb-action-btn:hover{color:white;background:#555}
+
+/* ===== CANVAS AREA ===== */
+.canvas-area{flex:1;background:#555;display:flex;flex-direction:column;overflow:hidden}
+.canvas-toolbar{height:32px;background:#484848;border-bottom:1px solid #333;display:flex;align-items:center;padding:0 12px;gap:6px;flex-shrink:0}
+.canvas-toolbar-btn{background:none;border:1px solid transparent;color:#ccc;cursor:pointer;padding:3px 8px;border-radius:2px;font-size:11px;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:4px}
+.canvas-toolbar-btn:hover{background:#666;border-color:#777;color:white}
+.canvas-toolbar-btn.active{background:#c44529;color:white;border-color:#a33820}
+.canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:20px}
+.slide-canvas{
+  width:800px;height:450px;
+  background:white;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  position:relative;
+  overflow:hidden;
+  flex-shrink:0;
+  border-radius:1px;
+}
+.slide-element{
+  position:absolute;
+  cursor:move;
+  user-select:none;
+}
+.slide-element .el-content{
+  width:100%;height:100%;
+  border:1px solid transparent;
+  padding:6px 10px;
+  outline:none;
+  background:transparent;
+  font-family:inherit;
+  resize:none;
+  overflow:hidden;
+}
+.slide-element:hover .el-content,
+.slide-element.selected .el-content{border-color:#c44529;border-style:dashed}
+.slide-element.selected .el-content{border-style:solid;background:rgba(255,255,255,.5)}
+.slide-element .resize-handle{
+  position:absolute;width:8px;height:8px;
+  background:#c44529;border:1px solid white;
+  border-radius:50%;cursor:se-resize;
+  bottom:-4px;right:-4px;display:none;
+}
+.slide-element.selected .resize-handle{display:block}
+.el-title{font-size:32px;font-weight:700;color:#1a1a1a;text-align:center}
+.el-subtitle{font-size:16px;color:#555;text-align:center}
+.el-body{font-size:14px;color:#333;line-height:1.7}
+.el-shape{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+
+/* ===== NOTES ===== */
+.notes-area{height:110px;background:#fff;border-top:2px solid #ccc;flex-shrink:0;display:flex;flex-direction:column}
+.notes-label{padding:4px 12px;font-size:11px;color:#888;border-bottom:1px solid #eee;background:#f9f9f9;flex-shrink:0}
+.notes-input{flex:1;border:none;padding:8px 12px;font-size:12px;font-family:inherit;color:#333;outline:none;resize:none;background:#fff}
+
+/* ===== STATUS BAR ===== */
+.status-bar{
+  height:24px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.9), rgba(235,235,235,.9)),
+    repeating-linear-gradient(135deg, rgba(196,69,41,.08) 0 8px, rgba(255,255,255,0) 8px 16px);
+  border-top:1px solid #c9c9c9;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75);
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  gap:12px;
+  font-size:11px;
+  color:#555;
+  flex-shrink:0;
+}
+.status-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.zoom-slider{appearance:none;-webkit-appearance:none;width:80px;height:3px;border-radius:2px;background:#ccc;outline:none;cursor:pointer}
+.zoom-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--ppt-red);cursor:pointer}
+
+/* ===== THEME PICKER ===== */
+.theme-grid{display:flex;flex-wrap:wrap;gap:6px;padding:8px}
+.theme-swatch{width:52px;height:36px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:border-color .15s;display:flex;align-items:flex-end;justify-content:center;padding-bottom:3px;font-size:8px;font-weight:700;color:rgba(0,0,0,.6);overflow:hidden}
+.theme-swatch:hover{border-color:#c44529}
+.theme-swatch.active{border-color:#c44529;box-shadow:0 0 0 2px rgba(196,69,41,.3)}
+
+/* ===== FILE MENU ===== */
+.file-menu-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 16px;border:none;background:none;cursor:pointer;font-size:12px;font-family:inherit;color:#333;text-align:left}
+.file-menu-item:hover{background:#f0f0f0}
+.file-menu-item i{width:16px;color:#666}
+
+/* ===== LAYOUT PICKER ===== */
+.layout-grid{display:flex;flex-wrap:wrap;gap:8px;padding:10px}
+.layout-card{width:90px;height:60px;border:2px solid #ddd;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;font-size:9px;color:#555;transition:all .15s;background:#fafafa;text-align:center;padding:4px}
+.layout-card:hover{border-color:#c44529;background:#fde8e4}
+
+/* ===== MODAL ===== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:2000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:white;border-radius:4px;box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;min-width:320px}
+.modal-header{background:#f3f2f1;padding:12px 16px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:13px}
+.modal-close-btn{background:none;border:none;cursor:pointer;font-size:16px;color:#666}
+
+/* MOBILE TOOLBAR */
+.mobile-toolbar{display:none}
+
+@media(max-width:900px){
+  .slide-panel{width:130px}
+  .slide-thumb{width:120px;height:68px}
+  .slide-canvas{width:600px;height:337px}
+  #pptFont{width:80px}
+  .rb span{display:none}
+  .rb{min-width:28px}
+}
+
+@media(max-width:600px){
+  /* Title bar */
+  .winctrls{display:none}
+  .qat{margin-right:4px}
+  .title-app-icon{width:26px;height:26px;font-size:13px;margin-right:4px}
+  .title-center{font-size:11px}
+  .title-right button{padding:3px 7px;font-size:11px;gap:3px}
+
+  /* Ribbon: scrollable on mobile */
+  .ribbon{display:block}
+  .ribbon-tabs-row{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+  .ribbon-tabs-row::-webkit-scrollbar{display:none}
+  .ribbon-content.active{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+  .ribbon-content::-webkit-scrollbar{display:none}
+  .ribbon-group{flex-shrink:0;padding:2px 4px 0}
+  .rb{min-width:38px;height:48px;padding:2px 4px}
+  .rb i{font-size:16px}
+  #pptFont{width:75px}
+  #pptSize{width:34px}
+
+  /* Mobile quick-access toolbar */
+  .mobile-toolbar{
+    display:flex;align-items:center;overflow-x:auto;
+    background:#f8f8f8;border-bottom:1px solid #d1d1d1;
+    padding:3px 6px;gap:2px;flex-shrink:0;
+    -webkit-overflow-scrolling:touch;
+  }
+  .mobile-toolbar::-webkit-scrollbar{display:none}
+  .mtb-btn{
+    background:transparent;border:1px solid transparent;border-radius:4px;
+    width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+    font-size:13px;cursor:pointer;flex-shrink:0;color:#333;font-family:inherit;
+  }
+  .mtb-btn:active{background:#fde8e4;border-color:#f0a898}
+  .mtb-sep{width:1px;height:20px;background:#d1d1d1;margin:0 2px;flex-shrink:0}
+
+  /* Editor body */
+  .editor-body{flex-direction:column}
+
+  /* Slide panel: horizontal strip on top */
+  .slide-panel{
+    width:100%;height:80px;
+    flex-direction:row;border-right:none;border-bottom:2px solid #222;
+    overflow-x:auto;overflow-y:hidden;
+  }
+  .slide-panel-header{display:none}
+  .slide-list{flex-direction:row;padding:6px 8px;gap:6px;align-items:center}
+  .slide-thumb-wrap{flex-shrink:0}
+  .slide-thumb{width:100px;height:56px}
+  .slide-thumb .thumb-title{font-size:8px}
+  .slide-thumb .thumb-body{display:none}
+  .slide-thumb-num{display:none}
+  .slide-thumb-actions{display:none}
+
+  /* Canvas area */
+  .canvas-area{flex:1;min-height:0}
+  .canvas-wrap{padding:8px}
+  .slide-canvas{
+    width:100% !important;
+    height:auto !important;
+    aspect-ratio:16/9;
+    min-height:0;
+  }
+
+  /* Notes */
+  .notes-area{height:64px}
+  .notes-input{font-size:12px}
+
+  /* Status bar */
+  .status-bar{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- TITLE BAR -->
+<div class="title-bar">
+  <div class="title-app-icon">P</div>
+  <div class="qat">
+    <button class="qat-btn" onclick="savePresentation()" title="Save"><i class="fas fa-save"></i></button>
+    <button class="qat-btn" onclick="undoAction()" title="Undo"><i class="fas fa-undo"></i></button>
+    <button class="qat-btn" onclick="redoAction()" title="Redo"><i class="fas fa-redo"></i></button>
+  </div>
+  <div class="title-center"><span id="presNameDisplay">Presentation1</span>  -  PowerPoint</div>
+  <div class="title-right">
+    <button onclick="startSlideShow()" title="Slide Show"><i class="fas fa-play"></i> Slide Show</button>
+    <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Dashboard</button>
+  </div>
+  <div class="winctrls">
+    <button class="winctrl">&#x2212;</button>
+    <button class="winctrl">&#x25A1;</button>
+    <button class="winctrl close" onclick="goBack()">&#x2715;</button>
+  </div>
+</div>
+
+<!-- RIBBON -->
+<div class="ribbon">
+  <div class="ribbon-tabs-row">
+    <button class="ribbon-tab file-tab" onclick="toggleFileMenu()">File</button>
+    <button class="ribbon-tab active" onclick="switchTab('home',this)">Home</button>
+    <button class="ribbon-tab" onclick="switchTab('insert',this)">Insert</button>
+    <button class="ribbon-tab" onclick="switchTab('design',this)">Design</button>
+    <button class="ribbon-tab" onclick="switchTab('transitions',this)">Transitions</button>
+    <button class="ribbon-tab" onclick="switchTab('slideshow',this)">Slide Show</button>
+    <button class="ribbon-tab" onclick="switchTab('view3',this)">View</button>
+  </div>
+
+  <!-- HOME TAB -->
+  <div class="ribbon-content active" id="tab-home" data-tab="home">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="addSlide()" title="New Slide"><i class="fas fa-plus-square"></i><span>New Slide</span></button>
+        <button class="rb" onclick="openLayoutPicker()" title="Layout"><i class="fas fa-th-large"></i><span>Layout</span></button>
+        <button class="rb" onclick="duplicateSlide()" title="Duplicate"><i class="fas fa-copy"></i><span>Duplicate</span></button>
+        <button class="rb" onclick="deleteSlide()" title="Delete Slide"><i class="fas fa-trash"></i><span>Delete</span></button>
+      </div>
+      <div class="ribbon-group-label">Slides</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns rb-col">
+        <div class="rb-row">
+          <select class="font-combo" id="pptFont" onchange="applyTextStyle('font',this.value)">
+            <option>Calibri</option><option>Arial</option><option>Times New Roman</option>
+            <option>Georgia</option><option>Verdana</option><option>Impact</option>
+            <option>Courier New</option><option>Trebuchet MS</option>
+          </select>
+          <select class="font-combo" id="pptSize" onchange="applyTextStyle('size',this.value)">
+            <option>12</option><option>14</option><option>16</option><option>18</option>
+            <option selected>24</option><option>28</option><option>32</option>
+            <option>36</option><option>40</option><option>48</option><option>60</option><option>72</option>
+          </select>
+        </div>
+        <div class="rb-row">
+          <button class="rb-sm" id="btn-pptB" onclick="applyTextStyle('bold')" title="Bold"><b>B</b></button>
+          <button class="rb-sm" id="btn-pptI" onclick="applyTextStyle('italic')" title="Italic"><i>I</i></button>
+          <button class="rb-sm" id="btn-pptU" onclick="applyTextStyle('underline')" title="Underline"><u>U</u></button>
+          <button class="rb-sm" onclick="applyTextStyle('shadow')" title="Shadow"><i class="fas fa-clone"></i></button>
+          <div class="rb-sm" title="Font Color" style="position:relative">
+            <div style="display:flex;flex-direction:column;align-items:center;padding:2px 4px;cursor:pointer" onclick="pickTextColor()">
+              <span style="font-weight:700;font-size:12px">A</span>
+              <div id="pptFontColorBar" style="width:16px;height:4px;background:#FF0000;border-radius:1px;margin-top:1px"></div>
+              <input type="color" id="pptFontColorPicker" value="#FF0000" style="position:absolute;opacity:0;width:100%;height:100%;cursor:pointer" onchange="applyTextColor()">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ribbon-group-label">Font</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb-sm" onclick="applyTextStyle('alignLeft')" title="Left"><i class="fas fa-align-left"></i></button>
+        <button class="rb-sm" onclick="applyTextStyle('alignCenter')" title="Center"><i class="fas fa-align-center"></i></button>
+        <button class="rb-sm" onclick="applyTextStyle('alignRight')" title="Right"><i class="fas fa-align-right"></i></button>
+        <button class="rb-sm" onclick="applyTextStyle('bullet')" title="Bullets"><i class="fas fa-list-ul"></i></button>
+      </div>
+      <div class="ribbon-group-label">Paragraph</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="addTextBox()" title="Text Box"><i class="fas fa-font"></i><span>Text Box</span></button>
+        <button class="rb" onclick="insertShape('rect')" title="Rectangle"><i class="fas fa-square"></i><span>Rectangle</span></button>
+        <button class="rb" onclick="insertShape('ellipse')" title="Oval"><i class="fas fa-circle"></i><span>Oval</span></button>
+        <button class="rb" onclick="insertShape('arrow')" title="Arrow"><i class="fas fa-arrow-right"></i><span>Arrow</span></button>
+      </div>
+      <div class="ribbon-group-label">Drawing</div>
+    </div>
+  </div>
+
+  <!-- INSERT TAB -->
+  <div class="ribbon-content" id="tab-insert" data-tab="insert">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="addTextBox()"><i class="fas fa-font"></i><span>Text Box</span></button>
+        <button class="rb" onclick="insertShape('rect')"><i class="fas fa-square"></i><span>Rectangle</span></button>
+        <button class="rb" onclick="insertShape('ellipse')"><i class="fas fa-circle"></i><span>Circle</span></button>
+        <button class="rb" onclick="insertShape('triangle')"><i class="fas fa-play" style="transform:rotate(-90deg)"></i><span>Triangle</span></button>
+        <button class="rb" onclick="insertShape('star')"><i class="fas fa-star"></i><span>Star</span></button>
+      </div>
+      <div class="ribbon-group-label">Illustrations</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="insertImagePrompt()"><i class="fas fa-image"></i><span>Image</span></button>
+      </div>
+      <div class="ribbon-group-label">Images</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="insertTable()"><i class="fas fa-table"></i><span>Table</span></button>
+        <button class="rb" onclick="insertDivider()"><i class="fas fa-minus"></i><span>Divider</span></button>
+      </div>
+      <div class="ribbon-group-label">Tables</div>
+    </div>
+  </div>
+
+  <!-- DESIGN TAB -->
+  <div class="ribbon-content" id="tab-design" data-tab="design">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <div id="themeGallery" style="display:flex;gap:5px;flex-wrap:wrap;max-width:380px"></div>
+      </div>
+      <div class="ribbon-group-label">Themes</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:10px;color:#888">Slide Background</label>
+          <input type="color" id="slideBgColor" value="#ffffff" onchange="applySlideBackground()" style="width:60px;height:24px;border:1px solid #bbb;border-radius:2px;cursor:pointer;padding:1px">
+        </div>
+      </div>
+      <div class="ribbon-group-label">Background</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="setAspectRatio('16:9')"><i class="fas fa-desktop"></i><span>16:9</span></button>
+        <button class="rb" onclick="setAspectRatio('4:3')"><i class="fas fa-square"></i><span>4:3</span></button>
+      </div>
+      <div class="ribbon-group-label">Slide Size</div>
+    </div>
+  </div>
+
+  <!-- TRANSITIONS TAB -->
+  <div class="ribbon-content" id="tab-transitions" data-tab="transitions">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb pressed" onclick="setTransition('none')" id="tr-none"><i class="fas fa-ban"></i><span>None</span></button>
+        <button class="rb" onclick="setTransition('fade')" id="tr-fade"><i class="fas fa-adjust"></i><span>Fade</span></button>
+        <button class="rb" onclick="setTransition('slide')" id="tr-slide"><i class="fas fa-arrow-right"></i><span>Push</span></button>
+        <button class="rb" onclick="setTransition('zoom')" id="tr-zoom"><i class="fas fa-expand-alt"></i><span>Zoom</span></button>
+        <button class="rb" onclick="setTransition('flip')" id="tr-flip"><i class="fas fa-sync"></i><span>Flip</span></button>
+      </div>
+      <div class="ribbon-group-label">Transition to This Slide</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="applyTransitionAll()"><i class="fas fa-layer-group"></i><span>Apply to All</span></button>
+      </div>
+      <div class="ribbon-group-label">Timing</div>
+    </div>
+  </div>
+
+  <!-- SLIDE SHOW TAB -->
+  <div class="ribbon-content" id="tab-slideshow" data-tab="slideshow">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb" onclick="startSlideShow()"><i class="fas fa-play-circle"></i><span>From Beginning</span></button>
+        <button class="rb" onclick="startSlideShowCurrent()"><i class="fas fa-play"></i><span>From Current</span></button>
+      </div>
+      <div class="ribbon-group-label">Start Slide Show</div>
+    </div>
+  </div>
+
+  <!-- VIEW TAB -->
+  <div class="ribbon-content" id="tab-view3" data-tab="view3">
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb pressed" id="btn-normalview" onclick="setView('normal')"><i class="fas fa-columns"></i><span>Normal</span></button>
+        <button class="rb" id="btn-outlineview" onclick="setView('outline')"><i class="fas fa-list"></i><span>Outline</span></button>
+        <button class="rb" id="btn-sorterview" onclick="setView('sorter')"><i class="fas fa-th"></i><span>Slide Sorter</span></button>
+      </div>
+      <div class="ribbon-group-label">Presentation Views</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="ribbon-group-btns">
+        <button class="rb-sm" onclick="zoomCanvas(-10)">−</button>
+        <input type="range" class="zoom-slider" id="pptZoom" min="30" max="200" value="100" oninput="zoomCanvas(0,this.value)" style="width:60px">
+        <button class="rb-sm" onclick="zoomCanvas(10)">+</button>
+        <span id="pptZoomLabel" style="font-size:11px;color:#555">100%</span>
+      </div>
+      <div class="ribbon-group-label">Zoom</div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE TOOLBAR -->
+<div class="mobile-toolbar" id="mobileToolbar">
+  <button class="mtb-btn" onclick="addSlide()" title="New Slide"><i class="fas fa-plus-square"></i></button>
+  <button class="mtb-btn" onclick="duplicateSlide()" title="Duplicate"><i class="fas fa-copy"></i></button>
+  <button class="mtb-btn" onclick="deleteSlide()" title="Delete Slide"><i class="fas fa-trash"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="applyTextStyle('bold')" title="Bold"><b>B</b></button>
+  <button class="mtb-btn" onclick="applyTextStyle('italic')" title="Italic"><i style="font-style:italic">I</i></button>
+  <button class="mtb-btn" onclick="applyTextStyle('underline')" title="Underline"><u>U</u></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="applyTextStyle('alignLeft')" title="Left"><i class="fas fa-align-left"></i></button>
+  <button class="mtb-btn" onclick="applyTextStyle('alignCenter')" title="Center"><i class="fas fa-align-center"></i></button>
+  <button class="mtb-btn" onclick="applyTextStyle('alignRight')" title="Right"><i class="fas fa-align-right"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="applyTextStyle('bullet')" title="Bullets"><i class="fas fa-list-ul"></i></button>
+  <button class="mtb-btn" onclick="addTextBox()" title="Text Box"><i class="fas fa-font"></i></button>
+  <div class="mtb-sep"></div>
+  <button class="mtb-btn" onclick="startSlideShow()" title="Slide Show" style="color:#C44529"><i class="fas fa-play"></i></button>
+  <button class="mtb-btn" onclick="savePresentation()" title="Save"><i class="fas fa-save"></i></button>
+</div>
+
+<!-- EDITOR BODY -->
+<div class="editor-body" id="editorBody">
+
+  <!-- SLIDE PANEL -->
+  <div class="slide-panel" id="slidePanel">
+    <div class="slide-panel-header">
+      Slides <span id="slideCountLabel">1</span>
+      <button onclick="addSlide()" title="Add Slide"><i class="fas fa-plus"></i></button>
+    </div>
+    <div class="slide-list" id="slideList"></div>
+  </div>
+
+  <!-- CANVAS + NOTES -->
+  <div class="canvas-area">
+    <div class="canvas-toolbar">
+      <span style="color:#aaa;font-size:11px;margin-right:6px">Slide <span id="currentSlideNum">1</span> of <span id="totalSlidesNum">1</span></span>
+      <button class="canvas-toolbar-btn" onclick="addSlide()"><i class="fas fa-plus"></i> New Slide</button>
+      <button class="canvas-toolbar-btn" onclick="deleteSlide()"><i class="fas fa-trash"></i> Delete</button>
+      <button class="canvas-toolbar-btn" onclick="addTextBox()"><i class="fas fa-font"></i> Text Box</button>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+        <button class="canvas-toolbar-btn active" onclick="startSlideShow()"><i class="fas fa-play"></i> Slide Show</button>
+      </div>
+    </div>
+    <div class="canvas-wrap" id="canvasWrap">
+      <div class="slide-canvas" id="slideCanvas" onclick="deselectAll()"></div>
+    </div>
+    <div class="notes-area">
+      <div class="notes-label">Click to add notes</div>
+      <textarea class="notes-input" id="notesInput" placeholder="Speaker notes for this slide…" oninput="saveCurrentSlide()"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <span id="pptStatus">Slide 1 of 1</span>
+  <span id="pptThemeStatus">Theme: Default</span>
+  <div class="status-right">
+    <button class="rb-sm" onclick="zoomCanvas(-10)">−</button>
+    <input type="range" class="zoom-slider" id="pptZoom2" min="30" max="200" value="100" oninput="zoomCanvas(0,this.value)">
+    <button class="rb-sm" onclick="zoomCanvas(10)">+</button>
+    <span id="pptZoomLabel2">100%</span>
+  </div>
+</div>
+
+<!-- FILE MENU -->
+<div id="pptFileMenu" style="display:none;position:fixed;top:36px;left:0;width:240px;background:white;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:3000;border:1px solid #ddd">
+  <div style="background:var(--ppt-red);color:white;padding:12px 16px;font-size:14px;font-weight:600">File</div>
+  <button class="file-menu-item" onclick="newPresentation()"><i class="fas fa-file"></i> New</button>
+  <button class="file-menu-item" onclick="savePresentation()"><i class="fas fa-save"></i> Save</button>
+  <button class="file-menu-item" onclick="renamePresentation()"><i class="fas fa-pencil-alt"></i> Rename</button>
+  <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="openPptx()"><i class="fas fa-folder-open" style="color:#D04423"></i> Open PowerPoint (.pptx)</button>
+  <button class="file-menu-item" onclick="exportPptx()"><i class="fas fa-file-powerpoint" style="color:#D04423"></i> Export as PowerPoint (.pptx)</button>
+  <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="exportPdf()"><i class="fas fa-file-pdf" style="color:#FF4757"></i> Export as PDF</button>
+  <button class="file-menu-item" onclick="downloadPresentation('html')"><i class="fas fa-download"></i> Export as HTML</button>
+  <button class="file-menu-item" onclick="downloadPresentation('txt')"><i class="fas fa-file-alt"></i> Export as Text</button>
+  <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="startSlideShow()"><i class="fas fa-play"></i> Start Slide Show</button>
+  <div style="border-top:1px solid #eee;margin:4px 0"></div>
+  <button class="file-menu-item" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+</div>
+
+<!-- LAYOUT PICKER MODAL -->
+<div class="modal-overlay" id="layoutModal">
+  <div class="modal-box">
+    <div class="modal-header">Choose Layout <button class="modal-close-btn" onclick="closeLayoutPicker()">&#x2715;</button></div>
+    <div class="layout-grid" id="layoutGrid"></div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+    <script src="js/powerpoint-editor-v2.js"></script>
+</body>
+</html>
+
+

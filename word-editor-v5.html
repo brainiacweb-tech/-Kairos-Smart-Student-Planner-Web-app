@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6C63FF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Kairos">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="1000669890-Photoroom.png">
+<title>Document1 - Word</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--word-blue:#2b579a;--word-blue-dark:#1e3f72;--word-blue-light:#deebf7;--ribbon-bg:#fff;--ribbon-border:#d7d7d7;--doc-bg:#f3f2f1;--text:#333;--text-light:#666;--surface:#fff;--shadow:0 8px 24px rgba(0,0,0,.12)}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',Arial,sans-serif;font-size:12px;background:var(--doc-bg);display:flex;flex-direction:column;color:var(--text)}
+.title-bar{height:36px;background:var(--word-blue);color:#fff;display:flex;align-items:center;padding:0 8px;gap:8px;flex-shrink:0;user-select:none}
+.title-app-icon{width:28px;height:28px;background:#fff;color:var(--word-blue);font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;border-radius:2px;flex-shrink:0;font-family:'Times New Roman',serif}
+.title-center{flex:1;text-align:center;font-size:13px;font-weight:500;opacity:.98;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.title-right{display:flex;align-items:center;gap:6px}
+.title-right button,.title-right a{background:transparent;border:none;color:#fff;padding:4px 10px;cursor:pointer;font-size:12px;border-radius:2px;text-decoration:none;display:flex;align-items:center;gap:5px}
+.title-right button:hover,.title-right a:hover{background:rgba(255,255,255,.18)}
+.title-right .back-btn{background:rgba(255,255,255,.16);font-weight:600}
+.ribbon{background:var(--ribbon-bg);border-bottom:1px solid var(--ribbon-border);box-shadow:0 1px 0 rgba(255,255,255,.8) inset}
+.ribbon-tabs{display:flex;gap:0;padding:0 8px;border-bottom:1px solid var(--ribbon-border);background:#fafafa;overflow-x:auto}
+.ribbon-tab{appearance:none;border:none;background:transparent;padding:10px 14px;font:inherit;cursor:pointer;color:#444;font-weight:600;border-bottom:3px solid transparent;white-space:nowrap}
+.ribbon-tab.active{color:var(--word-blue);border-bottom-color:var(--word-blue);background:#fff}
+.ribbon-contents{position:relative}
+.ribbon-content{display:none;padding:10px 10px 12px;gap:12px;align-items:stretch;flex-wrap:wrap}
+.ribbon-content.active{display:flex}
+.ribbon-group{border:1px solid #ddd;border-radius:8px;padding:8px 10px;background:#fff;min-height:80px;display:flex;flex-direction:column;gap:8px;min-width:120px}
+.ribbon-group-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#666;margin-top:auto;text-align:center}
+.ribbon-group-btns{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.rb,.mtb-btn,.file-menu-item,.modal-btn{font:inherit}
+.rb{border:1px solid #ccc;background:#fff;border-radius:6px;padding:8px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:34px}
+.rb:hover{background:#f4f4f4}.rb.pressed{background:#eaf2ff;border-color:#9cc0f0;color:var(--word-blue)}
+select{border:1px solid #ccc;border-radius:6px;background:#fff;padding:7px 9px;font:inherit;min-height:34px}
+.color-chip{width:22px;height:22px;border-radius:50%;border:1px solid #bbb;display:inline-block;vertical-align:middle}
+.mobile-toolbar{display:none;background:#fff;border-bottom:1px solid #ddd;padding:8px;gap:6px;flex-wrap:wrap}
+.mtb-btn{border:1px solid #ccc;background:#fff;border-radius:6px;padding:7px 9px;cursor:pointer;min-width:34px;min-height:34px}.mtb-btn:hover{background:#f5f5f5}
+.ruler-wrap{background:#f7f7f7;border-bottom:1px solid #ddd;overflow:hidden;flex-shrink:0}
+.ruler{height:22px;overflow:hidden}
+.doc-workspace{flex:1;overflow:auto;background:#f3f2f1;padding:24px 12px}
+.doc-page{width:816px;min-height:1056px;background:#fff;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,.15);padding:96px;transform-origin:top center}
+#editor{min-height:100%;outline:none;font-size:16px;line-height:1.6;white-space:normal;word-break:break-word}
+#editor:empty:before{content:attr(data-placeholder);color:#999;pointer-events:none}
+.file-menu-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 16px;border:none;background:none;cursor:pointer;font-size:12px;color:#333;text-align:left}.file-menu-item:hover{background:#f0f0f0}.file-menu-item i{width:16px;color:#666}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.34);display:none;align-items:center;justify-content:center;z-index:3000;padding:20px}.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:12px;box-shadow:var(--shadow);width:min(560px,100%);overflow:hidden}
+.modal-header{padding:14px 16px;border-bottom:1px solid #ddd;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.modal-body{padding:16px}.modal-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}.modal-row label{width:74px;color:#555;font-size:12px}.modal-row input{flex:1;height:34px;border:1px solid #bbb;border-radius:6px;padding:0 10px;font:inherit;outline:none}.modal-row input:focus{border-color:#2B579A;box-shadow:0 0 0 2px rgba(43,87,154,.12)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;padding:0 16px 16px;flex-wrap:wrap}.modal-btn{border:1px solid #cfcfcf;background:#fff;padding:8px 12px;border-radius:6px;cursor:pointer}.modal-btn.primary{background:var(--word-blue);border-color:var(--word-blue);color:#fff}
+.table-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;padding:16px}.table-cell-btn{height:24px;border:1px solid #d0d0d0;border-radius:3px;background:#fafafa;cursor:pointer}.table-cell-btn.hovered{background:#d8e8fb;border-color:#9cc0f0}.table-grid-label{padding:0 16px 16px;color:#666;font-size:12px}
+#fileMenu{display:none;position:fixed;top:36px;left:0;width:260px;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:3000;border:1px solid #ddd;border-radius:0 0 8px 0;overflow:hidden}
+#fileDocName{padding:8px 16px;font-size:11px;color:#888;border-bottom:1px solid #eee}
+@media (max-width: 900px){.ribbon{display:block}.ribbon-tabs{padding:0 4px}.ribbon-tab{padding:9px 10px}.ribbon-content{padding:8px 8px 10px;gap:8px}.ribbon-group{min-width:unset;flex:1 1 140px}.mobile-toolbar{display:flex}.doc-workspace{padding:12px 0}.doc-page{width:100%;min-height:auto;padding:40px 24px}.title-center{display:none}.title-bar{padding:0 6px}}
+@media print{.title-bar,.ribbon,.mobile-toolbar,.ruler-wrap,#fileMenu,.modal-overlay{display:none !important}.doc-workspace{padding:0;background:#fff}.doc-page{box-shadow:none;margin:0;width:auto;min-height:auto;padding:0}}
+</style>
+</head>
+<body>
+<div class="title-bar">
+	<div class="title-app-icon">W</div>
+	<div class="title-center"><span id="docNameDisplay">Document1</span> - Word</div>
+	<div class="title-right"><button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i><span>Back</span></button></div>
+</div>
+
+<div class="ribbon">
+	<div class="ribbon-tabs">
+		<button class="ribbon-tab active" onclick="switchTab('file', this)">File</button>
+		<button class="ribbon-tab" onclick="switchTab('home', this)">Home</button>
+		<button class="ribbon-tab" onclick="switchTab('insert', this)">Insert</button>
+		<button class="ribbon-tab" onclick="switchTab('view', this)">View</button>
+	</div>
+	<div class="ribbon-contents">
+		<div class="ribbon-content active" data-tab="file">
+			<div class="ribbon-group" style="min-width:160px"><div class="ribbon-group-btns"><button class="rb file-tab" onclick="toggleFileMenu()"><i class="fas fa-bars"></i><span>File Menu</span></button><button class="rb" onclick="saveDoc()"><i class="fas fa-save"></i><span>Save</span></button><button class="rb" onclick="newDoc()"><i class="fas fa-file"></i><span>New</span></button></div><div class="ribbon-group-label">File</div></div>
+		</div>
+		<div class="ribbon-content" data-tab="home">
+			<div class="ribbon-group"><div class="ribbon-group-btns"><button class="rb" id="btn-bold" onclick="cmd('bold')"><b>B</b></button><button class="rb" id="btn-italic" onclick="cmd('italic')"><i>I</i></button><button class="rb" id="btn-underline" onclick="cmd('underline')"><u>U</u></button><button class="rb" onclick="cmd('strikeThrough')"><s>S</s></button></div><div class="ribbon-group-label">Style</div></div>
+			<div class="ribbon-group"><div class="ribbon-group-btns"><button class="rb" onclick="cmd('justifyLeft')">Left</button><button class="rb" onclick="cmd('justifyCenter')">Center</button><button class="rb" onclick="cmd('justifyRight')">Right</button><button class="rb" onclick="cmd('insertUnorderedList')">Bullets</button></div><div class="ribbon-group-label">Paragraph</div></div>
+			<div class="ribbon-group"><div class="ribbon-group-btns"><select id="ribbonFontName" onchange="applyFontName()"><option value="Arial">Arial</option><option value="Inter">Inter</option><option value="Calibri">Calibri</option><option value="Georgia">Georgia</option><option value="Times New Roman">Times</option></select><select id="ribbonFontSize" onchange="applyFontSize()"><option>8</option><option>10</option><option selected>12</option><option>14</option><option>16</option><option>18</option><option>24</option><option>36</option></select></div><div class="ribbon-group-label">Font</div></div>
+			<div class="ribbon-group"><div class="ribbon-group-btns"><button class="rb" onclick="setView('print')" id="btn-printlayout">Print Layout</button><button class="rb" onclick="setView('web')" id="btn-weblayout">Web Layout</button><button class="rb" onclick="setView('focus')" id="btn-focusview">Focus</button></div><div class="ribbon-group-label">View</div></div>
+		</div>
+		<div class="ribbon-content" data-tab="insert">
+			<div class="ribbon-group"><div class="ribbon-group-btns"><button class="rb" onclick="insertPageBreak()">Page Break</button><button class="rb" onclick="insertHR()">Horizontal Line</button><button class="rb" onclick="insertLink()">Link</button><button class="rb" onclick="openTableModal()">Table</button></div><div class="ribbon-group-label">Insert</div></div>
+		</div>
+		<div class="ribbon-content" data-tab="view">
+			<div class="ribbon-group"><div class="ribbon-group-btns"><button class="rb" onclick="zoomOut()">-</button><button class="rb" onclick="zoomReset()">100%</button><button class="rb" onclick="zoomIn()">+</button><button class="rb" onclick="setOrientation('portrait')">Portrait</button><button class="rb" onclick="setOrientation('landscape')">Landscape</button></div><div class="ribbon-group-label">Zoom</div></div>
+			<div class="ribbon-group"><div class="ribbon-group-btns"><span class="color-chip" id="fontColorSwatch" style="background:#FF0000"></span><input type="color" id="fontColorPicker" value="#FF0000" onchange="applyFontColor()" style="width:40px;height:34px;border:none;background:transparent;padding:0;cursor:pointer"></div><div class="ribbon-group-label">Color</div></div>
+		</div>
+	</div>
+</div>
+
+<div class="mobile-toolbar" id="mobileToolbar"><button class="mtb-btn" onclick="cmd('bold')"><b>B</b></button><button class="mtb-btn" onclick="cmd('italic')"><i>I</i></button><button class="mtb-btn" onclick="cmd('underline')"><u>U</u></button><button class="mtb-btn" onclick="cmd('strikeThrough')"><s>S</s></button><button class="mtb-btn" onclick="openFindReplace()"><i class="fas fa-search"></i></button><button class="mtb-btn" onclick="openTableModal()"><i class="fas fa-table"></i></button><button class="mtb-btn" onclick="saveDoc()"><i class="fas fa-save"></i></button></div>
+
+<div class="ruler-wrap"><div class="ruler"><div class="ruler-inner"><svg width="100%" height="22" xmlns="http://www.w3.org/2000/svg" id="rulerSvg"></svg></div></div></div>
+
+<div class="doc-workspace" id="docWorkspace"><div class="doc-page" id="docPage"><div id="editor" contenteditable="true" data-placeholder="Start typing your document…" spellcheck="true"></div></div></div>
+
+<div id="fileMenu"><div style="background:var(--word-blue);color:#fff;padding:12px 16px;font-size:14px;font-weight:700">File</div><div id="fileDocName">Document1</div><button class="file-menu-item" onclick="newDoc()"><i class="fas fa-file"></i> New</button><button class="file-menu-item" onclick="saveDoc()"><i class="fas fa-save"></i> Save</button><button class="file-menu-item" onclick="renameDoc()"><i class="fas fa-pencil-alt"></i> Rename</button><div style="border-top:1px solid #eee;margin:4px 0"></div><button class="file-menu-item" onclick="openDocx()"><i class="fas fa-folder-open" style="color:#2B579A"></i> Open Word (.docx)</button><button class="file-menu-item" onclick="exportDocx()"><i class="fas fa-file-word" style="color:#2B579A"></i> Export as Word (.docx)</button><div style="border-top:1px solid #eee;margin:4px 0"></div><button class="file-menu-item" onclick="downloadDoc('html')"><i class="fas fa-download"></i> Download as HTML</button><button class="file-menu-item" onclick="downloadDoc('txt')"><i class="fas fa-file-alt"></i> Download as TXT</button><div style="border-top:1px solid #eee;margin:4px 0"></div><button class="file-menu-item" onclick="printDoc()"><i class="fas fa-print"></i> Print</button><div style="border-top:1px solid #eee;margin:4px 0"></div><button class="file-menu-item" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back to Dashboard</button></div>
+
+<div class="modal-overlay" id="findReplaceModal"><div class="modal-box"><div class="modal-header">Find &amp; Replace <button onclick="closeFindReplace()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#666">✕</button></div><div class="modal-body"><div class="modal-row"><label>Find:</label><input type="text" id="findInput" placeholder="Text to find"></div><div class="modal-row"><label>Replace:</label><input type="text" id="replaceInput" placeholder="Replace with"></div></div><div class="modal-footer"><button class="modal-btn" onclick="findNext()">Find Next</button><button class="modal-btn" onclick="replaceNext()">Replace</button><button class="modal-btn primary" onclick="replaceAll()">Replace All</button><button class="modal-btn" onclick="closeFindReplace()">Close</button></div></div></div>
+
+<div class="modal-overlay" id="tableModal"><div class="modal-box"><div class="modal-header">Insert Table <button onclick="closeTableModal()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#666">✕</button></div><div class="modal-body" style="padding:0"><div class="table-grid" id="tableGrid"></div><div class="table-grid-label" id="tableGridLabel">Hover to select size</div></div></div></div>
+
+<script src="js/config.js"></script>
+<script src="js/word-editor-v5.js"></script>
+</body>
+</html>

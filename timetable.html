@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6C63FF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kairos">
+    <link rel="apple-touch-icon" href="1000669890-Photoroom.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Kairos - Timetable Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css?v=4">
+    <link rel="stylesheet" href="css/components.css?v=4">
+    <link rel="stylesheet" href="css/pages/dashboard.css?v=4">
+    <style>
+        /* Timetable Specific Styles */
+        .timetable-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .timetable-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-md);
+        }
+
+        .timetable-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .timetable-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), #a39bff);
+            border-radius: var(--radius-lg);
+            color: white;
+        }
+
+        .timetable-title {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .timetable-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            background: var(--surface);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(108, 99, 255, 0.05);
+        }
+
+        .upload-area.drag-over {
+            border-color: var(--primary);
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .upload-text {
+            font-size: 0.95rem;
+            color: var(--text);
+            margin: var(--spacing-sm) 0;
+        }
+
+        .upload-subtext {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .hidden-file-input {
+            display: none;
+        }
+
+        .uploaded-files {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: rgba(108, 99, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+        }
+
+        .file-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .file-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .btn-view, .btn-delete-file, .btn-download-file {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-view {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #5248E5;
+        }
+
+        .btn-download-file {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-download-file:hover {
+            background: #1DC64A;
+        }
+
+        .btn-delete-file {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-delete-file:hover {
+            background: #E63946;
+        }
+
+        .lecture-schedule {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .lecture-item {
+            padding: var(--spacing-md);
+            background: rgba(108, 99, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--primary);
+        }
+
+        .lecture-time {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .lecture-course {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .lecture-room {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: var(--spacing-xs) 0 0 0;
+        }
+
+        .add-manual-lecture {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .form-label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .form-input, .form-select {
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+        }
+
+        .alert-settings {
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.1), rgba(46, 213, 115, 0.1));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+
+        .alert-setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .alert-setting-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .alert-text {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .alert-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .alert-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.on {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 1px;
+            left: 1px;
+            transition: left 0.3s;
+        }
+
+        .toggle-switch.on::after {
+            left: 26px;
+        }
+
+        .stats-mini-timetable {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .stat-box {
+            padding: var(--spacing-md);
+            background: linear-gradient(135deg, var(--primary), #a39bff);
+            border-radius: var(--radius-lg);
+            color: white;
+            text-align: center;
+        }
+
+        .stat-box-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: var(--spacing-sm) 0;
+        }
+
+        .stat-box-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        /* Optimize for 67% zoom and tighter layouts */
+        @media (max-width: 1300px) {
+            .timetable-container {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+
+            .timetable-card {
+                padding: var(--spacing-md);
+            }
+
+            .timetable-header {
+                gap: var(--spacing-sm);
+                margin-bottom: var(--spacing-md);
+            }
+
+            .timetable-icon {
+                font-size: 1.5rem;
+                width: 40px;
+                height: 40px;
+            }
+
+            .timetable-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Large screen layout - expand back to 2 columns */
+        @media (min-width: 1600px) {
+            .timetable-container {
+                grid-template-columns: 1fr 1fr;
+                gap: var(--spacing-lg);
+            }
+
+            .timetable-card {
+                padding: var(--spacing-lg);
+            }
+
+            .timetable-header {
+                gap: var(--spacing-md);
+                margin-bottom: var(--spacing-lg);
+            }
+
+            .timetable-icon {
+                font-size: 2rem;
+                width: 50px;
+                height: 50px;
+            }
+
+            .timetable-title {
+                font-size: 1.25rem;
+            }
+
+            .create-timetable-form {
+                grid-template-columns: 1fr 1fr;
+                gap: var(--spacing-lg);
+            }
+        }
+
+        /* Mobile optimization */
+        @media (max-width: 480px) {
+            .timetable-icon {
+                font-size: 1.2rem;
+                width: 32px;
+                height: 32px;
+            }
+
+            .timetable-title {
+                font-size: 0.95rem;
+            }
+
+            .tab-button {
+                padding: var(--spacing-sm) var(--spacing-md);
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab-button {
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            font-size: 0.95rem;
+        }
+
+        .tab-button:hover {
+            color: var(--text);
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Create Timetable Styles */
+        .create-timetable-form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .weekly-grid {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .weekly-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            color: var(--text);
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .day-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+        }
+
+        .day-card:hover {
+            border-color: var(--primary);
+            background: rgba(108, 99, 255, 0.05);
+        }
+
+        .day-card.has-lectures {
+            background: rgba(108, 99, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        .day-name {
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text);
+        }
+
+        .lecture-count {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .create-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .quick-add-section {
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.1), rgba(46, 213, 115, 0.1));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .quick-add-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: var(--text);
+        }
+
+        @media (max-width: 1024px) {
+            .create-timetable-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div class="dashboard-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header" onclick="window.location.href='dashboard.html'">
+                <div class="sidebar-logo-icon"><img src="1000669890-Photoroom.png" alt="Kairos Logo"></div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-chart-pie"></i></span>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+                <a href="assignments.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-tasks"></i></span>
+                    <span class="nav-label">Assignments</span>
+                </a>
+                <a href="planner.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-calendar"></i></span>
+                    <span class="nav-label">Planner</span>
+                </a>
+                <a href="timetable.html" class="nav-item active">
+                    <span class="nav-icon"><i class="fas fa-table"></i></span>
+                    <span class="nav-label">Timetable</span>
+                </a>
+                <a href="analytics.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+                    <span class="nav-label">Analytics</span>
+                </a>
+                <a href="gpa-calculator.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-calculator"></i></span>
+                    <span class="nav-label">GPA Calc</span>
+                </a>
+                <a href="cwa-to-gpa.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-exchange-alt"></i></span>
+                    <span class="nav-label">CWA→GPA</span>
+                </a>
+                <a href="lecture-tools.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-microphone"></i></span>
+                    <span class="nav-label">Lecture Tools</span>
+                </a>
+                <a href="pdf-tools.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-file-pdf"></i></span>
+                    <span class="nav-label">PDF Tools</span>
+                </a>
+                <a href="word-editor-v5.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-file-word"></i></span>
+                    <span class="nav-label">Word</span>
+                </a>
+                <a href="excel-editor.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-file-excel"></i></span>
+                    <span class="nav-label">Excel</span>
+                </a>
+                <a href="powerpoint-editor-v2.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-file-powerpoint"></i></span>
+                    <span class="nav-label">PowerPoint</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                    <span class="nav-label">Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="nav-item" onclick="logout()" data-action="logout">
+                    <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                    <span class="nav-label">Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <div style="flex: 1; display: flex; flex-direction: column;">
+            <!-- NAVBAR -->
+            <nav class="navbar">
+                <div class="navbar-left">
+                    <button class="navbar-toggle" title="Toggle sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="navbar-title">Timetable Manager</h1>
+                </div>
+
+                <div class="navbar-right">
+                    <button class="btn-icon" onclick="openNotificationPanel()" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <!-- Profile Dropdown Menu -->
+                    <div class="user-profile-menu">
+                        <button class="user-profile-btn" onclick="toggleProfileMenu()" title="User Profile">
+                            <div class="user-profile-avatar">👤</div>
+                            <span class="user-profile-name" id="userNameDisplay">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="user-profile-dropdown" id="profileDropdown">
+                            <div class="user-profile-header">
+                                <div class="user-profile-avatar">👤</div>
+                                <div>
+                                    <div class="user-profile-title" id="userNameDisplay2">User</div>
+                                    <div class="user-profile-subtitle" id="userEmailDisplay">user@example.com</div>
+                                </div>
+                            </div>
+                            <a href="settings.html#profile" class="user-profile-item">
+                                <i class="fas fa-user"></i> Profile
+                            </a>
+                            <a href="settings.html#account" class="user-profile-item">
+                                <i class="fas fa-lock"></i> Account
+                            </a>
+                            <a href="settings.html" class="user-profile-item">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                            <div class="user-profile-divider"></div>
+                            <button class="user-profile-item danger" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- PAGE CONTENT -->
+            <main class="main-content">
+                <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                    <div>
+                        <h1 class="page-title">📅 Timetable Manager</h1>
+                        <p style="color: var(--text-secondary); margin-top: var(--spacing-xs);">Upload your timetable, add lectures, and let Kairos suggest a personalised study plan</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateStudyPlan()" style="flex-shrink:0;">
+                        <i class="fas fa-magic"></i> Suggest Study Plan
+                    </button>
+                </div>
+
+                <!-- TAB NAVIGATION -->
+                <div class="tab-navigation">
+                    <button class="tab-button active" onclick="switchTab('upload')">
+                        <i class="fas fa-upload"></i> Upload Timetable
+                    </button>
+                    <button class="tab-button" onclick="switchTab('create')">
+                        <i class="fas fa-plus-circle"></i> Create Timetable
+                    </button>
+                </div>
+
+                <!-- UPLOAD TAB -->
+                <div id="tab-upload" class="tab-content active">
+                <!-- STATS -->
+                <div class="stats-mini-timetable">
+                    <div class="stat-box">
+                        <i class="fas fa-file-upload" style="font-size: 1.5rem;"></i>
+                        <div class="stat-box-value" id="totalTimetables">0</div>
+                        <div class="stat-box-label">Timetables</div>
+                    </div>
+                    <div class="stat-box" style="background: linear-gradient(135deg, #FF4757, #FF8C98);">
+                        <i class="fas fa-clock" style="font-size: 1.5rem;"></i>
+                        <div class="stat-box-value" id="totalLectures">0</div>
+                        <div class="stat-box-label">Lectures</div>
+                    </div>
+                    <div class="stat-box" style="background: linear-gradient(135deg, #2ED573, #6DE89F);">
+                        <i class="fas fa-bell" style="font-size: 1.5rem;"></i>
+                        <div class="stat-box-value" id="alertStatus">OFF</div>
+                        <div class="stat-box-label">Alerts</div>
+                    </div>
+                </div>
+
+                <!-- MAIN GRID -->
+                <div class="timetable-container">
+                    <!-- UPLOAD SECTION -->
+                    <div class="timetable-card">
+                        <div class="timetable-header">
+                            <div class="timetable-icon">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <div>
+                                <h2 class="timetable-title">Upload Timetable</h2>
+                                <p class="timetable-desc">PDF, Image, or CSV file</p>
+                            </div>
+                        </div>
+
+                        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">Drag & drop your timetable here</div>
+                            <div class="upload-subtext">or click to select (PDF, PNG, JPG, CSV)</div>
+                        </div>
+
+                        <input type="file" id="fileInput" class="hidden-file-input" accept=".pdf,.png,.jpg,.jpeg,.csv,image/*" onchange="handleFileUpload(event)">
+
+                        <div style="margin-top: var(--spacing-lg);">
+                            <h3 style="font-size: 0.95rem; margin-bottom: var(--spacing-md); color: var(--text);">Your Timetables</h3>
+                            <div class="uploaded-files" id="uploadedFiles">
+                                <p style="color: var(--text-secondary); text-align: center; margin: 0;">No timetables uploaded yet</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LECTURES SECTION -->
+                    <div class="timetable-card">
+                        <div class="timetable-header">
+                            <div class="timetable-icon" style="background: linear-gradient(135deg, #FF4757, #FF8C98);">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div>
+                                <h2 class="timetable-title">Your Lectures</h2>
+                                <p class="timetable-desc">Today's & upcoming schedule</p>
+                            </div>
+                        </div>
+
+                        <div class="lecture-schedule" id="lectureSchedule">
+                            <p style="color: var(--text-secondary); text-align: center; margin: 0;">No lectures scheduled</p>
+                        </div>
+
+                        <!-- ADD MANUAL LECTURE -->
+                        <div class="add-manual-lecture">
+                            <h3 style="margin: 0 0 var(--spacing-md) 0; font-size: 0.95rem;">Add Lecture Manually</h3>
+
+                            <div class="form-group">
+                                <label class="form-label">Course Name</label>
+                                <input type="text" id="courseName" class="form-input" placeholder="e.g., ACC301, BUS401, MKT201">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Room/Location</label>
+                                <input type="text" id="roomLocation" class="form-input" placeholder="e.g., Building A, Room 101">
+                            </div>
+
+                            <div style="margin: var(--spacing-md) 0;">
+                                <label class="form-label" style="margin-bottom: var(--spacing-md);">Select Days</label>
+                                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm);">
+                                    <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
+                                        <input type="checkbox" class="day-checkbox" value="Monday"> Mon
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
+                                        <input type="checkbox" class="day-checkbox" value="Tuesday"> Tue
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
+                                        <input type="checkbox" class="day-checkbox" value="Wednesday"> Wed
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
+                                        <input type="checkbox" class="day-checkbox" value="Thursday"> Thu
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
+                                        <input type="checkbox" class="day-checkbox" value="Friday"> Fri
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
+                                        <input type="checkbox" class="day-checkbox" value="Saturday"> Sat
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
+                                        <input type="checkbox" class="day-checkbox" value="Sunday"> Sun
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="time-inputs">
+                                <div class="form-group">
+                                    <label class="form-label">Start Time</label>
+                                    <input type="time" id="startTime" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">End Time</label>
+                                    <input type="time" id="endTime" class="form-input">
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary" onclick="addManualLecture()" style="width: 100%;">
+                                <i class="fas fa-plus"></i> Add Lecture
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ALERT SETTINGS -->
+                <div class="alert-settings">
+                    <h2 style="margin: 0 0 var(--spacing-lg) 0; font-size: 1.1rem;">Notification Settings</h2>
+
+                    <div class="alert-setting-item">
+                        <div class="alert-text">
+                            <p class="alert-label">Daily Lecture Alerts</p>
+                            <p class="alert-desc">Get notified before each lecture</p>
+                        </div>
+                        <div class="toggle-switch" id="dailyAlertsToggle" onclick="toggleDailyAlerts()"></div>
+                    </div>
+
+                    <div class="alert-setting-item">
+                        <div class="alert-text">
+                            <p class="alert-label">Alert Advance Time</p>
+                            <p class="alert-desc">Minutes before lecture starts</p>
+                        </div>
+                        <select class="form-select" id="alertAdvanceTime" style="width: 100px;">
+                            <option value="5">5 minutes</option>
+                            <option value="10">10 minutes</option>
+                            <option value="15">15 minutes</option>
+                            <option value="30">30 minutes</option>
+                            <option value="60">1 hour</option>
+                        </select>
+                    </div>
+
+                    <div class="alert-setting-item">
+                        <div class="alert-text">
+                            <p class="alert-label">Sound Notification</p>
+                            <p class="alert-desc">Play sound with alerts</p>
+                        </div>
+                        <div class="toggle-switch" id="soundNotifToggle" onclick="toggleSoundNotif()"></div>
+                    </div>
+                </div>
+                </div>
+
+                <!-- CREATE TAB -->
+                <div id="tab-create" class="tab-content">
+                <div style="margin-bottom: var(--spacing-lg);">
+                    <h2 style="margin: 0 0 var(--spacing-md) 0; font-size: 1.25rem;">Create Your Own Timetable</h2>
+                    <p style="color: var(--text-secondary); margin: 0;">Build your timetable by adding lectures for each day of the week</p>
+                </div>
+
+                <!-- QUICK ADD FORM -->
+                <div class="quick-add-section">
+                    <div class="quick-add-title">✨ Quick Add Lecture</div>
+                    <div class="create-timetable-form">
+                        <div>
+                            <div class="form-group">
+                                <label class="form-label">Course Name</label>
+                                <input type="text" id="quickCourseName" class="form-input" placeholder="e.g., ACC301 - Accounting">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Room/Location</label>
+                                <input type="text" id="quickRoom" class="form-input" placeholder="e.g., A101">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label class="form-label">Start Time</label>
+                                <input type="time" id="quickStartTime" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">End Time</label>
+                                <input type="time" id="quickEndTime" class="form-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: var(--spacing-sm); margin-top: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                        <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;"><input type="checkbox" class="quick-day-checkbox" value="Monday"> Mon</label>
+                        <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;"><input type="checkbox" class="quick-day-checkbox" value="Tuesday"> Tue</label>
+                        <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;"><input type="checkbox" class="quick-day-checkbox" value="Wednesday"> Wed</label>
+                        <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;"><input type="checkbox" class="quick-day-checkbox" value="Thursday"> Thu</label>
+                        <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;"><input type="checkbox" class="quick-day-checkbox" value="Friday"> Fri</label>
+                        <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;"><input type="checkbox" class="quick-day-checkbox" value="Saturday"> Sat</label>
+                        <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;"><input type="checkbox" class="quick-day-checkbox" value="Sunday"> Sun</label>
+                    </div>
+                    <button class="btn btn-primary" onclick="quickAddLecture()" style="width: 100%; cursor: pointer;">
+                        <i class="fas fa-plus"></i> Add to Timetable
+                    </button>
+                </div>
+
+                <!-- WEEKLY VIEW -->
+                <div class="weekly-grid">
+                    <div class="weekly-header">📅 Your Weekly Schedule</div>
+                    <div class="days-grid" id="daysGrid">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- TIMETABLE PREVIEW -->
+                <div class="timetable-card">
+                    <div class="timetable-header">
+                        <div class="timetable-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div>
+                            <h2 class="timetable-title">Timetable Preview</h2>
+                            <p class="timetable-desc">All lectures in your custom timetable</p>
+                        </div>
+                    </div>
+
+                    <div id="timetablePreview" style="max-height: 400px; overflow-y: auto;">
+                        <p style="color: var(--text-secondary); text-align: center; margin: 0;">No lectures added yet</p>
+                    </div>
+
+                    <div style="margin-top: var(--spacing-lg); display: flex; gap: var(--spacing-md);">
+                        <button class="btn btn-primary" onclick="saveTimetableAsNew()" style="flex: 1; cursor: pointer;">
+                            <i class="fas fa-save"></i> Save Timetable
+                        </button>
+                        <button class="btn" style="flex: 1; background: var(--surface); border: 1px solid var(--border); cursor: pointer;" onclick="clearCreateTimetable()">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="js/app.js?v=4"></script>
+    <script src="js/storage.js?v=4"></script>
+    <script src="js/timetable.js?v=4"></script>
+</body>
+</html>
+
+
+
+
+
