@@ -1,0 +1,763 @@
+/* ===========================
+   PLANNER PAGE
+   =========================== */
+
+.planner-container {
+  display: flex;
+  gap: var(--spacing-lg);
+  min-height: 100vh;
+}
+
+.planner-content {
+  flex: 1;
+  padding: var(--spacing-md);
+}
+
+/* ===========================
+   PLANNER HEADER
+   =========================== */
+
+.planner-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  align-items: stretch;
+  margin-bottom: var(--spacing-lg);
+}
+
+.planner-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.planner-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* ===========================
+   CONFLICT WARNING
+   =========================== */
+
+.conflict-warning {
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  color: var(--danger);
+  animation: fadeIn var(--transition-smooth);
+}
+
+.conflict-warning-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.conflict-warning-content {
+  flex: 1;
+}
+
+.conflict-warning.hidden {
+  display: none;
+}
+
+/* ===========================
+   WEEKLY TIMETABLE
+   =========================== */
+
+.timetable {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+
+.timetable-container {
+  overflow-x: auto;
+}
+
+.timetable-grid {
+  display: grid;
+  grid-template-columns: 50px repeat(7, 100px);
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+.timetable-header {
+  display: contents;
+}
+
+.timetable-time-slot {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: var(--spacing-sm);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-align: center;
+  color: var(--text);
+}
+
+.timetable-day-header {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: var(--spacing-sm);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-align: center;
+  color: var(--text);
+}
+
+.timetable-day-header:nth-child(9n) {
+  border-right: none;
+}
+
+.timetable-day-name {
+  display: block;
+  font-weight: 700;
+}
+
+.timetable-day-date {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.timetable-cell {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 2px;
+  min-height: 50px;
+  position: relative;
+  background: var(--bg);
+}
+
+.timetable-cell:nth-child(8n) {
+  border-right: none;
+}
+
+.timetable-cell.has-event {
+  background: transparent;
+  padding: 0;
+  overflow: hidden;
+}
+
+.timetable-cell.drop-zone {
+  background: rgba(108, 99, 255, 0.1);
+  border: 2px dashed var(--primary);
+}
+
+/* ===========================
+   TIMETABLE EVENTS
+   =========================== */
+
+.timetable-event {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--primary);
+  color: white;
+  padding: 2px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: var(--radius-sm);
+  cursor: move;
+  transition: all var(--transition-smooth);
+  z-index: 10;
+}
+
+.timetable-event:hover {
+  box-shadow: var(--shadow-lg);
+  z-index: 20;
+}
+
+.timetable-event.class {
+  background: #4A90E2;
+}
+
+.timetable-event.study {
+  background: var(--primary);
+}
+
+.timetable-event.personal {
+  background: #95A5A6;
+}
+
+.timetable-event.dragging {
+  opacity: 0.7;
+  transform: scale(0.95);
+}
+
+/* ===========================
+   TIME LABELS
+   =========================== */
+
+.timetable-time-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 80px;
+}
+
+.time-label {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ===========================
+   GENERATE STUDY PLAN
+   =========================== */
+
+.generate-section {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.generate-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  color: var(--text);
+}
+
+.generate-section-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.generate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* ===========================
+   LEGEND
+   =========================== */
+
+.planner-legend {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.legend-title {
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  color: var(--text);
+}
+
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+}
+
+.legend-color.class { background: #4A90E2; }
+.legend-color.study { background: var(--primary); }
+.legend-color.personal { background: #95A5A6; }
+
+.legend-label {
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ===========================
+   EVENT FORM (MODAL)
+   =========================== */
+
+.event-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.event-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.event-form-group label {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.event-form-group input,
+.event-form-group select,
+.event-form-group textarea {
+  width: 100%;
+}
+
+.event-color-picker {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.event-color-option {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.event-color-option:hover {
+  transform: scale(1.1);
+}
+
+.event-color-option.selected {
+  border-color: var(--text);
+  box-shadow: var(--shadow-lg);
+}
+
+
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+
+/* Large screens - expand timetable */
+@media (min-width: 1600px) {
+  .timetable-grid {
+    grid-template-columns: 80px repeat(7, 1fr);
+  }
+
+  .timetable-cell {
+    min-height: 60px;
+    padding: var(--spacing-xs);
+  }
+
+  .timetable-time-slot,
+  .timetable-day-header {
+    padding: var(--spacing-md);
+    font-size: 0.85rem;
+  }
+
+  .timetable-event {
+    font-size: 0.7rem;
+    padding: var(--spacing-xs);
+  }
+}
+
+@media (max-width: 1024px) {
+  .timetable-container {
+    overflow-x: scroll;
+  }
+
+  .timetable-grid {
+    grid-template-columns: 60px repeat(7, 120px);
+  }
+}
+
+@media (max-width: 767px) {
+  .planner-header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .planner-title {
+    font-size: 1.3rem;
+  }
+
+  .planner-actions {
+    width: 100%;
+    gap: var(--spacing-sm);
+  }
+
+  .planner-actions .btn {
+    flex: 1;
+    font-size: 0.95rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-height: 44px;
+  }
+
+  .timetable-container {
+    overflow-x: auto;
+  }
+
+  .timetable-grid {
+    grid-template-columns: 50px repeat(7, 80px);
+  }
+
+  .timetable-cell {
+    min-height: 50px;
+  }
+
+  .time-label {
+    height: 50px;
+    font-size: 0.7rem;
+  }
+
+  .timetable-event {
+    font-size: 0.65rem;
+    padding: var(--spacing-xs) 2px;
+  }
+
+  .timetable-day-header {
+    padding: var(--spacing-sm);
+    font-size: 0.75rem;
+  }
+
+  .timetable-day-date {
+    font-size: 0.65rem;
+  }
+
+  .legend-items {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .event-color-picker {
+    flex-wrap: wrap;
+  }
+}
+
+/* ===========================
+   PLANNER SAVE/LOAD STYLES
+   =========================== */
+
+.saved-planners-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.planner-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-smooth);
+}
+
+.planner-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.planner-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.planner-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  flex: 1;
+}
+
+.planner-card-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.5;
+}
+
+.planner-card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border);
+}
+
+.drawer {
+  position: fixed;
+  right: -500px;
+  top: 0;
+  bottom: 0;
+  width: 500px;
+  background: var(--surface);
+  z-index: 1000;
+  transition: right var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+}
+
+.drawer.active {
+  right: 0;
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.drawer-header-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-smooth);
+}
+
+.modal-close:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.drawer-body {
+  flex: 1;
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+}
+
+.form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--card-bg);
+  transition: all var(--transition-smooth);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+}
+
+.modal-footer {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.modal-footer .btn {
+  flex: 1;
+  justify-content: center;
+}
+
+/* ===========================
+   EVENT DELETE BUTTON
+   =========================== */
+
+.event-delete-btn {
+  display: none;
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  background: rgba(0, 0, 0, 0.3);
+  border: none;
+  color: white;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 0.6rem;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  z-index: 30;
+}
+
+.timetable-event:hover .event-delete-btn {
+  display: flex;
+}
+
+.event-delete-btn:hover {
+  background: rgba(255, 71, 87, 0.8);
+}
+
+/* ===========================
+   SCHEDULE MANAGEMENT
+   =========================== */
+
+.manage-schedules-top {
+  margin-bottom: var(--spacing-lg);
+}
+
+.schedules-divider {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: var(--spacing-md) 0;
+  margin: var(--spacing-lg) 0 var(--spacing-md) 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.schedule-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  transition: all var(--transition-smooth);
+}
+
+.schedule-item:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.schedule-item-info {
+  flex: 1;
+}
+
+.schedule-item-name {
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.schedule-item-meta {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.schedule-item-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.btn-small {
+  padding: 6px 12px !important;
+  font-size: 0.85rem !important;
+  min-height: auto !important;
+  height: 32px;
+}
+
+@media (max-width: 1024px) {
+  .saved-planners-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+
+  .drawer {
+    width: 100%;
+    right: -100%;
+  }
+
+  .schedule-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .schedule-item-actions {
+    width: 100%;
+    gap: var(--spacing-sm);
+  }
+
+  .schedule-item-actions .btn-small {
+    flex: 1;
+  }
+}
+
+/* ===========================
+   SIDEBAR OPEN STATE (Mobile)
+   =========================== */
+
+@media (max-width: 767px) {
+  body.sidebar-open {
+    overflow: hidden;
+  }
+
+  body.sidebar-open .planner-container,
+  body.sidebar-open .main-content {
+    position: relative;
+    z-index: 0;
+    pointer-events: none;
+  }
+}
+
