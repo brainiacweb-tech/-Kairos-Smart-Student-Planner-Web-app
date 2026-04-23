@@ -16,6 +16,11 @@ import zipfile
 import tempfile
 import subprocess
 from pathlib import Path
+import random
+import time
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 from flask import Flask, request, send_file, send_from_directory, jsonify
 from flask_cors import CORS
@@ -955,6 +960,78 @@ def ppt_import():
 
     return jsonify({"slides": slides_out, "name": Path(f.filename).stem})
 
+
+# ─────────────────────────────────────────────
+#  AUTH ROUTES
+# ─────────────────────────────────────────────
+
+otp_store = {}
+
+SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
+SMTP_EMAIL = os.environ.get("SMTP_EMAIL", "")
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
+
+@app.route("/api/auth/send-otp", methods=["POST"])
+def send_otp():
+    data = request.get_json(force=True)
+    email = data.get("email")
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+    
+    if not SMTP_EMAIL or not SMTP_PASSWORD:
+        print(f"[AUTH] SMTP not configured. Generating dummy OTP for {email}")
+        otp = "123456"
+    else:
+        otp = str(random.randint(100000, 999999))
+    
+    otp_store[email] = {
+        "otp": otp,
+        "expires_at": time.time() + 600 # 10 minutes expiry
+    }
+    
+    if SMTP_EMAIL and SMTP_PASSWORD:
+        try:
+            msg = MIMEMultipart()
+            msg['From'] = SMTP_EMAIL
+            msg['To'] = email
+            msg['Subject'] = "Your Kairos Verification Code"
+            body = f"Hello,\n\nYour verification code for Kairos is: {otp}\n\nThis code will expire in 10 minutes.\n\nBest,\nKairos Team"
+            msg.attach(MIMEText(body, 'plain'))
+            
+            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+            server.starttls()
+            server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            server.send_message(msg)
+            server.quit()
+        except Exception as e:
+            return jsonify({"error": f"Failed to send email: {str(e)}"}), 500
+            
+    return jsonify({"success": True, "message": "OTP sent successfully"})
+
+@app.route("/api/auth/verify-otp", methods=["POST"])
+def verify_otp():
+    data = request.get_json(force=True)
+    email = data.get("email")
+    otp = data.get("otp")
+    
+    if not email or not otp:
+        return jsonify({"error": "Email and OTP are required"}), 400
+        
+    record = otp_store.get(email)
+    if not record:
+        return jsonify({"error": "No OTP requested for this email"}), 400
+        
+    if time.time() > record["expires_at"]:
+        del otp_store[email]
+        return jsonify({"error": "OTP has expired"}), 400
+        
+    if record["otp"] != otp:
+        return jsonify({"error": "Invalid OTP"}), 400
+        
+    # Verification successful
+    del otp_store[email]
+    return jsonify({"success": True, "message": "Email verified successfully"})
 
 # ─────────────────────────────────────────────
 #  HEALTH CHECK
