@@ -156,21 +156,49 @@
             <main class="main-content">
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">📄 PDF Tools</h1>
-                        <p style="color: var(--text-secondary);">Manage, edit, and convert your PDF files</p>
+                        <h1 class="page-title">📄 PDF & Image Tools</h1>
+                        <p style="color: var(--text-secondary);">Manage, edit, convert, and extract data from your documents</p>
+                    </div>
+                </div>
+
+                <!-- Dynamic Workspace Area (Hidden by default) -->
+                <div id="pdfWorkspace" style="display: none; background: var(--card-bg, #fff); border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; border: 2px dashed var(--border, #ddd); text-align: center; position: relative;">
+                    <button onclick="closeWorkspace()" style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 1.2rem; color: var(--text-secondary); cursor: pointer;"><i class="fas fa-times"></i></button>
+                    
+                    <div id="workspaceIcon" style="font-size: 4rem; color: var(--primary); margin-bottom: 15px;"></div>
+                    <h2 id="workspaceTitle" style="margin-bottom: 10px; font-family: var(--font-primary);">Tool Name</h2>
+                    <p id="workspaceDesc" style="color: var(--text-secondary); margin-bottom: 25px;">Tool description goes here.</p>
+                    
+                    <div id="workspaceActionArea">
+                        <!-- Action specific UI will be injected here -->
                     </div>
                 </div>
 
                 <!-- PDF Tools Grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+                <div id="pdfToolsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+                    
+                    <!-- Extract Timetable (NEW) -->
+                    <div class="card" style="border: 2px solid var(--primary, #6C63FF);">
+                        <div style="text-align: center; padding: var(--spacing-lg);">
+                            <div style="background: rgba(108, 99, 255, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--spacing-md);">
+                                <i class="fas fa-calendar-plus" style="font-size: 2.5rem; color: var(--primary);"></i>
+                            </div>
+                            <h3 style="margin: var(--spacing-md) 0;">Extract Timetable</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Upload a PDF or Image schedule to automatically add to Timetable</p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="openWorkspace('extract-timetable', 'Extract Timetable', 'Upload a PDF or Image of your class schedule to automatically parse it.', 'fas fa-calendar-plus', '.pdf,.jpg,.jpeg,.png')">
+                                <i class="fas fa-magic"></i> Extract Smartly
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Merge PDF -->
                     <div class="card">
                         <div style="text-align: center; padding: var(--spacing-lg);">
                             <i class="fas fa-object-ungroup" style="font-size: 2.5rem; color: var(--primary); margin-bottom: var(--spacing-md); display: block;"></i>
                             <h3 style="margin: var(--spacing-md) 0;">Merge PDFs</h3>
                             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Combine multiple PDF files into one</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initMergePDF()">
-                                <i class="fas fa-plus"></i> Upload Files
+                            <button class="btn btn-outline" style="width: 100%;" onclick="openWorkspace('merge', 'Merge PDFs', 'Select multiple PDF files to combine them into a single document.', 'fas fa-object-ungroup', '.pdf', true)">
+                                <i class="fas fa-tools"></i> Open Tool
                             </button>
                         </div>
                     </div>
@@ -181,8 +209,8 @@
                             <i class="fas fa-cut" style="font-size: 2.5rem; color: var(--warning); margin-bottom: var(--spacing-md); display: block;"></i>
                             <h3 style="margin: var(--spacing-md) 0;">Split PDF</h3>
                             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Split PDF into individual pages</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initSplitPDF()">
-                                <i class="fas fa-upload"></i> Choose PDF
+                            <button class="btn btn-outline" style="width: 100%;" onclick="openWorkspace('split', 'Split PDF', 'Upload a PDF to split every page into a separate file.', 'fas fa-cut', '.pdf')">
+                                <i class="fas fa-tools"></i> Open Tool
                             </button>
                         </div>
                     </div>
@@ -193,8 +221,8 @@
                             <i class="fas fa-compress" style="font-size: 2.5rem; color: var(--success); margin-bottom: var(--spacing-md); display: block;"></i>
                             <h3 style="margin: var(--spacing-md) 0;">Compress PDF</h3>
                             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Reduce PDF file size</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initCompressPDF()">
-                                <i class="fas fa-upload"></i> Choose PDF
+                            <button class="btn btn-outline" style="width: 100%;" onclick="openWorkspace('compress', 'Compress PDF', 'Upload a PDF to reduce its file size without losing quality.', 'fas fa-compress', '.pdf')">
+                                <i class="fas fa-tools"></i> Open Tool
                             </button>
                         </div>
                     </div>
@@ -204,9 +232,9 @@
                         <div style="text-align: center; padding: var(--spacing-lg);">
                             <i class="fas fa-stamp" style="font-size: 2.5rem; color: var(--danger); margin-bottom: var(--spacing-md); display: block;"></i>
                             <h3 style="margin: var(--spacing-md) 0;">Add Watermark</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Add text or image watermark</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initWatermark()">
-                                <i class="fas fa-upload"></i> Choose PDF
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Add text watermark</p>
+                            <button class="btn btn-outline" style="width: 100%;" onclick="openWorkspace('watermark', 'Add Watermark', 'Upload a PDF to stamp it with custom text.', 'fas fa-stamp', '.pdf')">
+                                <i class="fas fa-tools"></i> Open Tool
                             </button>
                         </div>
                     </div>
@@ -217,8 +245,8 @@
                             <i class="fas fa-image" style="font-size: 2.5rem; color: #FF9999; margin-bottom: var(--spacing-md); display: block;"></i>
                             <h3 style="margin: var(--spacing-md) 0;">PDF to JPG</h3>
                             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Convert PDF pages to JPG images</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initConvertToImage('jpg')">
-                                <i class="fas fa-upload"></i> Choose PDF
+                            <button class="btn btn-outline" style="width: 100%;" onclick="openWorkspace('pdf-to-jpg', 'PDF to JPG', 'Convert each page of your PDF into high-quality JPG images.', 'fas fa-image', '.pdf')">
+                                <i class="fas fa-tools"></i> Open Tool
                             </button>
                         </div>
                     </div>
@@ -229,8 +257,8 @@
                             <i class="fas fa-image" style="font-size: 2.5rem; color: #99CCFF; margin-bottom: var(--spacing-md); display: block;"></i>
                             <h3 style="margin: var(--spacing-md) 0;">PDF to PNG</h3>
                             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Convert PDF pages to PNG images</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initConvertToImage('png')">
-                                <i class="fas fa-upload"></i> Choose PDF
+                            <button class="btn btn-outline" style="width: 100%;" onclick="openWorkspace('pdf-to-png', 'PDF to PNG', 'Convert each page of your PDF into transparent PNG images.', 'fas fa-image', '.pdf')">
+                                <i class="fas fa-tools"></i> Open Tool
                             </button>
                         </div>
                     </div>
@@ -241,8 +269,8 @@
                             <i class="fas fa-sync-alt" style="font-size: 2.5rem; color: #FFCC99; margin-bottom: var(--spacing-md); display: block;"></i>
                             <h3 style="margin: var(--spacing-md) 0;">Rotate PDF</h3>
                             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Rotate pages 90°, 180°, 270°</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initRotatePDF()">
-                                <i class="fas fa-upload"></i> Choose PDF
+                            <button class="btn btn-outline" style="width: 100%;" onclick="openWorkspace('rotate', 'Rotate PDF', 'Fix upside-down or sideways PDF pages.', 'fas fa-sync-alt', '.pdf')">
+                                <i class="fas fa-tools"></i> Open Tool
                             </button>
                         </div>
                     </div>
@@ -253,8 +281,8 @@
                             <i class="fas fa-lock-open" style="font-size: 2.5rem; color: #CC99FF; margin-bottom: var(--spacing-md); display: block;"></i>
                             <h3 style="margin: var(--spacing-md) 0;">Unlock PDF</h3>
                             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Remove password protection</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initUnlockPDF()">
-                                <i class="fas fa-upload"></i> Choose PDF
+                            <button class="btn btn-outline" style="width: 100%;" onclick="openWorkspace('unlock', 'Unlock PDF', 'Remove password restrictions from a protected PDF.', 'fas fa-lock-open', '.pdf')">
+                                <i class="fas fa-tools"></i> Open Tool
                             </button>
                         </div>
                     </div>
@@ -265,8 +293,8 @@
                             <i class="fas fa-clone" style="font-size: 2.5rem; color: #99FF99; margin-bottom: var(--spacing-md); display: block;"></i>
                             <h3 style="margin: var(--spacing-md) 0;">Extract Pages</h3>
                             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Extract specific pages from PDF</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initExtractPages()">
-                                <i class="fas fa-upload"></i> Choose PDF
+                            <button class="btn btn-outline" style="width: 100%;" onclick="openWorkspace('extract-pages', 'Extract Pages', 'Pull out only the specific pages you need from a large PDF.', 'fas fa-clone', '.pdf')">
+                                <i class="fas fa-tools"></i> Open Tool
                             </button>
                         </div>
                     </div>
@@ -276,9 +304,9 @@
                         <div style="text-align: center; padding: var(--spacing-lg);">
                             <i class="fas fa-file-word" style="font-size: 2.5rem; color: #2B579A; margin-bottom: var(--spacing-md); display: block;"></i>
                             <h3 style="margin: var(--spacing-md) 0;">Word to PDF</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Convert Word documents (.docx, .doc) to PDF</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initWordToPDF()">
-                                <i class="fas fa-upload"></i> Choose Document
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Convert Word documents (.docx) to PDF</p>
+                            <button class="btn btn-outline" style="width: 100%;" onclick="openWorkspace('word-to-pdf', 'Word to PDF', 'Convert your Microsoft Word documents into portable PDFs.', 'fas fa-file-word', '.docx,.doc')">
+                                <i class="fas fa-tools"></i> Open Tool
                             </button>
                         </div>
                     </div>
@@ -288,76 +316,65 @@
                         <div style="text-align: center; padding: var(--spacing-lg);">
                             <i class="fas fa-file-powerpoint" style="font-size: 2.5rem; color: #D24726; margin-bottom: var(--spacing-md); display: block;"></i>
                             <h3 style="margin: var(--spacing-md) 0;">PPT to PDF</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Convert PowerPoint (.pptx, .ppt) to PDF</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initPPTToPDF()">
-                                <i class="fas fa-upload"></i> Choose Presentation
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Convert PowerPoint (.pptx) to PDF</p>
+                            <button class="btn btn-outline" style="width: 100%;" onclick="openWorkspace('ppt-to-pdf', 'PPT to PDF', 'Convert your PowerPoint presentations into portable PDFs.', 'fas fa-file-powerpoint', '.pptx,.ppt')">
+                                <i class="fas fa-tools"></i> Open Tool
                             </button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Recently Processed -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 style="margin: 0;">✨ Features</h3>
-                    </div>
-                    <div style="padding: var(--spacing-md);">
-                        <ul style="list-style: none;">
-                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
-                                <i class="fas fa-check" style="color: var(--success);"></i>
-                                <span>Fast and secure PDF processing</span>
-                            </li>
-                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
-                                <i class="fas fa-check" style="color: var(--success);"></i>
-                                <span>No file size limits</span>
-                            </li>
-                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
-                                <i class="fas fa-check" style="color: var(--success);"></i>
-                                <span>Works offline - files stay private</span>
-                            </li>
-                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
-                                <i class="fas fa-check" style="color: var(--success);"></i>
-                                <span>Works on Windows, Mac & Android</span>
-                            </li>
-                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
-                                <i class="fas fa-check" style="color: var(--success);"></i>
-                                <span>Tools available 24/7</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- File Input (Hidden) -->
-                <input type="file" id="pdfFileInput" accept=".pdf" style="display: none;" onchange="handlePDFUpload()">
             </main>
+        </div>
+    </div>
+
+    <!-- Custom Prompt Modal -->
+    <div id="customPromptModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; backdrop-filter: blur(4px); align-items: center; justify-content: center;">
+        <div style="background: var(--card-bg, #fff); padding: 30px; border-radius: 16px; width: 90%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); text-align: center;">
+            <h2 id="promptTitle" style="margin-bottom: 10px; font-family: var(--font-primary);">Enter Value</h2>
+            <p id="promptDesc" style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">Please enter the required information.</p>
+            <input type="text" id="promptInput" style="width: 100%; padding: 12px; border: 1px solid var(--border, #ddd); border-radius: 8px; font-size: 1rem; margin-bottom: 20px; outline: none;">
+            <div style="display: flex; gap: 10px;">
+                <button id="promptCancel" class="btn btn-outline" style="flex: 1;">Cancel</button>
+                <button id="promptConfirm" class="btn btn-primary" style="flex: 1;">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timetable Preview Modal -->
+    <div id="timetablePreviewModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; backdrop-filter: blur(4px); align-items: center; justify-content: center;">
+        <div style="background: var(--card-bg, #fff); padding: 30px; border-radius: 16px; width: 90%; max-width: 600px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; font-family: var(--font-primary);">Confirm Extracted Timetable</h2>
+                <button onclick="document.getElementById('timetablePreviewModal').style.display='none'" style="background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary);">&times;</button>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.95rem;">We found the following classes in your document. Please verify them before importing.</p>
+            
+            <div id="extractedClassesContainer" style="overflow-y: auto; flex: 1; border: 1px solid var(--border, #eee); border-radius: 8px; padding: 10px; margin-bottom: 20px;">
+                <!-- Classes will be injected here -->
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="document.getElementById('timetablePreviewModal').style.display='none'">Cancel</button>
+                <button class="btn btn-primary" id="btnImportTimetable">Import to Timetable</button>
+            </div>
         </div>
     </div>
 
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Notification Panel -->
-    <div class="drawer" id="notificationPanel">
-        <div class="drawer-header">
-            <h2 class="drawer-header-title">Notifications</h2>
-            <button class="modal-close" onclick="closeDrawer('notificationPanel')">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="drawer-body" id="notificationList">
-            <!-- Populated by JS -->
-        </div>
-    </div>
-
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Tesseract.js for Image OCR -->
+    <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
+    
     <script src="js/config.js"></script>
     <script src="js/app.js?v=4"></script>
     <script src="js/storage.js?v=4"></script>
-    <script src="js/pdf-tools.js?v=4"></script>
+    <script src="js/pdf-tools.js?v=5"></script>
 </body>
 </html>
 
