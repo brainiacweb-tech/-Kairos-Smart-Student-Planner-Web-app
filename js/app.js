@@ -415,6 +415,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.style.overflow = 'auto';
         }
     });
+
+    // Start background active alarm system
+    startBackgroundAlarmChecker();
 });
 
 /* ===========================
@@ -690,4 +693,161 @@ function checkDeadlineNotifications() {
     });
 
     localStorage.setItem('kairos_notif_fired', JSON.stringify(fired));
+}
+
+// ── ACTIVE ALARM & SOUND SYSTEM ──────────────────────────────────────────────
+
+let audioCtx = null;
+let activeOscillators = [];
+let alarmInterval = null;
+let activeAlarmModal = null;
+
+function initAudio() {
+    if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+function playAlarmSound() {
+    initAudio();
+    if (!audioCtx) return; // Not supported or blocked
+
+    // Stop any existing sound
+    stopAlarmSound();
+
+    // Create a pulsing "beep-beep" pattern using setInterval
+    alarmInterval = setInterval(() => {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+        osc.frequency.setValueAtTime(1100, audioCtx.currentTime + 0.1); // C#6
+        
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
+        gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.2);
+        
+        activeOscillators.push(osc);
+    }, 1000); // Pulse every 1 second
+}
+
+function stopAlarmSound() {
+    if (alarmInterval) {
+        clearInterval(alarmInterval);
+        alarmInterval = null;
+    }
+    activeOscillators.forEach(osc => {
+        try { osc.stop(); } catch(e){}
+    });
+    activeOscillators = [];
+}
+
+function showAlarmModal(title, description) {
+    if (activeAlarmModal) return; // Don't stack alarms
+
+    activeAlarmModal = document.createElement('div');
+    activeAlarmModal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:99999;backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;flex-direction:column;animation:fadeIn 0.3s ease;';
+    
+    // Add pulsing red glow
+    activeAlarmModal.innerHTML = `
+        <div style="background:var(--card-bg, #fff);padding:40px;border-radius:24px;width:90%;max-width:450px;text-align:center;box-shadow:0 0 50px rgba(255, 71, 87, 0.4);animation:pulseGlow 2s infinite;">
+            <style>
+                @keyframes pulseGlow {
+                    0% { box-shadow: 0 0 30px rgba(255, 71, 87, 0.4); }
+                    50% { box-shadow: 0 0 60px rgba(255, 71, 87, 0.8); transform: scale(1.02); }
+                    100% { box-shadow: 0 0 30px rgba(255, 71, 87, 0.4); }
+                }
+            </style>
+            <i class="fas fa-bell" style="font-size:4rem;color:var(--danger, #ff4757);margin-bottom:20px;animation:shake 0.5s infinite;"></i>
+            <h1 style="margin-bottom:15px;font-family:var(--font-primary);color:var(--text-primary);">${title}</h1>
+            <p style="color:var(--text-secondary);font-size:1.1rem;margin-bottom:30px;">${description}</p>
+            <button id="btnDismissAlarm" class="btn btn-primary" style="width:100%;padding:15px;font-size:1.1rem;background:var(--danger, #ff4757);border:none;">
+                <i class="fas fa-times-circle"></i> Dismiss Alarm
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(activeAlarmModal);
+    
+    document.getElementById('btnDismissAlarm').addEventListener('click', () => {
+        stopAlarmSound();
+        activeAlarmModal.remove();
+        activeAlarmModal = null;
+    });
+
+    // We must try to init audio on first show in case they haven't interacted yet, 
+    // but usually checking happens after page load interaction.
+    playAlarmSound();
+}
+
+function startBackgroundAlarmChecker() {
+    // Run every 30 seconds
+    setInterval(() => {
+        const now = new Date();
+        const currentTimeString = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+        const currentDay = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][now.getDay()];
+        
+        const firedAlarms = JSON.parse(localStorage.getItem('kairos_active_alarms_fired') || '{}');
+
+        // 1. Check Timetable for classes starting in 10 minutes
+        const timetable = JSON.parse(localStorage.getItem('kairos_timetable') || '[]');
+        timetable.forEach(cls => {
+            if (cls.day === currentDay) {
+                // Parse class start time
+                const [startH, startM] = cls.startTime.split(':').map(Number);
+                const classTime = new Date();
+                classTime.setHours(startH, startM, 0, 0);
+                
+                // Diff in minutes
+                const diffMs = classTime - now;
+                const diffMins = Math.floor(diffMs / 60000);
+                
+                if (diffMins === 10) { // Exactly 10 minutes away
+                    const alarmKey = `class_${cls.id}_${now.toDateString()}`;
+                    if (!firedAlarms[alarmKey]) {
+                        showAlarmModal(
+                            "Upcoming Class!",
+                            `<strong>${cls.title}</strong> starts in 10 minutes (${cls.startTime}).<br><br>Location: ${cls.location || 'TBA'}`
+                        );
+                        firedAlarms[alarmKey] = true;
+                    }
+                }
+            }
+        });
+
+        // 2. Check Assignments for due in 1 hour
+        const assignments = JSON.parse(localStorage.getItem('kairos_assignments') || '[]');
+        assignments.forEach(a => {
+            if (a.status === 'completed' || !a.dueDate) return;
+            const due = new Date(a.dueDate).getTime();
+            const remainingMins = Math.floor((due - now.getTime()) / 60000);
+            
+            if (remainingMins === 60) { // Exactly 1 hour away
+                const alarmKey = `assign_${a.id}_1h`;
+                if (!firedAlarms[alarmKey]) {
+                    showAlarmModal(
+                        "Deadline Approaching!",
+                        `Your assignment <strong>${a.title}</strong> is due in 1 hour!`
+                    );
+                    firedAlarms[alarmKey] = true;
+                }
+            }
+        });
+
+        localStorage.setItem('kairos_active_alarms_fired', JSON.stringify(firedAlarms));
+
+    }, 30000); // 30,000 ms = 30 seconds
 }
