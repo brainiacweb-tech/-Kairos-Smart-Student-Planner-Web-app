@@ -352,6 +352,28 @@ body.light-mode .sidebar {
   max-width: 1400px;
   margin: 0 auto;
   box-sizing: border-box;
+  position: relative;
+}
+
+.main-content::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 400px;
+  background-image: 
+    linear-gradient(rgba(108, 99, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108, 99, 255, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1), transparent);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1), transparent);
+  pointer-events: none;
+  z-index: -1;
+  border-radius: var(--radius-lg);
+}
+
+body.light-mode .main-content::before {
+  background-image: 
+    linear-gradient(rgba(108, 99, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108, 99, 255, 0.08) 1px, transparent 1px);
 }
 
 .page-header {

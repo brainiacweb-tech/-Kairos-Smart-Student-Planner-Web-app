@@ -1,1 +1,762 @@
-<html><script>window.location.replace('word-editor-v5.html?cb=20260422012332&pageVersion=2026-04-22-word-v5');</script></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2B579A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Word">
+<link rel="apple-touch-icon" href="1000669890-Photoroom.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document1 - Word</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* Fluent Design Reset and Variables */
+:root {
+  --word-blue: #2B579A;
+  --word-blue-dark: #1e3f72;
+  --word-blue-light: #deebf7;
+  --bg-color: #f3f2f1;
+  --ribbon-bg: #ffffff;
+  --ribbon-border: #e1dfdd;
+  --text-main: #201f1e;
+  --text-light: #605e5c;
+  --btn-hover: #f3f2f1;
+  --btn-active: #edebe9;
+  --accent: #0078d4;
+  --shadow: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', 'Inter', Arial, sans-serif; }
+
+body, html { height: 100%; width: 100%; overflow: hidden; background: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c8c6c4; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #a19f9d; }
+
+/* === TITLE BAR === */
+.title-bar {
+  height: 48px; background: var(--word-blue); color: white; display: flex; align-items: center; padding: 0 16px; flex-shrink: 0; user-select: none;
+}
+.app-icon {
+  width: 32px; height: 32px; background: white; color: var(--word-blue); display: flex; align-items: center; justify-content: center; font-family: 'Times New Roman', serif; font-size: 20px; font-weight: bold; border-radius: 4px; margin-right: 16px;
+}
+.qat { display: flex; gap: 4px; margin-right: 24px; }
+.qat-btn {
+  background: transparent; border: none; color: white; width: 36px; height: 36px; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; font-size: 14px;
+}
+.qat-btn:hover { background: rgba(255,255,255,0.2); }
+
+.doc-title { flex: 1; text-align: center; font-size: 14px; font-weight: 500; display: flex; justify-content: center; align-items: center; gap: 8px;}
+.doc-title input {
+    background: transparent; border: none; color: white; font-family: inherit; font-size: 14px; font-weight: 500; text-align: center; width: 150px; outline: none; border-radius: 4px; padding: 4px;
+}
+.doc-title input:focus, .doc-title input:hover { background: rgba(255,255,255,0.1); }
+
+.title-right { display: flex; gap: 8px; align-items: center;}
+.nav-btn {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 16px; border-radius: 4px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.2); }
+
+/* === RIBBON === */
+.ribbon {
+  background: var(--ribbon-bg); border-bottom: 1px solid var(--ribbon-border); flex-shrink: 0; z-index: 100; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.ribbon-tabs {
+  display: flex; padding: 0 8px;
+}
+.tab {
+  padding: 8px 16px; border: none; background: transparent; font-size: 13px; color: var(--text-main); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; position: relative;
+}
+.tab:hover { background: var(--btn-hover); }
+.tab.active { color: var(--word-blue); border-bottom-color: var(--word-blue); font-weight: 600; }
+.tab.file { background: var(--word-blue); color: white; border-radius: 4px 4px 0 0; margin-top: 4px; margin-right: 4px; }
+.tab.file:hover { background: var(--word-blue-dark); }
+
+.ribbon-content {
+  display: none; padding: 8px; align-items: flex-start; gap: 8px; height: 90px;
+}
+.ribbon-content.active { display: flex; }
+
+.ribbon-group {
+  display: flex; flex-direction: column; align-items: center; border-right: 1px solid var(--ribbon-border); padding: 0 12px; height: 100%; position: relative;
+}
+.ribbon-group:last-child { border-right: none; }
+.group-actions { display: flex; align-items: flex-start; gap: 4px; flex: 1; }
+.group-label { font-size: 11px; color: var(--text-light); text-align: center; margin-top: auto; padding-bottom: 2px;}
+
+/* Ribbon Buttons */
+.r-btn {
+  background: transparent; border: 1px solid transparent; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px 8px; cursor: pointer; color: var(--text-main); transition: background 0.2s; height: 60px; min-width: 48px;
+}
+.r-btn:hover { background: var(--btn-hover); border-color: var(--ribbon-border); }
+.r-btn.active { background: var(--word-blue-light); border-color: #90c8f0; }
+.r-btn i { font-size: 20px; color: #323130; margin-bottom: 4px; }
+.r-btn span { font-size: 11px; white-space: nowrap; }
+
+.r-btn-sm {
+  background: transparent; border: 1px solid transparent; border-radius: 4px; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; cursor: pointer; color: var(--text-main); transition: background 0.2s; font-size: 14px;
+}
+.r-btn-sm:hover { background: var(--btn-hover); border-color: var(--ribbon-border); }
+.r-btn-sm.active { background: var(--btn-active); border-color: #90c8f0; }
+
+.col-layout { display: flex; flex-direction: column; gap: 2px; }
+.row-layout { display: flex; align-items: center; gap: 2px; }
+
+/* Select Inputs */
+.r-select {
+  border: 1px solid var(--ribbon-border); border-radius: 4px; padding: 4px 8px; font-size: 12px; outline: none; background: white; color: var(--text-main); height: 28px;
+}
+.r-select:focus, .r-select:hover { border-color: #888; }
+#fontFamily { width: 140px; }
+#fontSize { width: 50px; }
+
+/* Color Pickers */
+.color-picker {
+    position: relative; width: 28px; height: 28px; display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 2px; border: 1px solid transparent; border-radius: 4px;
+}
+.color-picker:hover { background: var(--btn-hover); border-color: var(--ribbon-border); }
+.color-picker i { font-size: 14px; font-weight: bold; }
+.color-indicator { width: 16px; height: 4px; border-radius: 2px; margin-top: 2px; }
+.color-picker input[type="color"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; top: 0; left: 0; }
+
+/* Styles Gallery */
+.styles-gallery { display: flex; gap: 4px; overflow-x: auto; max-width: 300px; padding-bottom: 4px;}
+.styles-gallery::-webkit-scrollbar { height: 4px; }
+.style-box {
+  border: 1px solid var(--ribbon-border); border-radius: 4px; padding: 8px 16px; cursor: pointer; background: white; text-align: center; display: flex; align-items: center; justify-content: center; min-width: 80px; transition: all 0.2s; height: 50px;
+}
+.style-box:hover { background: var(--btn-hover); border-color: #a19f9d; }
+.style-box.normal { font-size: 13px; }
+.style-box.h1 { font-size: 16px; font-weight: 600; color: var(--word-blue); }
+.style-box.h2 { font-size: 14px; font-weight: 600; color: var(--word-blue); }
+.style-box.h3 { font-size: 13px; font-weight: 600; color: #323130; }
+
+/* === WORKSPACE === */
+.workspace {
+  flex: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 40px 16px;
+}
+.page-container {
+  position: relative; background: white; width: 816px; min-height: 1056px; box-shadow: var(--shadow-lg); margin-bottom: 40px; padding: 96px; display: flex; flex-direction: column;
+}
+#editor {
+  flex: 1; outline: none; font-size: 15px; font-family: 'Calibri', Arial, sans-serif; line-height: 1.6; color: #000;
+}
+#editor[data-placeholder]:empty:before { content: attr(data-placeholder); color: #a19f9d; pointer-events: none; }
+#editor h1 { font-size: 28px; color: var(--word-blue); margin-bottom: 12px; font-weight: 600;}
+#editor h2 { font-size: 22px; color: var(--word-blue); margin-bottom: 10px; font-weight: 600;}
+#editor h3 { font-size: 18px; color: #323130; margin-bottom: 8px; font-weight: 600;}
+#editor p { margin-bottom: 10px; }
+#editor ul, #editor ol { margin-left: 24px; margin-bottom: 10px; }
+#editor table { border-collapse: collapse; width: 100%; margin-bottom: 12px; }
+#editor table, #editor th, #editor td { border: 1px solid #d2d0ce; }
+#editor th, #editor td { padding: 8px 12px; }
+#editor th { background: #f3f2f1; }
+#editor hr { border: none; border-top: 1px solid #d2d0ce; margin: 20px 0; }
+#editor blockquote { border-left: 4px solid var(--word-blue); padding-left: 16px; color: #605e5c; margin-left: 0; font-style: italic; }
+
+/* === FILE MENU === */
+.file-menu-overlay {
+  display: none; position: fixed; inset: 0; top: 48px; background: rgba(0,0,0,0.4); z-index: 1000;
+}
+.file-menu {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 300px; background: white; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; animation: slideIn 0.3s ease;
+}
+@keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+.file-menu-header {
+  padding: 24px; background: var(--word-blue); color: white; display: flex; align-items: center; gap: 16px; cursor: pointer;
+}
+.file-menu-header i { font-size: 24px; }
+.file-menu-header h2 { font-weight: 500; font-size: 20px; }
+.file-menu-items { padding: 12px 0; overflow-y: auto; flex: 1; }
+.fm-item {
+  display: flex; align-items: center; gap: 16px; padding: 12px 24px; width: 100%; border: none; background: transparent; cursor: pointer; font-size: 14px; color: var(--text-main); text-align: left; transition: background 0.2s;
+}
+.fm-item:hover { background: var(--btn-hover); }
+.fm-item i { width: 24px; font-size: 18px; color: var(--word-blue); text-align: center;}
+.fm-divider { height: 1px; background: #e1dfdd; margin: 8px 24px; }
+
+/* === MODALS === */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.6); backdrop-filter: blur(4px); z-index: 2000; align-items: center; justify-content: center;
+}
+.modal {
+  background: white; border-radius: 8px; box-shadow: var(--shadow-lg); width: 400px; max-width: 90%; overflow: hidden; animation: popIn 0.2s ease; border: 1px solid #e1dfdd;
+}
+@keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal-header {
+  padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e1dfdd;
+}
+.modal-header h3 { font-size: 16px; font-weight: 600; color: var(--text-main); }
+.close-btn { background: transparent; border: none; font-size: 18px; cursor: pointer; color: #a19f9d; }
+.close-btn:hover { color: #323130; }
+.modal-body { padding: 24px; }
+.input-group { margin-bottom: 16px; }
+.input-group label { display: block; margin-bottom: 8px; font-size: 13px; color: var(--text-main); }
+.input-group input { width: 100%; padding: 8px 12px; border: 1px solid #8a8886; border-radius: 4px; outline: none; font-size: 14px; }
+.input-group input:focus { border-color: var(--word-blue); border-width: 2px; padding: 7px 11px; }
+.modal-footer { padding: 16px 24px; background: #f3f2f1; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #e1dfdd; }
+.btn { padding: 6px 16px; border: 1px solid #8a8886; background: white; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+.btn:hover { background: #f3f2f1; }
+.btn.primary { background: var(--word-blue); color: white; border-color: var(--word-blue); }
+.btn.primary:hover { background: var(--word-blue-dark); border-color: var(--word-blue-dark); }
+
+/* Table Grid Picker */
+.table-grid { display: grid; grid-template-columns: repeat(10, 24px); gap: 2px; justify-content: center; }
+.table-cell { width: 24px; height: 24px; border: 1px solid #c8c6c4; background: white; cursor: pointer; }
+.table-cell.hovered { background: var(--word-blue-light); border-color: var(--word-blue); }
+.table-lbl { text-align: center; margin-top: 12px; font-size: 13px; color: var(--text-light); }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; padding: 12px 24px; border-radius: 4px; color: white; font-size: 14px; font-weight: 500; box-shadow: var(--shadow-lg); z-index: 9999; display: flex; align-items: center; gap: 12px; opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateY(20px);
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.info { background: #0078d4; }
+.toast.success { background: #107c10; }
+.toast.error { background: #a80000; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .page-container { width: 100%; min-height: auto; margin: 0; padding: 40px 24px; box-shadow: none; border-bottom: 1px solid #e1dfdd;}
+  .workspace { padding: 0; background: white; }
+  .ribbon-tabs { overflow-x: auto; }
+  .ribbon-tabs::-webkit-scrollbar { display: none; }
+  .ribbon-content.active { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 12px;}
+  .ribbon-content::-webkit-scrollbar { height: 4px; }
+  .title-bar { padding: 0 8px; }
+  .doc-title input { width: 100px; }
+  .nav-btn span { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP TITLE BAR -->
+<div class="title-bar">
+  <div class="app-icon"><i class="fas fa-file-word"></i></div>
+  <div class="qat">
+    <button class="qat-btn" onclick="saveDoc()" title="Save (Ctrl+S)"><i class="fas fa-save"></i></button>
+    <button class="qat-btn" onclick="document.execCommand('undo')" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i></button>
+    <button class="qat-btn" onclick="document.execCommand('redo')" title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i></button>
+  </div>
+  <div class="doc-title">
+    <input type="text" id="docNameInput" value="Document1" onchange="updateDocName(this.value)" title="Rename document"> - Word
+  </div>
+  <div class="title-right">
+    <button class="nav-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> <span>Dashboard</span></button>
+  </div>
+</div>
+
+<!-- RIBBON -->
+<div class="ribbon">
+  <div class="ribbon-tabs">
+    <button class="tab file" onclick="openFileMenu()">File</button>
+    <button class="tab active" onclick="switchTab('home', this)">Home</button>
+    <button class="tab" onclick="switchTab('insert', this)">Insert</button>
+    <button class="tab" onclick="switchTab('layout', this)">Layout</button>
+    <button class="tab" onclick="switchTab('view', this)">View</button>
+  </div>
+
+  <!-- HOME TAB -->
+  <div class="ribbon-content active" id="tab-home">
+    <div class="ribbon-group">
+      <div class="group-actions">
+        <button class="r-btn" onclick="cmd('paste')" title="Paste"><i class="fas fa-paste" style="font-size:24px; color:var(--word-blue);"></i><span>Paste</span></button>
+        <div class="col-layout">
+          <button class="r-btn-sm" onclick="cmd('cut')" title="Cut"><i class="fas fa-cut"></i></button>
+          <button class="r-btn-sm" onclick="cmd('copy')" title="Copy"><i class="fas fa-copy"></i></button>
+          <button class="r-btn-sm" onclick="cmd('removeFormat')" title="Clear Formatting"><i class="fas fa-eraser"></i></button>
+        </div>
+      </div>
+      <div class="group-label">Clipboard</div>
+    </div>
+
+    <div class="ribbon-group">
+      <div class="group-actions" style="flex-direction: column;">
+        <div class="row-layout">
+          <select id="fontFamily" class="r-select" onchange="applyFont(this.value)" title="Font">
+            <option value="Calibri" selected>Calibri</option>
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Segoe UI">Segoe UI</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Courier New">Courier New</option>
+          </select>
+          <select id="fontSize" class="r-select" onchange="applyFontSize(this.value)" title="Font Size">
+            <option value="1">8</option><option value="2">10</option>
+            <option value="3" selected>12</option><option value="4">14</option>
+            <option value="5">18</option><option value="6">24</option><option value="7">36</option>
+          </select>
+        </div>
+        <div class="row-layout">
+          <button class="r-btn-sm" id="btn-bold" onclick="cmd('bold')" title="Bold"><i class="fas fa-bold"></i></button>
+          <button class="r-btn-sm" id="btn-italic" onclick="cmd('italic')" title="Italic"><i class="fas fa-italic"></i></button>
+          <button class="r-btn-sm" id="btn-underline" onclick="cmd('underline')" title="Underline"><i class="fas fa-underline"></i></button>
+          <button class="r-btn-sm" id="btn-strikeThrough" onclick="cmd('strikeThrough')" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
+          <button class="r-btn-sm" onclick="cmd('subscript')" title="Subscript"><i class="fas fa-subscript"></i></button>
+          <button class="r-btn-sm" onclick="cmd('superscript')" title="Superscript"><i class="fas fa-superscript"></i></button>
+          
+          <div class="color-picker" title="Highlight Color">
+            <i class="fas fa-highlighter" style="color: #605e5c;"></i>
+            <div class="color-indicator" id="hiliteInd" style="background: yellow;"></div>
+            <input type="color" onchange="applyHilite(this.value)" value="#ffff00">
+          </div>
+          <div class="color-picker" title="Font Color">
+            <i class="fas fa-font" style="color: #605e5c;"></i>
+            <div class="color-indicator" id="colorInd" style="background: #a80000;"></div>
+            <input type="color" onchange="applyColor(this.value)" value="#a80000">
+          </div>
+        </div>
+      </div>
+      <div class="group-label">Font</div>
+    </div>
+
+    <div class="ribbon-group">
+      <div class="group-actions" style="flex-direction: column;">
+        <div class="row-layout">
+          <button class="r-btn-sm" onclick="cmd('insertUnorderedList')" title="Bullets"><i class="fas fa-list-ul"></i></button>
+          <button class="r-btn-sm" onclick="cmd('insertOrderedList')" title="Numbering"><i class="fas fa-list-ol"></i></button>
+          <button class="r-btn-sm" onclick="cmd('outdent')" title="Decrease Indent"><i class="fas fa-outdent"></i></button>
+          <button class="r-btn-sm" onclick="cmd('indent')" title="Increase Indent"><i class="fas fa-indent"></i></button>
+        </div>
+        <div class="row-layout">
+          <button class="r-btn-sm" id="btn-justifyLeft" onclick="cmd('justifyLeft')" title="Align Left"><i class="fas fa-align-left"></i></button>
+          <button class="r-btn-sm" id="btn-justifyCenter" onclick="cmd('justifyCenter')" title="Center"><i class="fas fa-align-center"></i></button>
+          <button class="r-btn-sm" id="btn-justifyRight" onclick="cmd('justifyRight')" title="Align Right"><i class="fas fa-align-right"></i></button>
+          <button class="r-btn-sm" id="btn-justifyFull" onclick="cmd('justifyFull')" title="Justify"><i class="fas fa-align-justify"></i></button>
+        </div>
+      </div>
+      <div class="group-label">Paragraph</div>
+    </div>
+
+    <div class="ribbon-group">
+      <div class="group-actions">
+        <div class="styles-gallery">
+          <div class="style-box normal" onclick="cmd('formatBlock','p')">Normal</div>
+          <div class="style-box h1" onclick="cmd('formatBlock','H1')">Heading 1</div>
+          <div class="style-box h2" onclick="cmd('formatBlock','H2')">Heading 2</div>
+          <div class="style-box h3" onclick="cmd('formatBlock','H3')">Heading 3</div>
+          <div class="style-box normal" onclick="cmd('formatBlock','BLOCKQUOTE')" style="font-style:italic">Quote</div>
+        </div>
+      </div>
+      <div class="group-label">Styles</div>
+    </div>
+  </div>
+
+  <!-- INSERT TAB -->
+  <div class="ribbon-content" id="tab-insert">
+    <div class="ribbon-group">
+      <div class="group-actions">
+        <button class="r-btn" onclick="insertPageBreak()"><i class="fas fa-file-alt" style="color:var(--word-blue);"></i><span>Page Break</span></button>
+      </div>
+      <div class="group-label">Pages</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="group-actions">
+        <button class="r-btn" onclick="openModal('tableModal')"><i class="fas fa-table" style="color:#107c10;"></i><span>Table</span></button>
+      </div>
+      <div class="group-label">Tables</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="group-actions">
+        <button class="r-btn" onclick="insertImage()"><i class="fas fa-image" style="color:#d83b01;"></i><span>Pictures</span></button>
+        <button class="r-btn" onclick="insertLink()"><i class="fas fa-link" style="color:var(--word-blue);"></i><span>Link</span></button>
+        <button class="r-btn" onclick="cmd('insertHorizontalRule')"><i class="fas fa-minus" style="color:#605e5c;"></i><span>Divider</span></button>
+      </div>
+      <div class="group-label">Media & Text</div>
+    </div>
+  </div>
+
+  <!-- LAYOUT TAB -->
+  <div class="ribbon-content" id="tab-layout">
+    <div class="ribbon-group">
+      <div class="group-actions">
+        <button class="r-btn" onclick="setMargins('96px')"><i class="fas fa-border-style"></i><span>Normal</span></button>
+        <button class="r-btn" onclick="setMargins('48px')"><i class="fas fa-compress-alt"></i><span>Narrow</span></button>
+        <button class="r-btn" onclick="setMargins('144px')"><i class="fas fa-expand-alt"></i><span>Wide</span></button>
+      </div>
+      <div class="group-label">Margins</div>
+    </div>
+  </div>
+
+  <!-- VIEW TAB -->
+  <div class="ribbon-content" id="tab-view">
+    <div class="ribbon-group">
+      <div class="group-actions">
+        <button class="r-btn active" id="btn-printView" onclick="setView('print')"><i class="fas fa-file-alt"></i><span>Print Layout</span></button>
+        <button class="r-btn" id="btn-webView" onclick="setView('web')"><i class="fas fa-globe"></i><span>Web Layout</span></button>
+      </div>
+      <div class="group-label">Views</div>
+    </div>
+    <div class="ribbon-group">
+      <div class="group-actions">
+        <button class="r-btn" onclick="zoom(10)"><i class="fas fa-search-plus"></i><span>Zoom In</span></button>
+        <button class="r-btn" onclick="zoom(-10)"><i class="fas fa-search-minus"></i><span>Zoom Out</span></button>
+        <button class="r-btn" onclick="setZoom(100)"><i class="fas fa-compress"></i><span>100%</span></button>
+      </div>
+      <div class="group-label">Zoom</div>
+    </div>
+  </div>
+</div>
+
+<!-- WORKSPACE -->
+<div class="workspace" id="workspace">
+  <div class="page-container" id="page">
+    <div id="editor" contenteditable="true" data-placeholder="Start typing..." spellcheck="true"></div>
+  </div>
+</div>
+
+<!-- FILE MENU -->
+<div class="file-menu-overlay" id="fileMenuOverlay" onclick="closeFileMenu(event)">
+  <div class="file-menu" onclick="event.stopPropagation()">
+    <div class="file-menu-header" onclick="closeFileMenu(event)">
+      <i class="fas fa-arrow-left"></i>
+      <h2>Word Editor</h2>
+    </div>
+    <div class="file-menu-items">
+      <button class="fm-item" onclick="newDoc()"><i class="fas fa-file"></i> New Document</button>
+      <button class="fm-item" onclick="openDocx()"><i class="fas fa-folder-open"></i> Open Word Document</button>
+      <div class="fm-divider"></div>
+      <button class="fm-item" onclick="saveDoc()"><i class="fas fa-save"></i> Save (Browser)</button>
+      <button class="fm-item" onclick="document.getElementById('docNameInput').focus(); closeFileMenu();"><i class="fas fa-pencil-alt"></i> Rename</button>
+      <div class="fm-divider"></div>
+      <button class="fm-item" onclick="exportDocx()"><i class="fas fa-file-word"></i> Export as Word (.docx)</button>
+      <button class="fm-item" onclick="download('html')"><i class="fas fa-file-code"></i> Download as HTML</button>
+      <button class="fm-item" onclick="download('txt')"><i class="fas fa-file-alt"></i> Download as TXT</button>
+      <div class="fm-divider"></div>
+      <button class="fm-item" onclick="window.print(); closeFileMenu();"><i class="fas fa-print"></i> Print</button>
+      <div class="fm-divider"></div>
+      <button class="fm-item" onclick="goBack()"><i class="fas fa-sign-out-alt"></i> Exit to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<!-- FIND AND REPLACE MODAL -->
+<div class="modal-overlay" id="findModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Find & Replace</h3>
+      <button class="close-btn" onclick="closeModal('findModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group">
+        <label>Find what:</label>
+        <input type="text" id="findText">
+      </div>
+      <div class="input-group">
+        <label>Replace with:</label>
+        <input type="text" id="replaceText">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="findNext()">Find Next</button>
+      <button class="btn" onclick="replaceNext()">Replace</button>
+      <button class="btn primary" onclick="replaceAll()">Replace All</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLE MODAL -->
+<div class="modal-overlay" id="tableModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Insert Table</h3>
+      <button class="close-btn" onclick="closeModal('tableModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="table-grid" id="tableGrid"></div>
+      <div class="table-lbl" id="tableLbl">Hover to select dimensions</div>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script>
+// ==================== STATE ====================
+const editor = document.getElementById('editor');
+let docName = 'Document1';
+let currentZoom = 100;
+let savedSel = null;
+
+// ==================== INITIALIZATION & FIX ====================
+// BUG FIX: Use a completely new key to ignore the old corrupted drafts in localStorage!
+const STORAGE_KEY = 'kairos_word_doc_v2';
+const NAME_KEY = 'kairos_word_name_v2';
+
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  const name = localStorage.getItem(NAME_KEY);
+  if(saved) editor.innerHTML = saved;
+  if(name) { docName = name; document.getElementById('docNameInput').value = docName; }
+  
+  // Build table grid
+  const grid = document.getElementById('tableGrid');
+  for(let r=1; r<=8; r++) {
+    for(let c=1; c<=10; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'table-cell';
+      cell.dataset.r = r; cell.dataset.c = c;
+      cell.onmouseenter = () => highlightTable(r, c);
+      cell.onclick = () => { insertTable(r, c); closeModal('tableModal'); };
+      grid.appendChild(cell);
+    }
+  }
+
+  // Keyboard Shortcuts
+  document.addEventListener('keydown', e => {
+    if((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveDoc(); }
+    if((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); openModal('findModal'); }
+    if((e.ctrlKey || e.metaKey) && e.key === 'h') { e.preventDefault(); openModal('findModal'); }
+  });
+
+  // Editor events
+  editor.addEventListener('input', autoSave);
+  editor.addEventListener('keyup', updateActiveButtons);
+  editor.addEventListener('mouseup', updateActiveButtons);
+  
+  // Selection preservation for ribbon clicks
+  editor.addEventListener('blur', () => {
+    const sel = window.getSelection();
+    if(sel.rangeCount > 0) savedSel = sel.getRangeAt(0).cloneRange();
+  });
+});
+
+function autoSave() {
+  localStorage.setItem(STORAGE_KEY + '_draft', editor.innerHTML);
+}
+
+// ==================== UI INTERACTION ====================
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ribbon-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+function openFileMenu() { document.getElementById('fileMenuOverlay').style.display = 'block'; }
+function closeFileMenu(e) { 
+  if(!e || e.target === document.getElementById('fileMenuOverlay') || e.target.closest('.file-menu-header')) {
+    document.getElementById('fileMenuOverlay').style.display = 'none'; 
+  }
+}
+
+function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+function showToast(msg, type='info') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  let icon = 'info-circle';
+  if(type==='success') icon='check-circle';
+  if(type==='error') icon='exclamation-circle';
+  t.innerHTML = `<i class="fas fa-${icon}"></i> ${msg}`;
+  document.body.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 300);
+  }, 3000);
+}
+
+// ==================== EDITING COMMANDS ====================
+function cmd(command, value=null) {
+  if(savedSel) {
+    editor.focus();
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(savedSel);
+  }
+  document.execCommand(command, false, value);
+  updateActiveButtons();
+  editor.focus();
+}
+
+function applyFont(f) { cmd('fontName', f); }
+function applyFontSize(s) { cmd('fontSize', s); }
+function applyColor(c) { document.getElementById('colorInd').style.background = c; cmd('foreColor', c); }
+function applyHilite(c) { document.getElementById('hiliteInd').style.background = c; cmd('hiliteColor', c); }
+
+function updateActiveButtons() {
+  const commands = ['bold', 'italic', 'underline', 'strikeThrough', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'];
+  commands.forEach(c => {
+    const btn = document.getElementById('btn-' + c);
+    if(btn) btn.classList.toggle('active', document.queryCommandState(c));
+  });
+}
+
+// ==================== INSERTION ====================
+function insertPageBreak() {
+  cmd('insertHTML', '<hr style="page-break-after:always; border:1px dashed #c8c6c4; margin:20px 0;">');
+}
+function insertLink() {
+  const url = prompt("Enter URL:", "https://");
+  if(url) cmd('createLink', url);
+}
+function insertImage() {
+  const url = prompt("Enter Image URL:");
+  if(url) cmd('insertImage', url);
+}
+
+function highlightTable(r, c) {
+  document.querySelectorAll('.table-cell').forEach(cell => {
+    cell.classList.toggle('hovered', cell.dataset.r <= r && cell.dataset.c <= c);
+  });
+  document.getElementById('tableLbl').innerText = `${r} x ${c} Table`;
+}
+function insertTable(r, c) {
+  let html = '<table><tbody>';
+  for(let i=0; i<r; i++) {
+    html += '<tr>';
+    for(let j=0; j<c; j++) html += '<td><br></td>';
+    html += '</tr>';
+  }
+  html += '</tbody></table><p><br></p>';
+  cmd('insertHTML', html);
+}
+
+// ==================== LAYOUT & VIEW ====================
+function setMargins(m) {
+  document.getElementById('page').style.padding = m;
+}
+function setView(v) {
+  const page = document.getElementById('page');
+  document.getElementById('btn-printView').classList.remove('active');
+  document.getElementById('btn-webView').classList.remove('active');
+  if(v === 'print') {
+    page.style.width = '816px';
+    page.style.minHeight = '1056px';
+    page.style.boxShadow = 'var(--shadow-lg)';
+    document.getElementById('workspace').style.background = 'var(--bg-color)';
+    document.getElementById('btn-printView').classList.add('active');
+  } else {
+    page.style.width = '100%';
+    page.style.minHeight = 'auto';
+    page.style.boxShadow = 'none';
+    document.getElementById('workspace').style.background = 'white';
+    document.getElementById('btn-webView').classList.add('active');
+  }
+}
+function zoom(delta) {
+  setZoom(Math.max(50, Math.min(200, currentZoom + delta)));
+}
+function setZoom(val) {
+  currentZoom = val;
+  document.getElementById('page').style.transform = `scale(${val/100})`;
+  document.getElementById('page').style.transformOrigin = 'top center';
+}
+
+// ==================== FIND & REPLACE ====================
+function findNext() {
+  const q = document.getElementById('findText').value;
+  if(q) window.find(q, false, false, true, false, false, false);
+}
+function replaceNext() {
+  const f = document.getElementById('findText').value;
+  const r = document.getElementById('replaceText').value;
+  if(f && window.find(f)) document.execCommand('insertText', false, r);
+}
+function replaceAll() {
+  const f = document.getElementById('findText').value;
+  const r = document.getElementById('replaceText').value;
+  if(!f) return;
+  let count = 0;
+  editor.focus();
+  while(window.find(f)) { document.execCommand('insertText', false, r); count++; if(count>999) break; }
+  showToast(`Replaced ${count} occurrences.`);
+}
+
+// ==================== FILE MANAGEMENT ====================
+function updateDocName(val) {
+  docName = val || 'Document1';
+  document.title = `${docName} - Word`;
+  localStorage.setItem(NAME_KEY, docName);
+}
+function newDoc() {
+  if(confirm('Start a new document? Unsaved changes will be lost.')) {
+    editor.innerHTML = '';
+    updateDocName('Document1');
+    document.getElementById('docNameInput').value = 'Document1';
+    localStorage.removeItem(STORAGE_KEY);
+    closeFileMenu();
+  }
+}
+function saveDoc() {
+  localStorage.setItem(STORAGE_KEY, editor.innerHTML);
+  localStorage.setItem(NAME_KEY, docName);
+  showToast('Document saved to browser.', 'success');
+  closeFileMenu();
+}
+function download(fmt) {
+  let content = fmt === 'txt' ? editor.innerText : `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${docName}</title></head><body>${editor.innerHTML}<\/body><\/html>`;
+  const blob = new Blob([content], {type: fmt==='txt'?'text/plain':'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${docName}.${fmt}`;
+  a.click();
+  closeFileMenu();
+}
+function goBack() { window.location.href = 'dashboard.html'; }
+
+// ==================== PYTHON BACKEND DOCX IMPORT / EXPORT ====================
+const _WORD_API = (typeof KAIROS_API_BASE !== 'undefined') ? KAIROS_API_BASE : 'http://localhost:5000/api';
+
+async function exportDocx(){
+  closeFileMenu();
+  showToast('⏳ Exporting as Word (.docx)...', 'info');
+  try {
+    const res = await fetch(`${_WORD_API}/word/export`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ html: editor.innerHTML, name: docName })
+    });
+    if(!res.ok) throw new Error(`HTTP Error ${res.status}`);
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = docName.endsWith('.docx') ? docName : docName + '.docx';
+    a.click();
+    showToast('✅ Word document exported!', 'success');
+  } catch(e) {
+    showToast(e.name==='TypeError' ? '❌ Backend not running.' : `❌ ${e.message}`, 'error');
+  }
+}
+
+async function openDocx(){
+  closeFileMenu();
+  if(editor.innerHTML.trim() && !confirm('Replace current document with imported file?')) return;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.docx,.doc';
+  input.onchange = async () => {
+    const file = input.files[0];
+    if(!file) return;
+    showToast('⏳ Opening Word document...', 'info');
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch(`${_WORD_API}/word/import`, { method: 'POST', body: fd });
+      if(!res.ok) throw new Error(`HTTP Error ${res.status}`);
+      const data = await res.json();
+      editor.innerHTML = data.html || '';
+      updateDocName(data.name || file.name.replace(/\.(docx?)$/i,''));
+      document.getElementById('docNameInput').value = docName;
+      showToast('✅ Document opened!', 'success');
+      autoSave();
+    } catch(e) {
+      showToast(e.name==='TypeError' ? '❌ Backend not running.' : `❌ ${e.message}`, 'error');
+    }
+  };
+  input.click();
+}
+</script>
+</body>
+</html>

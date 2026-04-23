@@ -414,6 +414,8 @@ document.addEventListener('keydown', e=>{
 function isCorruptedWordDoc(content){
   if(!content) return false;
   const suspiciousSnippets = [
+    'const blob',
+    'document.getElementById("fileMenu")'
     'const _WORD_API',
     'async function exportDocx',
     'function drawRuler',
@@ -444,7 +446,7 @@ window.addEventListener('load', ()=>{
 
   const saved = localStorage.getItem('kairos_word_doc');
   const savedName = localStorage.getItem('kairos_word_name');
-  if(saved) {
+  if(saved) { if (saved.includes('const ') || saved.includes('document.getElementById')) { localStorage.removeItem('kairos_word_doc'); localStorage.removeItem('kairos_word_doc_draft'); editor.innerHTML=''; if(typeof showToast==='function') showToast('Corrupted draft removed. Starting clean document.','info'); return; }
     if (isCorruptedWordDoc(saved)) {
       localStorage.removeItem('kairos_word_doc');
       localStorage.removeItem('kairos_word_doc_draft');
