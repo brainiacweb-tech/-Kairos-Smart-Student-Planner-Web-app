@@ -3,69 +3,541 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#6C63FF">
+<meta name="theme-color" content="#0078d4">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Kairos">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="1000669890-Photoroom.png">
 <title>Document1 - Word</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--word-blue:#2b579a;--word-blue-dark:#1e3f72;--word-blue-light:#deebf7;--ribbon-bg:#fff;--ribbon-border:#d7d7d7;--doc-bg:#f3f2f1;--text:#333;--text-light:#666;--surface:#fff;--shadow:0 8px 24px rgba(0,0,0,.12)}
+:root{--ms-blue:#0078d4;--ms-blue-dark:#005a9e;--ms-blue-light:#f0f4f8;--ribbon-bg:#f3f2f1;--ribbon-border:#e5e5e5;--doc-bg:#ececec;--text:#323130;--text-light:#605e5c;--surface:#fff;--shadow:0 2px 8px rgba(0,0,0,.1);--font-primary:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif}
 html,body{height:100%;overflow:hidden}
-body{font-family:'Inter',Arial,sans-serif;font-size:12px;background:var(--doc-bg);display:flex;flex-direction:column;color:var(--text)}
-.title-bar{height:36px;background:var(--word-blue);color:#fff;display:flex;align-items:center;padding:0 8px;gap:8px;flex-shrink:0;user-select:none}
-.title-app-icon{width:28px;height:28px;background:#fff;color:var(--word-blue);font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;border-radius:2px;flex-shrink:0;font-family:'Times New Roman',serif}
-.title-center{flex:1;text-align:center;font-size:13px;font-weight:500;opacity:.98;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.title-right{display:flex;align-items:center;gap:6px}
-.title-right button,.title-right a{background:transparent;border:none;color:#fff;padding:4px 10px;cursor:pointer;font-size:12px;border-radius:2px;text-decoration:none;display:flex;align-items:center;gap:5px}
-.title-right button:hover,.title-right a:hover{background:rgba(255,255,255,.18)}
-.title-right .back-btn{background:rgba(255,255,255,.16);font-weight:600}
-.ribbon{background:var(--ribbon-bg);border-bottom:1px solid var(--ribbon-border);box-shadow:0 1px 0 rgba(255,255,255,.8) inset}
-.ribbon-tabs{display:flex;gap:0;padding:0 8px;border-bottom:1px solid var(--ribbon-border);background:#fafafa;overflow-x:auto}
-.ribbon-tab{appearance:none;border:none;background:transparent;padding:10px 14px;font:inherit;cursor:pointer;color:#444;font-weight:600;border-bottom:3px solid transparent;white-space:nowrap}
-.ribbon-tab.active{color:var(--word-blue);border-bottom-color:var(--word-blue);background:#fff}
-.ribbon-contents{position:relative}
-.ribbon-content{display:none;padding:10px 10px 12px;gap:12px;align-items:stretch;flex-wrap:wrap}
+body{font-family:var(--font-primary);font-size:14px;background:var(--doc-bg);display:flex;flex-direction:column;color:var(--text)}
+.header{display:flex;align-items:center;gap:0;background:#fff;border-bottom:1px solid var(--ribbon-border);flex-shrink:0}
+.header-logo{padding:8px 16px;font-weight:700;color:var(--ms-blue);font-size:18px;display:flex;align-items:center;gap:6px}
+.header-logo i{font-size:20px}
+.header-title{flex:1;padding:0 16px;font-size:14px;font-weight:500;color:var(--text)}
+.header-actions{display:flex;align-items:center;gap:8px;padding:0 12px}
+.header-btn{background:transparent;border:none;color:var(--text);padding:8px 12px;cursor:pointer;border-radius:4px;font-size:14px;display:flex;align-items:center;gap:6px;transition:background .15s ease}
+.header-btn:hover{background:var(--ms-blue-light)}
+.header-btn.primary{background:var(--ms-blue);color:#fff}
+.header-btn.primary:hover{background:var(--ms-blue-dark)}
+.ribbon{background:var(--ribbon-bg);border-bottom:1px solid var(--ribbon-border);flex-shrink:0}
+.ribbon-tabs{display:flex;gap:0;padding:0 16px;border-bottom:1px solid var(--ribbon-border);background:#fff;overflow-x:auto}
+.ribbon-tab{appearance:none;border:none;background:transparent;padding:10px 14px;font:inherit;cursor:pointer;color:var(--text-light);font-weight:600;font-size:13px;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s ease}
+.ribbon-tab:hover{color:var(--text);background:var(--ms-blue-light)}
+.ribbon-tab.active{color:var(--ms-blue);border-bottom-color:var(--ms-blue);background:transparent}
+.ribbon-contents{position:relative;background:var(--ribbon-bg);padding:8px 12px}
+.ribbon-content{display:none;gap:8px;align-items:stretch;flex-wrap:wrap}
 .ribbon-content.active{display:flex}
-.ribbon-group{border:1px solid #ddd;border-radius:8px;padding:8px 10px;background:#fff;min-height:80px;display:flex;flex-direction:column;gap:8px;min-width:120px}
-.ribbon-group-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#666;margin-top:auto;text-align:center}
-.ribbon-group-btns{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.rb,.mtb-btn,.file-menu-item,.modal-btn{font:inherit}
-.rb{border:1px solid #ccc;background:#fff;border-radius:6px;padding:8px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:34px}
-.rb:hover{background:#f4f4f4}.rb.pressed{background:#eaf2ff;border-color:#9cc0f0;color:var(--word-blue)}
-select{border:1px solid #ccc;border-radius:6px;background:#fff;padding:7px 9px;font:inherit;min-height:34px}
-.color-chip{width:22px;height:22px;border-radius:50%;border:1px solid #bbb;display:inline-block;vertical-align:middle}
-.mobile-toolbar{display:none;background:#fff;border-bottom:1px solid #ddd;padding:8px;gap:6px;flex-wrap:wrap}
-.mtb-btn{border:1px solid #ccc;background:#fff;border-radius:6px;padding:7px 9px;cursor:pointer;min-width:34px;min-height:34px}.mtb-btn:hover{background:#f5f5f5}
-.ruler-wrap{background:#f7f7f7;border-bottom:1px solid #ddd;overflow:hidden;flex-shrink:0}
-.ruler{height:22px;overflow:hidden}
-.doc-workspace{flex:1;overflow:auto;background:#f3f2f1;padding:24px 12px}
-.doc-page{width:816px;min-height:1056px;background:#fff;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,.15);padding:96px;transform-origin:top center}
-#editor{min-height:100%;outline:none;font-size:16px;line-height:1.6;white-space:normal;word-break:break-word}
+.ribbon-group{border:1px solid var(--ribbon-border);border-radius:4px;padding:6px 8px;background:#fff;display:flex;flex-direction:column;gap:4px;min-width:100px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.ribbon-group-btns{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.rb{font:inherit;border:1px solid #d4d4d4;background:#fff;border-radius:4px;padding:6px 10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:32px;font-size:13px;color:var(--text);transition:all .15s ease}
+.rb:hover{background:#f3f2f1;border-color:#c0c0c0}
+.rb.pressed{background:var(--ms-blue-light);border-color:var(--ms-blue);color:var(--ms-blue)}
+.rb i{font-size:14px}
+.rb.icon-only{min-width:32px;padding:6px}
+select{border:1px solid #d4d4d4;border-radius:4px;background:#fff;padding:6px 8px;font:inherit;font-size:13px;min-height:32px;cursor:pointer;color:var(--text)}
+select:focus{border-color:var(--ms-blue);outline:none}
+.color-picker-wrap{display:flex;gap:4px;align-items:center}
+.color-chip{width:24px;height:24px;border-radius:3px;border:2px solid #d4d4d4;cursor:pointer;transition:all .15s ease}
+.color-chip:hover{border-color:var(--ms-blue)}
+.color-input{width:40px;height:32px;border:1px solid #d4d4d4;border-radius:4px;padding:2px;cursor:pointer}
+.ruler-wrap{background:#f3f2f1;border-bottom:1px solid var(--ribbon-border);overflow:hidden;flex-shrink:0}
+.ruler{height:24px;overflow:hidden}
+.doc-workspace{flex:1;overflow:auto;background:var(--doc-bg);padding:32px 20px}
+.doc-page{width:816px;min-height:1056px;background:#fff;margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,.15);padding:96px;transform-origin:top center}
+#editor{min-height:100%;outline:none;font-size:16px;line-height:1.5;font-family:Calibri,'Segoe UI',sans-serif;color:#1f1f1f;white-space:normal;word-break:break-word}
 #editor:empty:before{content:attr(data-placeholder);color:#999;pointer-events:none}
-.file-menu-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 16px;border:none;background:none;cursor:pointer;font-size:12px;color:#333;text-align:left}.file-menu-item:hover{background:#f0f0f0}.file-menu-item i{width:16px;color:#666}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.34);display:none;align-items:center;justify-content:center;z-index:3000;padding:20px}.modal-overlay.open{display:flex}
-.modal-box{background:#fff;border-radius:12px;box-shadow:var(--shadow);width:min(560px,100%);overflow:hidden}
-.modal-header{padding:14px 16px;border-bottom:1px solid #ddd;font-weight:700;display:flex;align-items:center;justify-content:space-between}
-.modal-body{padding:16px}.modal-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}.modal-row label{width:74px;color:#555;font-size:12px}.modal-row input{flex:1;height:34px;border:1px solid #bbb;border-radius:6px;padding:0 10px;font:inherit;outline:none}.modal-row input:focus{border-color:#2B579A;box-shadow:0 0 0 2px rgba(43,87,154,.12)}
-.modal-footer{display:flex;gap:8px;justify-content:flex-end;padding:0 16px 16px;flex-wrap:wrap}.modal-btn{border:1px solid #cfcfcf;background:#fff;padding:8px 12px;border-radius:6px;cursor:pointer}.modal-btn.primary{background:var(--word-blue);border-color:var(--word-blue);color:#fff}
-.table-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;padding:16px}.table-cell-btn{height:24px;border:1px solid #d0d0d0;border-radius:3px;background:#fafafa;cursor:pointer}.table-cell-btn.hovered{background:#d8e8fb;border-color:#9cc0f0}.table-grid-label{padding:0 16px 16px;color:#666;font-size:12px}
-#fileMenu{display:none;position:fixed;top:36px;left:0;width:260px;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:3000;border:1px solid #ddd;border-radius:0 0 8px 0;overflow:hidden}
-#fileDocName{padding:8px 16px;font-size:11px;color:#888;border-bottom:1px solid #eee}
-@media (max-width: 900px){.ribbon{display:block}.ribbon-tabs{padding:0 4px}.ribbon-tab{padding:9px 10px}.ribbon-content{padding:8px 8px 10px;gap:8px}.ribbon-group{min-width:unset;flex:1 1 140px}.mobile-toolbar{display:flex}.doc-workspace{padding:12px 0}.doc-page{width:100%;min-height:auto;padding:40px 24px}.title-center{display:none}.title-bar{padding:0 6px}}
-@media print{.title-bar,.ribbon,.mobile-toolbar,.ruler-wrap,#fileMenu,.modal-overlay{display:none !important}.doc-workspace{padding:0;background:#fff}.doc-page{box-shadow:none;margin:0;width:auto;min-height:auto;padding:0}}
+.file-menu{display:none;position:fixed;top:48px;left:0;width:280px;background:#fff;border:1px solid #d4d4d4;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:3000;border-radius:4px;overflow:hidden}
+.file-menu-header{padding:12px 16px;border-bottom:1px solid #e5e5e5;color:var(--text-light);font-size:12px;font-weight:600;text-transform:uppercase}
+.file-menu-item{display:flex;align-items:center;gap:12px;width:100%;padding:10px 16px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text);text-align:left;transition:background .15s ease}
+.file-menu-item:hover{background:#f7f6f5}
+.file-menu-item i{width:16px;color:var(--ms-blue)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:3000;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:6px;box-shadow:0 8px 32px rgba(0,0,0,.2);width:min(480px,100%);overflow:hidden}
+.modal-header{padding:16px;border-bottom:1px solid #e5e5e5;font-weight:600;display:flex;align-items:center;justify-content:space-between;color:var(--text)}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--text-light);font-size:20px}
+.modal-body{padding:16px}
+.modal-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.modal-row label{min-width:80px;color:var(--text);font-size:13px;font-weight:500}
+.modal-row input{flex:1;height:32px;border:1px solid #d4d4d4;border-radius:4px;padding:0 10px;font:inherit;font-size:13px;outline:none}
+.modal-row input:focus{border-color:var(--ms-blue);box-shadow:0 0 0 2px rgba(0,120,212,.15)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;padding:0 16px 16px}
+.modal-btn{border:1px solid #d4d4d4;background:#fff;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s ease;color:var(--text)}
+.modal-btn:hover{background:#f3f2f1;border-color:#c0c0c0}
+.modal-btn.primary{background:var(--ms-blue);border-color:var(--ms-blue);color:#fff}
+.modal-btn.primary:hover{background:var(--ms-blue-dark)}
+.status-bar{height:28px;background:#fafafa;border-top:1px solid var(--ribbon-border);display:flex;align-items:center;padding:0 16px;gap:20px;font-size:12px;color:var(--text-light);flex-shrink:0}
+@media (max-width:900px){
+  .ribbon-tabs{padding:0 8px}
+  .ribbon-tab{padding:9px 10px;font-size:12px}
+  .ribbon-contents{padding:6px 8px}
+  .ribbon-group{min-width:unset;flex:1 1 120px}
+  .rb{padding:4px 8px;font-size:12px}
+  .doc-workspace{padding:12px 0}
+  .doc-page{width:100%;min-height:auto;padding:40px 20px}
+  .header-title{font-size:13px}
+}
+@media print{
+  .header,.ribbon,.ruler-wrap,.file-menu,.modal-overlay,.status-bar{display:none !important}
+  .doc-workspace{padding:0;background:#fff}
+  .doc-page{box-shadow:none;margin:0;width:auto;min-height:auto;padding:0}
+}
 </style>
 </head>
 <body>
-<div class="title-bar">
-	<div class="title-app-icon">W</div>
-	<div class="title-center"><span id="docNameDisplay">Document1</span> - Word</div>
-	<div class="title-right"><button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i><span>Back</span></button></div>
+
+<div class="header">
+  <div class="header-logo"><i class="fas fa-file-word"></i>Word</div>
+  <div class="header-title"><span id="docNameDisplay">Document1</span></div>
+  <div class="header-actions">
+    <button class="header-btn" onclick="goBack()"><i class="fas fa-home"></i></button>
+    <button class="header-btn primary" onclick="saveDoc()"><i class="fas fa-save"></i><span>Save</span></button>
+  </div>
 </div>
+
+<div class="ribbon">
+  <div class="ribbon-tabs">
+    <button class="ribbon-tab active" onclick="switchTab('home', this)">Home</button>
+    <button class="ribbon-tab" onclick="switchTab('insert', this)">Insert</button>
+    <button class="ribbon-tab" onclick="switchTab('design', this)">Design</button>
+    <button class="ribbon-tab" onclick="switchTab('layout', this)">Layout</button>
+    <button class="ribbon-tab" onclick="switchTab('file', this)">File</button>
+  </div>
+  <div class="ribbon-contents">
+    <div class="ribbon-content active" data-tab="home">
+      <div class="ribbon-group">
+        <div class="ribbon-group-btns">
+          <button class="rb icon-only" id="btn-bold" onclick="cmd('bold')" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
+          <button class="rb icon-only" id="btn-italic" onclick="cmd('italic')" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
+          <button class="rb icon-only" id="btn-underline" onclick="cmd('underline')" title="Underline (Ctrl+U)"><i class="fas fa-underline"></i></button>
+          <button class="rb icon-only" onclick="cmd('strikeThrough')" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
+        </div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-btns">
+          <select id="ribbonFontName" onchange="applyFontName()" title="Font">
+            <option value="Calibri">Calibri</option>
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Verdana">Verdana</option>
+          </select>
+          <select id="ribbonFontSize" onchange="applyFontSize()" title="Font Size">
+            <option>8</option>
+            <option>10</option>
+            <option>11</option>
+            <option selected>12</option>
+            <option>14</option>
+            <option>16</option>
+            <option>18</option>
+            <option>24</option>
+            <option>28</option>
+            <option>32</option>
+          </select>
+        </div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-btns">
+          <button class="rb icon-only" onclick="cmd('justifyLeft')" title="Align Left"><i class="fas fa-align-left"></i></button>
+          <button class="rb icon-only" onclick="cmd('justifyCenter')" title="Align Center"><i class="fas fa-align-center"></i></button>
+          <button class="rb icon-only" onclick="cmd('justifyRight')" title="Align Right"><i class="fas fa-align-right"></i></button>
+          <button class="rb icon-only" onclick="cmd('justifyFull')" title="Justify"><i class="fas fa-align-justify"></i></button>
+        </div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-btns">
+          <button class="rb icon-only" onclick="cmd('insertUnorderedList')" title="Bullets"><i class="fas fa-list-ul"></i></button>
+          <button class="rb icon-only" onclick="cmd('insertOrderedList')" title="Numbering"><i class="fas fa-list-ol"></i></button>
+          <button class="rb icon-only" onclick="increaseIndent()" title="Increase Indent"><i class="fas fa-indent"></i></button>
+          <button class="rb icon-only" onclick="decreaseIndent()" title="Decrease Indent"><i class="fas fa-outdent"></i></button>
+        </div>
+      </div>
+      <div class="ribbon-group">
+        <div class="color-picker-wrap">
+          <span class="color-chip" id="fontColorSwatch" style="background:#FF0000;cursor:pointer" onclick="document.getElementById('fontColorPicker').click()" title="Text Color"></span>
+          <input type="color" id="fontColorPicker" value="#FF0000" onchange="applyFontColor()" style="display:none">
+          <span class="color-chip" id="highlightSwatch" style="background:#FFFF00;cursor:pointer" onclick="document.getElementById('highlightPicker').click()" title="Highlight"></span>
+          <input type="color" id="highlightPicker" value="#FFFF00" onchange="applyHighlight()" style="display:none">
+        </div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-btns">
+          <button class="rb" onclick="openFindReplace()"><i class="fas fa-search"></i><span>Find</span></button>
+          <button class="rb" onclick="cmd('removeFormat')"><span>Clear</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="ribbon-content" data-tab="insert">
+      <div class="ribbon-group">
+        <div class="ribbon-group-btns">
+          <button class="rb" onclick="insertLink()"><i class="fas fa-link"></i><span>Link</span></button>
+          <button class="rb" onclick="openTableModal()"><i class="fas fa-table"></i><span>Table</span></button>
+          <button class="rb" onclick="insertHR()"><span>Line</span></button>
+          <button class="rb" onclick="insertPageBreak()"><span>Page Break</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="ribbon-content" data-tab="design">
+      <div class="ribbon-group">
+        <div class="ribbon-group-btns">
+          <button class="rb" onclick="setView('print')">Print Layout</button>
+          <button class="rb" onclick="setView('web')">Web Layout</button>
+          <button class="rb" onclick="setView('focus')">Focus</button>
+        </div>
+      </div>
+    </div>
+    <div class="ribbon-content" data-tab="layout">
+      <div class="ribbon-group">
+        <div class="ribbon-group-btns">
+          <button class="rb" onclick="setOrientation('portrait')"><i class="fas fa-portrait"></i></button>
+          <button class="rb" onclick="setOrientation('landscape')"><i class="fas fa-landscape"></i></button>
+        </div>
+      </div>
+      <div class="ribbon-group">
+        <div class="ribbon-group-btns">
+          <button class="rb" onclick="zoomOut()"><i class="fas fa-minus"></i></button>
+          <button class="rb" onclick="zoomReset()">100%</button>
+          <button class="rb" onclick="zoomIn()"><i class="fas fa-plus"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="ribbon-content" data-tab="file">
+      <div class="ribbon-group">
+        <div class="ribbon-group-btns">
+          <button class="rb" onclick="newDoc()"><i class="fas fa-file"></i><span>New</span></button>
+          <button class="rb" onclick="saveDoc()"><i class="fas fa-save"></i><span>Save</span></button>
+          <button class="rb" onclick="openFileMenu()"><i class="fas fa-download"></i><span>Export</span></button>
+          <button class="rb" onclick="printDoc()"><i class="fas fa-print"></i><span>Print</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ruler-wrap"><div class="ruler"><svg width="100%" height="24" xmlns="http://www.w3.org/2000/svg" id="rulerSvg"></svg></div></div>
+
+<div class="doc-workspace">
+  <div class="doc-page">
+    <div id="editor" contenteditable="true" spellcheck="true" data-placeholder="Start typing..."></div>
+  </div>
+</div>
+
+<div class="file-menu" id="fileMenu">
+  <div class="file-menu-header">File Options</div>
+  <button class="file-menu-item" onclick="newDoc()"><i class="fas fa-file"></i>New Document</button>
+  <button class="file-menu-item" onclick="saveDoc()"><i class="fas fa-save"></i>Save Document</button>
+  <button class="file-menu-item" onclick="exportDocx()"><i class="fas fa-download"></i>Download as .docx</button>
+  <button class="file-menu-item" onclick="printDoc()"><i class="fas fa-print"></i>Print</button>
+  <button class="file-menu-item" onclick="goBack()"><i class="fas fa-arrow-left"></i>Back to Home</button>
+</div>
+
+<div class="status-bar">
+  <span id="wordCount">Words: 0</span>
+  <span id="charCount">Characters: 0</span>
+  <span id="pageCount">Page: 1</span>
+</div>
+
+<div class="modal-overlay" id="tableModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span>Insert Table</span>
+      <button class="modal-close" onclick="closeModal('tableModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <label>Columns:</label>
+        <input type="number" id="tableColumns" value="3" min="1" max="20">
+      </div>
+      <div class="modal-row">
+        <label>Rows:</label>
+        <input type="number" id="tableRows" value="3" min="1" max="50">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn" onclick="closeModal('tableModal')">Cancel</button>
+      <button class="modal-btn primary" onclick="insertTable()">Insert</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="linkModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span>Insert Link</span>
+      <button class="modal-close" onclick="closeModal('linkModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <label>URL:</label>
+        <input type="text" id="linkUrl" placeholder="https://example.com">
+      </div>
+      <div class="modal-row">
+        <label>Text:</label>
+        <input type="text" id="linkText" placeholder="Link text">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn" onclick="closeModal('linkModal')">Cancel</button>
+      <button class="modal-btn primary" onclick="insertLinkHref()">Insert</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const editor = document.getElementById('editor');
+let currentZoom = 100;
+let docName = 'Document1';
+
+function cmd(c) {
+  document.execCommand(c, false, null);
+  updateButtonStates();
+  editor.focus();
+}
+
+function applyFontName() {
+  const font = document.getElementById('ribbonFontName').value;
+  document.execCommand('fontName', false, font);
+  editor.focus();
+}
+
+function applyFontSize() {
+  const size = document.getElementById('ribbonFontSize').value;
+  document.execCommand('fontSize', false, size);
+  editor.focus();
+}
+
+function applyFontColor() {
+  const color = document.getElementById('fontColorPicker').value;
+  document.getElementById('fontColorSwatch').style.background = color;
+  document.execCommand('foreColor', false, color);
+  editor.focus();
+}
+
+function applyHighlight() {
+  const color = document.getElementById('highlightPicker').value;
+  document.getElementById('highlightSwatch').style.background = color;
+  document.execCommand('backColor', false, color);
+  editor.focus();
+}
+
+function increaseIndent() {
+  document.execCommand('indent', false, null);
+  editor.focus();
+}
+
+function decreaseIndent() {
+  document.execCommand('outdent', false, null);
+  editor.focus();
+}
+
+function insertPageBreak() {
+  document.execCommand('insertHorizontalRule', false, null);
+  editor.focus();
+}
+
+function insertHR() {
+  document.execCommand('insertHorizontalRule', false, null);
+  editor.focus();
+}
+
+function openTableModal() {
+  document.getElementById('tableModal').classList.add('open');
+}
+
+function insertTable() {
+  const cols = parseInt(document.getElementById('tableColumns').value) || 3;
+  const rows = parseInt(document.getElementById('tableRows').value) || 3;
+  let table = '<table style="border-collapse:collapse;width:100%">';
+  for (let r = 0; r < rows; r++) {
+    table += '<tr>';
+    for (let c = 0; c < cols; c++) {
+      table += '<td style="border:1px solid #ddd;padding:8px">&nbsp;</td>';
+    }
+    table += '</tr>';
+  }
+  table += '</table>';
+  document.execCommand('insertHTML', false, table);
+  closeModal('tableModal');
+  editor.focus();
+}
+
+function openFindReplace() {
+  const text = prompt('Find text:');
+  if (text) {
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+}
+
+function insertLink() {
+  document.getElementById('linkModal').classList.add('open');
+}
+
+function insertLinkHref() {
+  const url = document.getElementById('linkUrl').value || '#';
+  const text = document.getElementById('linkText').value || 'Link';
+  document.execCommand('createLink', false, url);
+  closeModal('linkModal');
+  editor.focus();
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.ribbon-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ribbon-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+}
+
+function setView(view) {
+  const page = document.querySelector('.doc-page');
+  if (view === 'print') {
+    page.style.width = '816px';
+  } else if (view === 'web') {
+    page.style.width = '100%';
+  } else if (view === 'focus') {
+    page.style.width = '600px';
+  }
+}
+
+function setOrientation(o) {
+  const page = document.querySelector('.doc-page');
+  if (o === 'landscape') {
+    page.style.width = '1056px';
+    page.style.minHeight = '816px';
+  } else {
+    page.style.width = '816px';
+    page.style.minHeight = '1056px';
+  }
+}
+
+function zoomIn() {
+  currentZoom += 10;
+  document.querySelector('.doc-page').style.transform = `scale(${currentZoom / 100})`;
+}
+
+function zoomOut() {
+  if (currentZoom > 20) currentZoom -= 10;
+  document.querySelector('.doc-page').style.transform = `scale(${currentZoom / 100})`;
+}
+
+function zoomReset() {
+  currentZoom = 100;
+  document.querySelector('.doc-page').style.transform = 'scale(1)';
+}
+
+function saveDoc() {
+  const name = prompt('Document name:', docName);
+  if (name) {
+    docName = name;
+    document.getElementById('docNameDisplay').textContent = docName;
+    localStorage.setItem('docName', docName);
+    localStorage.setItem('docContent', editor.innerHTML);
+    alert('Document saved!');
+  }
+}
+
+function newDoc() {
+  if (confirm('Create a new document? (Current content will be lost)')) {
+    editor.innerHTML = '';
+    docName = 'Document' + new Date().getTime();
+    document.getElementById('docNameDisplay').textContent = docName;
+    updateStats();
+  }
+}
+
+function exportDocx() {
+  const content = editor.innerHTML;
+  fetch('/api/word/export', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ html: content, name: docName })
+  })
+  .then(r => r.blob())
+  .then(blob => {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = docName + '.docx';
+    a.click();
+  });
+}
+
+function printDoc() {
+  window.print();
+}
+
+function openFileMenu() {
+  const menu = document.getElementById('fileMenu');
+  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function goBack() {
+  if (confirm('Go back to home? (Make sure to save first)')) {
+    window.location.href = '/';
+  }
+}
+
+function updateButtonStates() {
+  document.getElementById('btn-bold').classList.toggle('pressed', document.queryCommandState('bold'));
+  document.getElementById('btn-italic').classList.toggle('pressed', document.queryCommandState('italic'));
+  document.getElementById('btn-underline').classList.toggle('pressed', document.queryCommandState('underline'));
+}
+
+function updateStats() {
+  const text = editor.innerText || '';
+  const words = text.trim().split(/\s+/).filter(w => w).length;
+  const chars = text.length;
+  const pages = Math.ceil(text.split('\n').length / 50);
+  document.getElementById('wordCount').textContent = `Words: ${words}`;
+  document.getElementById('charCount').textContent = `Characters: ${chars}`;
+  document.getElementById('pageCount').textContent = `Page: ${pages || 1}`;
+}
+
+editor.addEventListener('keyup', updateStats);
+editor.addEventListener('input', updateStats);
+editor.addEventListener('click', updateButtonStates);
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.file-menu') && !e.target.closest('[onclick*="openFileMenu"]')) {
+    document.getElementById('fileMenu').style.display = 'none';
+  }
+});
+
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('docContent');
+  if (saved) editor.innerHTML = saved;
+  docName = localStorage.getItem('docName') || 'Document1';
+  document.getElementById('docNameDisplay').textContent = docName;
+  updateStats();
+});
+
+// Initialize ruler (simplified)
+const rulerSvg = document.getElementById('rulerSvg');
+if (rulerSvg) {
+  let rulerHTML = '';
+  for (let i = 0; i < 100; i++) {
+    const height = i % 10 === 0 ? 12 : (i % 5 === 0 ? 8 : 4);
+    rulerHTML += `<line x1="${i * 10}" y1="24" x2="${i * 10}" y2="${24 - height}" stroke="#ccc" stroke-width="1"/>`;
+  }
+  rulerSvg.innerHTML = rulerHTML;
+}
+</script>
+</body>
+</html>
 
 <div class="ribbon">
 	<div class="ribbon-tabs">
