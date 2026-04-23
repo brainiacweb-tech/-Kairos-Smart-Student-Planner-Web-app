@@ -1,5 +1,4 @@
 [build]
-builder = "python"
 
 [deploy]
 command = "gunicorn backend.app:app"
