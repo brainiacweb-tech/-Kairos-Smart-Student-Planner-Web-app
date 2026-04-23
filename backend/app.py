@@ -72,6 +72,13 @@ def _no_cache(resp):
 def serve_index():
     return _no_cache(send_from_directory(FRONTEND_DIR, 'landing.html'))
 
+@app.route('/google402260b3a598f3b9.html')
+def serve_google_verification():
+    filepath = os.path.join(FRONTEND_DIR, 'google402260b3a598f3b9.html')
+    if os.path.exists(filepath):
+        return send_file(filepath, mimetype='text/html')
+    return "google-site-verification: google402260b3a598f3b9.html", 200, {'Content-Type': 'text/html'}
+
 @app.route('/<path:filename>')
 def serve_frontend(filename):
     filepath = os.path.join(FRONTEND_DIR, filename)
