@@ -196,6 +196,24 @@ class TimetableManager {
                 }
             }
         });
+        
+        // Extract 2D bounding boxes from Tesseract
+        const items = [];
+        if (result.data && result.data.words) {
+            for (const word of result.data.words) {
+                items.push({
+                    text: word.text,
+                    x: word.bbox.x0,
+                    y: word.bbox.y0,
+                    w: word.bbox.x1 - word.bbox.x0,
+                    h: word.bbox.y1 - word.bbox.y0
+                });
+            }
+        }
+        
+        const courses2D = this._parseTimetable2D(items);
+        if (courses2D && courses2D.length > 0) return courses2D;
+
         return this._parseTimetableText(result.data.text);
     }
 
@@ -215,13 +233,215 @@ class TimetableManager {
         const bytes = new Uint8Array(bin.length);
         for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
         const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+        
         let text = '';
+        let items = [];
+        let yOffset = 0; // stack pages vertically for 2D parsing
+        
         for (let p = 1; p <= pdf.numPages; p++) {
             const page = await pdf.getPage(p);
             const tc = await page.getTextContent();
+            const viewport = page.getViewport({ scale: 1.0 });
+            
+            for (const item of tc.items) {
+                // In PDF.js, item.transform is [scaleX, skewY, skewX, scaleY, translateX, translateY]
+                // Origin is bottom-left. We convert to top-left.
+                const tx = item.transform[4];
+                const ty = viewport.height - item.transform[5];
+                items.push({
+                    text: item.str,
+                    x: tx,
+                    y: ty + yOffset,
+                    w: item.width,
+                    h: item.height
+                });
+            }
             text += tc.items.map(i => i.str).join(' ') + '\n';
+            yOffset += viewport.height;
         }
+        
+        const courses2D = this._parseTimetable2D(items);
+        if (courses2D && courses2D.length > 0) return courses2D;
+
         return this._parseTimetableText(text);
+    }
+
+    _parseTimetable2D(items) {
+        if (!items || items.length === 0) return [];
+
+        const courses = [];
+        const courseRegex = /^([A-Z]{2,5})\s*[-_]?\s*(\d{3,4}[A-Z]?)$/i;
+        const timeRegex24 = /^(?:[01]?\d|2[0-3])[:.][0-5]\d$/;
+        const timeRegex12 = /^(?:1[0-2]|0?[1-9])[:.]?(?:[0-5]\d)?\s*(?:AM|PM)$/i;
+        const dayRegex = /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun)$/i;
+
+        // Merge nearby words into longer phrases (useful for dates "8:00 - 10:00")
+        const mergedItems = [];
+        let currentGroup = [];
+        
+        // Very basic proximity merge (horizontal)
+        const sortedItems = [...items].sort((a,b) => a.y - b.y || a.x - b.x);
+        for (let i = 0; i < sortedItems.length; i++) {
+            const item = sortedItems[i];
+            if (!item.text.trim()) continue;
+            
+            if (currentGroup.length === 0) {
+                currentGroup.push(item);
+            } else {
+                const last = currentGroup[currentGroup.length - 1];
+                // If on same line and close horizontally
+                if (Math.abs(item.y - last.y) < 15 && (item.x - (last.x + last.w)) < 40) {
+                    currentGroup.push(item);
+                } else {
+                    // Flush
+                    mergedItems.push(this._mergeGroup(currentGroup));
+                    currentGroup = [item];
+                }
+            }
+        }
+        if (currentGroup.length > 0) mergedItems.push(this._mergeGroup(currentGroup));
+
+        const dayRowZones = [];
+        const timeColZones = [];
+        const courseItems = [];
+
+        for (const item of mergedItems) {
+            // Check if day
+            let dMatch = item.text.match(dayRegex);
+            if (!dMatch) {
+                // try to find inside if it's the only thing
+                const words = item.text.split(' ');
+                if (words.length === 1) dMatch = words[0].match(dayRegex);
+            }
+            if (dMatch) {
+                const d = dMatch[1].slice(0, 3);
+                dayRowZones.push({
+                    day: d.charAt(0).toUpperCase() + d.slice(1).toLowerCase(),
+                    y: item.y,
+                    h: item.h
+                });
+                continue;
+            }
+
+            // Check if time
+            // e.g. "8:00 - 10:00" or just "8:00"
+            const times = [];
+            const timeTokens = item.text.split(/[-to ]+/);
+            for (const tk of timeTokens) {
+                if (tk.match(timeRegex24) || tk.match(timeRegex12)) {
+                    times.push(tk.replace('.', ':'));
+                }
+            }
+            if (times.length > 0) {
+                let st = times[0];
+                let et = times.length > 1 ? times[1] : this._addHours(st, 2); // simplistic formatting needed
+                
+                // Format
+                st = this._formatTime(st);
+                et = this._formatTime(et);
+                
+                timeColZones.push({
+                    startTime: st,
+                    endTime: et,
+                    x: item.x,
+                    w: item.w
+                });
+                continue;
+            }
+
+            // Check if course
+            let cMatch = item.text.match(courseRegex);
+            if (!cMatch) {
+                const words = item.text.split(/\s+/);
+                for (let w=0; w<words.length-1; w++) {
+                    const comb = words[w] + words[w+1];
+                    const cbMatch = comb.match(/^([A-Z]{2,5})(\d{3,4}[A-Z]?)$/i);
+                    if (cbMatch) {
+                        cMatch = [comb, cbMatch[1], cbMatch[2]];
+                        break;
+                    }
+                }
+            }
+            
+            if (cMatch) {
+                courseItems.push({
+                    code: `${cMatch[1].toUpperCase()}${cMatch[2]}`,
+                    x: item.x + item.w/2,
+                    y: item.y + item.h/2
+                });
+            }
+        }
+
+        // If we didn't find clear zones, abort 2D parsing
+        if (dayRowZones.length === 0 || timeColZones.length === 0 || courseItems.length === 0) {
+            return [];
+        }
+
+        // Project courses onto grid
+        for (const cItem of courseItems) {
+            // Find closest day (row)
+            let closestDay = null;
+            let minDy = Infinity;
+            for (const rz of dayRowZones) {
+                const dy = Math.abs(cItem.y - rz.y);
+                if (dy < minDy && dy < 150) { // arbitrary row max height
+                    minDy = dy;
+                    closestDay = rz.day;
+                }
+            }
+
+            // Find closest time (col)
+            let closestTime = null;
+            let minDx = Infinity;
+            for (const cz of timeColZones) {
+                const dx = Math.abs(cItem.x - (cz.x + cz.w/2));
+                if (dx < minDx && dx < 300) {
+                    minDx = dx;
+                    closestTime = cz;
+                }
+            }
+
+            if (closestDay && closestTime) {
+                courses.push({
+                    course: cItem.code,
+                    room: 'TBA', // hard to reliably extract room in 2D without complex bounding, fallback to TBA
+                    startTime: closestTime.startTime,
+                    endTime: closestTime.endTime,
+                    days: [closestDay]
+                });
+            }
+        }
+
+        // Remove duplicates
+        return courses.filter((v,i,a)=>a.findIndex(v2=>(v2.course===v.course && v2.startTime===v.startTime && v2.days.join()===v.days.join()))===i);
+    }
+
+    _mergeGroup(group) {
+        const x = Math.min(...group.map(g => g.x));
+        const y = Math.min(...group.map(g => g.y));
+        const maxRight = Math.max(...group.map(g => g.x + g.w));
+        const maxBottom = Math.max(...group.map(g => g.y + g.h));
+        return {
+            text: group.map(g => g.text).join(' '),
+            x: x,
+            y: y,
+            w: maxRight - x,
+            h: maxBottom - y
+        };
+    }
+
+    _formatTime(t) {
+        if (!t) return "08:00";
+        t = t.toUpperCase().replace('.', ':');
+        let isPM = t.includes('PM');
+        let timePart = t.replace(/\s*(AM|PM)/, '').trim();
+        if (!timePart.includes(':')) timePart += ':00';
+        let parts = timePart.split(':');
+        let h = parseInt(parts[0]);
+        let m = parts[1] || '00';
+        if (isPM && h !== 12) h += 12;
+        if (!isPM && h === 12) h = 0;
+        return `${String(h).padStart(2,'0')}:${m}`;
     }
 
     _parseTimetableText(text) {
