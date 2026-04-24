@@ -154,16 +154,34 @@ class TimetableManager {
         document.getElementById('_kairosDetectModal')?.remove();
         const m = document.createElement('div');
         m.id = '_kairosDetectModal';
-        m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;display:flex;align-items:center;justify-content:center;';
-        m.innerHTML = `<div style="background:#fff;border-radius:18px;padding:36px 40px;text-align:center;max-width:340px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.3);">
-            <div style="font-size:2.8rem;margin-bottom:14px;">🔍</div>
-            <h3 style="margin:0 0 6px;font-family:Poppins,sans-serif;color:#1a1a2e;">Scanning Timetable</h3>
-            <p style="color:#6b7280;font-size:0.88rem;margin-bottom:20px;">Auto-detecting courses from<br><strong>${fileName}</strong></p>
-            <div style="height:5px;background:#f0eeff;border-radius:3px;overflow:hidden;">
-              <div id="_kairosDetectBar" style="height:100%;background:linear-gradient(90deg,#6C63FF,#a39bff);border-radius:3px;width:30%;animation:_kScan 1.4s ease-in-out infinite;"></div>
+        m.style.cssText = 'position:fixed;inset:0;background:rgba(10, 10, 20, 0.85);backdrop-filter:blur(10px);z-index:99999;display:flex;align-items:center;justify-content:center;font-family:Poppins,sans-serif;';
+        m.innerHTML = `
+            <div style="position:relative;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:50px;text-align:center;max-width:400px;width:90%;box-shadow:0 0 40px rgba(108,99,255,0.2), inset 0 0 20px rgba(108,99,255,0.05);overflow:hidden;">
+                <!-- Scanning Beam Effect -->
+                <div style="position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg, transparent 70%, rgba(108,99,255,0.3) 100%);animation:spin 4s linear infinite;z-index:0;opacity:0.5;"></div>
+                <div style="position:absolute;inset:2px;background:#1a1a2e;border-radius:22px;z-index:1;"></div>
+                
+                <div style="position:relative;z-index:2;">
+                    <div style="position:relative;width:80px;height:80px;margin:0 auto 20px;">
+                        <div style="position:absolute;inset:0;border:3px solid rgba(108,99,255,0.3);border-radius:50%;border-top-color:#6C63FF;animation:spin 1s linear infinite;"></div>
+                        <i class="fas fa-crosshairs" style="font-size:2rem;color:#6C63FF;line-height:80px;"></i>
+                    </div>
+                    <h3 style="margin:0 0 8px;color:#fff;font-size:1.5rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Kairos AI Scanner</h3>
+                    <p style="color:#a0a0b0;font-size:0.9rem;margin-bottom:25px;line-height:1.4;">Extracting scheduling data from<br><strong style="color:#fff;">${fileName}</strong></p>
+                    
+                    <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;position:relative;box-shadow:inset 0 1px 3px rgba(0,0,0,0.5);">
+                        <div id="_kairosDetectBar" style="position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg, #6C63FF, #00d2ff, #6C63FF);background-size:200% 100%;border-radius:10px;width:15%;animation:kScan 2s ease-in-out infinite, pulseGlow 1.5s infinite;"></div>
+                    </div>
+                    <div style="margin-top:12px;color:#6C63FF;font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;animation:pulseText 1s infinite alternate;">Analyzing Document...</div>
+                </div>
             </div>
-            <style>@keyframes _kScan{0%,100%{width:20%;margin-left:0}50%{width:50%;margin-left:30%}}</style>
-        </div>`;
+            <style>
+                @keyframes spin { 100% { transform: rotate(360deg); } }
+                @keyframes kScan { 0% { left: 0%; width: 15%; } 50% { left: 85%; width: 15%; } 100% { left: 0%; width: 15%; } }
+                @keyframes pulseGlow { 0% { box-shadow: 0 0 5px #6C63FF; } 50% { box-shadow: 0 0 15px #00d2ff, 0 0 5px #6C63FF; } 100% { box-shadow: 0 0 5px #6C63FF; } }
+                @keyframes pulseText { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+            </style>
+        `;
         document.body.appendChild(m);
     }
 
@@ -207,56 +225,98 @@ class TimetableManager {
     }
 
     _parseTimetableText(text) {
-        const courses = [], seen = new Set();
-        const lines = text.split(/[\n\r]+/).map(l => l.trim()).filter(l => l.length > 2);
+        const courses = [];
+        const lines = text.split(/[\n\r]+/).map(l => l.trim()).filter(l => l.length > 1);
 
-        const codeRx   = /\b([A-Z]{2,5}\s?\d{3,4}[A-Z]?)\b/g;
-        const t24Rx    = /\b([01]?\d|2[0-3]):([0-5]\d)\b/g;
-        const t12Rx    = /\b(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([AaPp][Mm])\b/g;
-        const dayRx    = /\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/gi;
+        // Improved heuristics for course extraction
+        const courseRegex = /\b([A-Z]{2,5})\s*[-_]?\s*(\d{3,4}[A-Z]?)\b/i; // E.g. CS 101, MATH-201, PHY3000
+        const timeRegex24 = /\b(?:[01]?\d|2[0-3])[:.][0-5]\d\b/g;
+        const timeRegex12 = /\b(?:1[0-2]|0?[1-9])[:.]?(?:[0-5]\d)?\s*(?:AM|PM)\b/gi;
+        const dayRegex = /\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i;
+        const roomRegex = /\b(?:Room|Rm|Hall|Lab|Classroom|Building)\s*#?[A-Z0-9-]+\b|\b[A-Z]{1,2}[0-9]{2,4}\b/i;
+
+        let currentDayContext = 'Mon';
 
         for (let i = 0; i < lines.length; i++) {
-            const block = lines.slice(Math.max(0, i - 1), i + 3).join(' ');
-            let m; codeRx.lastIndex = 0;
-            while ((m = codeRx.exec(block)) !== null) {
-                const code = m[1].replace(/\s+/, '');
-                if (seen.has(code)) continue;
-                seen.add(code);
+            const line = lines[i];
+            
+            // Context tracking: If a line explicitly names a day, assume subsequent courses belong to it
+            const dayMatch = line.match(dayRegex);
+            if (dayMatch) {
+                const d = dayMatch[1].slice(0, 3);
+                currentDayContext = d.charAt(0).toUpperCase() + d.slice(1).toLowerCase();
+            }
 
-                const times = [];
-                let tm; t24Rx.lastIndex = 0;
-                while ((tm = t24Rx.exec(block)) !== null)
-                    times.push(`${tm[1].padStart(2,'0')}:${tm[2]}`);
-                if (!times.length) {
-                    t12Rx.lastIndex = 0;
-                    while ((tm = t12Rx.exec(block)) !== null) {
-                        let h = parseInt(tm[1]);
-                        const mn = tm[2] || '00', ap = tm[3].toUpperCase();
-                        if (ap === 'PM' && h !== 12) h += 12;
-                        if (ap === 'AM' && h === 12) h = 0;
-                        times.push(`${String(h).padStart(2,'0')}:${mn}`);
+            // Look for a course code in the current or adjacent lines
+            const block = lines.slice(Math.max(0, i - 1), i + 2).join(' ');
+            const codeMatch = line.match(courseRegex);
+            
+            if (codeMatch) {
+                const code = `${codeMatch[1].toUpperCase()}${codeMatch[2]}`;
+                
+                // Avoid extracting the exact same course on the exact same line twice
+                if (courses.some(c => c.course === code && c._lineIdx === i)) continue;
+
+                // Extract Times
+                let times = [];
+                let tm; 
+                timeRegex24.lastIndex = 0;
+                while ((tm = timeRegex24.exec(block)) !== null) times.push(tm[0].replace('.', ':'));
+                
+                if (times.length < 2) {
+                    timeRegex12.lastIndex = 0;
+                    while ((tm = timeRegex12.exec(block)) !== null) {
+                        let tstr = tm[0].toUpperCase().replace('.', ':');
+                        // Normalize 12h to 24h for consistency
+                        let isPM = tstr.includes('PM');
+                        let timePart = tstr.replace(/\s*(AM|PM)/, '').trim();
+                        if (!timePart.includes(':')) timePart += ':00';
+                        let [h, m] = timePart.split(':');
+                        h = parseInt(h);
+                        if (isPM && h !== 12) h += 12;
+                        if (!isPM && h === 12) h = 0;
+                        times.push(`${String(h).padStart(2,'0')}:${m}`);
                     }
                 }
 
-                const days = [];
-                dayRx.lastIndex = 0;
-                while ((tm = dayRx.exec(block)) !== null) {
-                    const d = tm[1].slice(0,3);
+                // Extract Days from block, fallback to context
+                let days = [];
+                const blockDays = [...block.matchAll(new RegExp(dayRegex.source, 'gi'))];
+                for (const bd of blockDays) {
+                    const d = bd[1].slice(0,3);
                     const nd = d.charAt(0).toUpperCase() + d.slice(1).toLowerCase();
                     if (!days.includes(nd)) days.push(nd);
                 }
+                if (days.length === 0) days.push(currentDayContext);
 
-                const roomM = block.match(/\b(Room\s*\w+|Hall\s*[A-Z]?\d*|Lab\s*\w+|[A-Z]{1,2}\d{2,4})\b/i);
+                // Extract Room
+                const rmMatch = block.match(roomRegex);
+                const room = rmMatch ? rmMatch[0].trim() : 'TBA';
+
+                // Deduce start and end
+                // Sort times to guess start and end
+                times.sort();
                 const st = times[0] || '08:00';
                 const et = times[1] || this._addHours(st, 2);
+
                 courses.push({
-                    course: code, room: roomM ? roomM[1].trim() : 'TBA',
-                    startTime: st, endTime: et,
-                    days: days.length ? days : ['Mon']
+                    course: code,
+                    room: room,
+                    startTime: st,
+                    endTime: et,
+                    days: days,
+                    _lineIdx: i // internal tracker
                 });
             }
         }
-        return courses;
+        
+        // Cleanup internal trackers
+        courses.forEach(c => delete c._lineIdx);
+        
+        // Remove duplicates (same course, same day, same time)
+        const uniqueCourses = courses.filter((v,i,a)=>a.findIndex(v2=>(v2.course===v.course && v2.startTime===v.startTime && v2.days.join()===v.days.join()))===i);
+        
+        return uniqueCourses;
     }
 
     _addHours(t, h) {
@@ -272,76 +332,118 @@ class TimetableManager {
 
         const isImage = timetable.type === 'image';
         const previewHTML = isImage
-            ? `<img src="${timetable.data}" style="max-width:100%;border-radius:8px;display:block;">`
-            : `<iframe src="${timetable.data}" style="width:100%;height:380px;border:none;border-radius:8px;"></iframe>`;
+            ? `<div style="width:100%;height:100%;background:url('${timetable.data}') center/contain no-repeat;border-radius:12px;"></div>`
+            : `<iframe src="${timetable.data}#zoom=FitH" style="width:100%;height:100%;border:none;border-radius:12px;"></iframe>`;
 
         const hasDetected = preDetected.length > 0;
+        const subtitleText = hasDetected ? "AI identified <strong style='color:#6C63FF;'>" + preDetected.length + "</strong> potential courses. Please verify and refine." : "Add your courses manually alongside your timetable.";
 
         const modal = document.createElement('div');
         modal.id = 'extractionModal';
-        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:12px;';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(15, 15, 25, 0.85);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:Inter,sans-serif;animation:modalFadeIn 0.3s ease-out;';
+        
         modal.innerHTML = `
-            <div style="background:#fff;border-radius:16px;max-width:980px;width:100%;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
-                <div style="padding:18px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
-                    <div>
-                        <h2 style="margin:0;font-size:1.2rem;color:#1a1a2e;font-family:Poppins,sans-serif;">
-                            ${hasDetected ? '✅ Courses Auto-Detected' : '📅 Timetable Editor'}
-                        </h2>
-                        <p style="margin:3px 0 0;font-size:0.82rem;color:#6b7280;">
-                            ${hasDetected ? `Found ${preDetected.length} course(s). Review, edit, or add more below.` : 'View your timetable and add courses manually.'}
-                        </p>
-                    </div>
-                    <button onclick="document.getElementById('extractionModal').remove()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#999;">✕</button>
-                </div>
-
-                <div style="display:grid;grid-template-columns:1fr 1fr;flex:1;overflow:hidden;min-height:0;">
-                    <div style="padding:14px;overflow-y:auto;border-right:1px solid #eee;background:#f8f9ff;">
-                        <div style="font-weight:700;margin-bottom:10px;color:#6C63FF;font-size:0.8rem;letter-spacing:0.06em;">YOUR TIMETABLE</div>
-                        ${previewHTML}
-                    </div>
-                    <div style="padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;">
-                        <div style="font-weight:700;color:#6C63FF;font-size:0.8rem;letter-spacing:0.06em;">
-                            ${hasDetected ? 'AUTO-DETECTED COURSES (tap to remove)' : 'ADD COURSES'}
+            <style>
+                @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+                .k-editor-glass { background: rgba(255, 255, 255, 0.95); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; }
+                .k-course-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; transition: all 0.2s; position:relative; overflow:hidden; }
+                .k-course-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); border-color:#6C63FF; }
+                .k-course-card::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background: linear-gradient(to bottom, #6C63FF, #00d2ff); }
+                .k-input { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:8px 12px; font-size:0.85rem; width:100%; transition:all 0.2s; box-sizing:border-box;}
+                .k-input:focus { outline:none; border-color:#6C63FF; box-shadow:0 0 0 3px rgba(108,99,255,0.1); background:#fff; }
+                .k-day-chip { display:inline-block; padding:3px 8px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:12px; font-size:0.75rem; color:#475569; cursor:pointer; transition:all 0.2s; margin:2px; }
+                .k-day-chip input:checked + span { color:#fff; }
+                .k-day-chip:has(input:checked) { background:#6C63FF; border-color:#6C63FF; }
+                .k-btn-primary { background:linear-gradient(135deg, #6C63FF, #5a52d5); color:#fff; border:none; padding:10px 24px; border-radius:10px; font-weight:600; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 6px -1px rgba(108,99,255,0.3); }
+                .k-btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 8px -1px rgba(108,99,255,0.4); }
+                .k-btn-ghost { background:transparent; color:#64748b; border:1px solid #cbd5e1; padding:10px 20px; border-radius:10px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+                .k-btn-ghost:hover { background:#f1f5f9; color:#334155; }
+            </style>
+            
+            <div class="k-editor-glass" style="max-width:1100px;width:100%;height:90vh;display:flex;flex-direction:column;overflow:hidden;">
+                <!-- Header -->
+                <div style="padding:20px 30px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; background:linear-gradient(to right, #ffffff, #f8fafc);">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <div style="width:40px;height:40px;border-radius:10px;background:rgba(108,99,255,0.1);display:flex;align-items:center;justify-content:center;color:#6C63FF;font-size:1.2rem;">
+                            <i class="fas fa-magic"></i>
                         </div>
-                        <div id="extractedCoursesList" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;"></div>
-                        <details style="margin-top:4px;" ${hasDetected ? '' : 'open'}>
-                            <summary style="cursor:pointer;font-size:0.85rem;font-weight:600;color:#6C63FF;padding:6px 0;list-style:none;">
-                                <span>+ Add / Edit a Course Manually</span>
-                            </summary>
-                            <div style="background:#f8f9ff;border-radius:10px;padding:14px;margin-top:8px;display:grid;gap:8px;">
-                                <input id="exCourse" type="text" placeholder="Course code (e.g. ACC301)" style="padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.88rem;width:100%;">
-                                <input id="exRoom" type="text" placeholder="Room (e.g. Hall A)" style="padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.88rem;width:100%;">
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                                    <div><label style="font-size:0.78rem;color:#6b7280;display:block;margin-bottom:3px;">Start Time</label><input id="exStart" type="time" value="08:00" style="padding:7px;border:1px solid #e5e7eb;border-radius:8px;width:100%;font-size:0.88rem;"></div>
-                                    <div><label style="font-size:0.78rem;color:#6b7280;display:block;margin-bottom:3px;">End Time</label><input id="exEnd" type="time" value="10:00" style="padding:7px;border:1px solid #e5e7eb;border-radius:8px;width:100%;font-size:0.88rem;"></div>
-                                </div>
-                                <div>
-                                    <label style="font-size:0.78rem;color:#6b7280;display:block;margin-bottom:5px;">Days</label>
-                                    <div style="display:flex;flex-wrap:wrap;gap:5px;">
-                                        ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d =>
-                                            `<label style="display:flex;align-items:center;gap:3px;cursor:pointer;font-size:0.82rem;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:3px 8px;">
-                                                <input type="checkbox" class="ex-day" value="${d}"> ${d}
-                                            </label>`).join('')}
+                        <div>
+                            <h2 style="margin:0;font-size:1.25rem;color:#0f172a;font-weight:700;">Extraction Results</h2>
+                            <p style="margin:2px 0 0;font-size:0.85rem;color:#64748b;">${subtitleText}</p>
+                        </div>
+                    </div>
+                    <button onclick="document.getElementById('extractionModal').remove()" style="background:none;border:none;font-size:1.5rem;color:#94a3b8;cursor:pointer;padding:5px;border-radius:50%;transition:all 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9';this.style.color='#0f172a'" onmouseout="this.style.backgroundColor='transparent';this.style.color='#94a3b8'">✕</button>
+                </div>
+
+                <!-- Body -->
+                <div style="display:flex; flex:1; overflow:hidden;">
+                    <!-- Left: Original View -->
+                    <div style="flex:5; padding:20px; background:#f8fafc; border-right:1px solid #e2e8f0; display:flex; flex-direction:column;">
+                        <div style="font-size:0.75rem; font-weight:700; color:#94a3b8; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; display:flex; justify-content:space-between;">
+                            <span>Original Source</span>
+                            <span style="color:#6C63FF;"><i class="fas fa-search-plus"></i> Use this to verify times</span>
+                        </div>
+                        <div style="flex:1; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:4px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                            ${previewHTML}
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Editor Panel -->
+                    <div style="flex:4; display:flex; flex-direction:column; background:#ffffff;">
+                        <div style="padding:15px 20px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:0.75rem; font-weight:700; color:#0f172a; letter-spacing:1px; text-transform:uppercase;">Extracted Courses</span>
+                            <span id="exCountBadge" style="background:#e0e7ff; color:#4338ca; padding:3px 8px; border-radius:12px; font-size:0.75rem; font-weight:600;">0 Valid</span>
+                        </div>
+                        
+                        <!-- List -->
+                        <div id="extractedCoursesList" style="flex:1; overflow-y:auto; padding:15px 20px; display:flex; flex-direction:column; gap:12px; background:#fafafa;"></div>
+                        
+                        <!-- Add Manual -->
+                        <div style="padding:15px 20px; background:#fff; border-top:1px solid #e2e8f0;">
+                            <details id="addCourseDetails">
+                                <summary style="cursor:pointer; font-size:0.85rem; font-weight:600; color:#6C63FF; list-style:none; display:flex; align-items:center; gap:8px;">
+                                    <i class="fas fa-plus-circle"></i> Add Missing Course Manually
+                                </summary>
+                                <div style="margin-top:12px; padding:12px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px;">
+                                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+                                        <input id="exCourse" type="text" placeholder="Course Code" class="k-input">
+                                        <input id="exRoom" type="text" placeholder="Room/Loc" class="k-input">
                                     </div>
+                                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+                                        <div><div style="font-size:0.7rem;color:#64748b;margin-bottom:2px;">Start</div><input id="exStart" type="time" value="08:00" class="k-input"></div>
+                                        <div><div style="font-size:0.7rem;color:#64748b;margin-bottom:2px;">End</div><input id="exEnd" type="time" value="10:00" class="k-input"></div>
+                                    </div>
+                                    <div style="margin-bottom:10px;">
+                                        <div style="font-size:0.7rem;color:#64748b;margin-bottom:4px;">Days</div>
+                                        <div style="display:flex; flex-wrap:wrap;">
+                                            <label class="k-day-chip"><input type="checkbox" class="ex-day" value="Mon" style="display:none;"><span>Mon</span></label>
+                                            <label class="k-day-chip"><input type="checkbox" class="ex-day" value="Tue" style="display:none;"><span>Tue</span></label>
+                                            <label class="k-day-chip"><input type="checkbox" class="ex-day" value="Wed" style="display:none;"><span>Wed</span></label>
+                                            <label class="k-day-chip"><input type="checkbox" class="ex-day" value="Thu" style="display:none;"><span>Thu</span></label>
+                                            <label class="k-day-chip"><input type="checkbox" class="ex-day" value="Fri" style="display:none;"><span>Fri</span></label>
+                                        </div>
+                                    </div>
+                                    <button onclick="timetableManager.addExtractedCourse()" style="width:100%; background:#0f172a; color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer; font-weight:500; font-size:0.85rem;"><i class="fas fa-check"></i> Add Course</button>
                                 </div>
-                                <button onclick="timetableManager.addExtractedCourse()" style="background:#6C63FF;color:#fff;border:none;padding:9px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;">
-                                    + Add Course
-                                </button>
-                            </div>
-                        </details>
+                            </details>
+                        </div>
                     </div>
                 </div>
 
-                <div style="padding:14px 24px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:12px;">
-                    <span id="exCountBadge" style="font-size:0.85rem;color:#6b7280;"></span>
-                    <div style="display:flex;gap:10px;">
-                        <button onclick="document.getElementById('extractionModal').remove()" style="padding:9px 18px;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;">Cancel</button>
-                        <button onclick="timetableManager.saveExtractedCourses()" style="padding:9px 22px;background:#6C63FF;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;">
-                            Save ${hasDetected ? preDetected.length : ''} Course(s)
+                <!-- Footer -->
+                <div style="padding:15px 30px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-size:0.8rem; color:#64748b;">
+                        <i class="fas fa-info-circle" style="color:#6C63FF"></i> Review your courses carefully before saving.
+                    </div>
+                    <div style="display:flex; gap:12px;">
+                        <button class="k-btn-ghost" onclick="document.getElementById('extractionModal').remove()">Cancel</button>
+                        <button class="k-btn-primary" onclick="timetableManager.saveExtractedCourses()">
+                            <i class="fas fa-save"></i> Save to Planner
                         </button>
                     </div>
                 </div>
-            </div>`;
+            </div>
+        `;
 
         document.body.appendChild(modal);
 
@@ -355,13 +457,26 @@ class TimetableManager {
         if (!list) return;
         const item = document.createElement('div');
         item.id = `exItem_${idx}`;
-        item.style.cssText = 'background:#f0eeff;border-left:3px solid #6C63FF;padding:8px 12px;border-radius:7px;font-size:0.83rem;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;cursor:pointer;';
-        item.title = 'Tap to remove';
-        item.innerHTML = `<div>
-            <strong>${entry.course}</strong> <span style="color:#6b7280;font-size:0.75rem;">${entry.room}</span><br>
-            <span style="color:#6C63FF;">${entry.startTime}${entry.endTime ? ' - ' + entry.endTime : ''}</span>
-            <span style="color:#6b7280;margin-left:6px;font-size:0.75rem;">${(entry.days||[]).join(', ')}</span>
-        </div><button onclick="timetableManager.removeExtractedItem(${idx})" style="background:none;border:none;color:#FF4757;cursor:pointer;font-size:0.95rem;padding:0 2px;">✕</button>`;
+        item.className = 'k-course-card';
+        
+        // Format days for display
+        const dayString = (entry.days||[]).map(d => `<span style="background:rgba(108,99,255,0.1);color:#6C63FF;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:600;margin-right:4px;">${d}</span>`).join('');
+
+        item.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="background:#f1f5f9;color:#0f172a;padding:4px 8px;border-radius:6px;font-weight:700;font-size:0.9rem;letter-spacing:0.5px;">${entry.course}</div>
+                    <div style="color:#64748b;font-size:0.8rem;"><i class="fas fa-map-marker-alt" style="color:#cbd5e1;"></i> ${entry.room}</div>
+                </div>
+                <button onclick="timetableManager.removeExtractedItem(${idx})" style="background:#fee2e2;border:none;color:#ef4444;width:24px;height:24px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><i class="fas fa-times" style="font-size:0.75rem;"></i></button>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="font-size:0.85rem;color:#334155;font-weight:500;">
+                    <i class="far fa-clock" style="color:#94a3b8;margin-right:4px;"></i> ${entry.startTime}${entry.endTime ? ' - ' + entry.endTime : ''}
+                </div>
+                <div>${dayString}</div>
+            </div>
+        `;
         list.appendChild(item);
         this._updateExCount();
     }
@@ -499,43 +614,60 @@ class TimetableManager {
         const DAYS  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         const HOURS = ['6AM','7AM','8AM','9AM','10AM','11AM','12PM','1PM','2PM','3PM','4PM','5PM','6PM','7PM','8PM','9PM','10PM'];
 
-        const rows = suggestions.map(s => `
-            <tr style="border-bottom:1px solid #f3f4f6;">
-                <td style="padding:8px 12px;font-weight:500">${s.title}</td>
-                <td style="padding:8px 12px;color:#6b7280">${DAYS[s.dayIndex]}</td>
-                <td style="padding:8px 12px;color:#6b7280">${HOURS[s.hourIndex] || ''}</td>
-            </tr>`).join('');
+        // Group suggestions by day for better presentation
+        const byDay = {};
+        suggestions.forEach(s => {
+            if(!byDay[s.dayIndex]) byDay[s.dayIndex] = [];
+            byDay[s.dayIndex].push(s);
+        });
+        
+        // Sort days
+        const sortedDays = Object.keys(byDay).sort((a,b) => parseInt(a) - parseInt(b));
+        
+        let timelineHTML = '';
+        sortedDays.forEach(dIdx => {
+            timelineHTML += `<div style="margin-bottom:15px;">
+                <div style="font-weight:700;color:#0f172a;border-bottom:2px solid #f1f5f9;padding-bottom:5px;margin-bottom:10px;font-size:0.9rem;">${DAYS[dIdx]}</div>
+                <div style="display:flex;flex-direction:column;gap:8px;padding-left:10px;border-left:2px solid #e0e7ff;">`;
+            
+            byDay[dIdx].sort((a,b) => a.hourIndex - b.hourIndex).forEach(s => {
+                timelineHTML += `
+                    <div style="display:flex;align-items:center;gap:12px;background:#fff;padding:8px 12px;border-radius:8px;border:1px solid #f1f5f9;box-shadow:0 1px 2px rgba(0,0,0,0.02);">
+                        <div style="background:#e0e7ff;color:#4338ca;padding:4px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;width:55px;text-align:center;">${HOURS[s.hourIndex]}</div>
+                        <div style="font-size:0.85rem;font-weight:500;color:#334155;">${s.title}</div>
+                        <div style="margin-left:auto;color:#10b981;font-size:0.8rem;"><i class="fas fa-brain"></i> AI Suggested</div>
+                    </div>`;
+            });
+            timelineHTML += `</div></div>`;
+        });
 
         const modal = document.createElement('div');
         modal.id = 'studyPlanModal';
-        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(15, 15, 25, 0.85);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:Inter,sans-serif;animation:modalFadeIn 0.3s ease-out;';
         modal.innerHTML = `
-            <div style="background:#fff;border-radius:16px;max-width:600px;width:100%;max-height:80vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.35);">
-                <div style="padding:20px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
+            <div style="background:#fff;border-radius:20px;max-width:650px;width:100%;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 25px 50px -12px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.4);">
+                
+                <div style="padding:25px 30px;background:linear-gradient(135deg, #6C63FF, #00d2ff);color:#fff;display:flex;justify-content:space-between;align-items:flex-start;">
                     <div>
-                        <h2 style="margin:0;font-size:1.15rem;color:#1a1a2e;">✨ Suggested Study Timetable</h2>
-                        <p style="margin:4px 0 0;font-size:0.85rem;color:#6b7280;">Based on your ${this.lectures.length} lecture(s)  -  edit to your preference in the Planner</p>
+                        <div style="display:inline-block;background:rgba(255,255,255,0.2);backdrop-filter:blur(5px);padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;margin-bottom:10px;letter-spacing:0.5px;">✨ KAIROS INTELLIGENCE</div>
+                        <h2 style="margin:0 0 5px;font-size:1.4rem;font-weight:700;">Your Optimized Study Plan</h2>
+                        <p style="margin:0;font-size:0.9rem;opacity:0.9;">Generated based on cognitive spacing for your ${this.lectures.length} scheduled lectures.</p>
                     </div>
-                    <button onclick="document.getElementById('studyPlanModal').remove()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#999;">✕</button>
+                    <button onclick="document.getElementById('studyPlanModal').remove()" style="background:none;border:none;font-size:1.5rem;color:#fff;opacity:0.7;cursor:pointer;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">✕</button>
                 </div>
-                <div style="overflow-y:auto;flex:1;padding:16px 24px;">
-                    <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
-                        <thead>
-                            <tr style="background:#f8f9ff;">
-                                <th style="padding:8px 12px;text-align:left;color:#6C63FF;font-size:0.8rem;">SESSION</th>
-                                <th style="padding:8px 12px;text-align:left;color:#6C63FF;font-size:0.8rem;">DAY</th>
-                                <th style="padding:8px 12px;text-align:left;color:#6C63FF;font-size:0.8rem;">TIME</th>
-                            </tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                    </table>
+                
+                <div style="overflow-y:auto;flex:1;padding:25px 30px;background:#fafafa;">
+                    ${timelineHTML}
                 </div>
-                <div style="padding:16px 24px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;gap:12px;">
-                    <p style="margin:0;font-size:0.82rem;color:#6b7280;">These will be added to your Planner. You can edit or delete them there.</p>
-                    <div style="display:flex;gap:10px;flex-shrink:0;">
-                        <button onclick="document.getElementById('studyPlanModal').remove()" style="padding:10px 18px;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">Dismiss</button>
-                        <button onclick="timetableManager.applyStudyPlan()" style="padding:10px 22px;background:#6C63FF;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">
-                            Apply to Planner
+                
+                <div style="padding:20px 30px;background:#fff;border-top:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;">
+                    <div style="font-size:0.8rem;color:#64748b;max-width:60%;">
+                        <i class="fas fa-info-circle text-primary"></i> These sessions will be added to your Planner grid. You can freely drag to reschedule them.
+                    </div>
+                    <div style="display:flex;gap:12px;flex-shrink:0;">
+                        <button onclick="document.getElementById('studyPlanModal').remove()" style="padding:10px 20px;background:#fff;border:1px solid #cbd5e1;color:#64748b;border-radius:10px;font-weight:600;font-size:0.9rem;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#f8fafc'">Dismiss</button>
+                        <button onclick="timetableManager.applyStudyPlan()" style="padding:10px 24px;background:linear-gradient(135deg, #6C63FF, #5a52d5);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:600;font-size:0.9rem;box-shadow:0 4px 6px -1px rgba(108,99,255,0.3);transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
+                            <i class="fas fa-magic"></i> Apply to Planner
                         </button>
                     </div>
                 </div>
