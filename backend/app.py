@@ -47,6 +47,13 @@ try:
 except ImportError:
     PDF2IMAGE_AVAILABLE = False
 
+# Optional: Anthropic AI (for timetable extraction)
+try:
+    import anthropic as _anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
+
 from PIL import Image
 
 app = Flask(__name__)
@@ -90,6 +97,57 @@ def serve_frontend(filename):
         return resp
     # SPA fallback
     return _no_cache(send_from_directory(FRONTEND_DIR, 'landing.html'))
+
+
+# ─────────────────────────────────────────────
+#  TIMETABLE AI EXTRACTION
+# ─────────────────────────────────────────────
+
+@app.route('/api/timetable/ai-extract', methods=['POST'])
+def ai_extract_timetable():
+    """Use Claude AI to parse raw timetable text into structured course data."""
+    if not ANTHROPIC_AVAILABLE:
+        return jsonify({'error': 'anthropic package not installed'}), 503
+
+    api_key = os.environ.get('ANTHROPIC_API_KEY')
+    if not api_key:
+        return jsonify({'error': 'ANTHROPIC_API_KEY not set'}), 503
+
+    data = request.get_json(silent=True) or {}
+    text = (data.get('text') or '').strip()
+    if not text:
+        return jsonify({'error': 'No text provided'}), 400
+
+    prompt = (
+        "You are a university timetable parser. Extract every course/lecture from the text below.\n\n"
+        "Return a JSON array (no other text, no markdown). Each item must have:\n"
+        '- "course": course name or code (string)\n'
+        '- "room": room / venue / location ("TBA" if unknown)\n'
+        '- "startTime": 24-hour HH:MM (e.g. "09:00")\n'
+        '- "endTime": 24-hour HH:MM (e.g. "11:00"); add 2 hours to start if unknown\n'
+        '- "days": array from ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]\n\n'
+        "Day combo rules: MWF→[Mon,Wed,Fri], TTh/T-Th→[Tue,Thu], MW→[Mon,Wed], M/W/F→[Mon,Wed,Fri].\n"
+        "Skip duplicate courses. If a field is truly absent, use sensible defaults.\n\n"
+        f"Timetable text:\n{text[:5000]}"
+    )
+
+    try:
+        client = _anthropic.Anthropic(api_key=api_key)
+        msg = client.messages.create(
+            model='claude-haiku-4-5-20251001',
+            max_tokens=2048,
+            messages=[{'role': 'user', 'content': prompt}],
+        )
+        raw = msg.content[0].text.strip()
+        # Strip markdown fences if present
+        raw = re.sub(r'^```(?:json)?\s*', '', raw)
+        raw = re.sub(r'\s*```$', '', raw)
+        courses = json.loads(raw)
+        return jsonify({'courses': courses, 'ai': True})
+    except json.JSONDecodeError:
+        return jsonify({'error': 'Could not parse AI response as JSON'}), 422
+    except Exception as exc:
+        return jsonify({'error': str(exc)}), 500
 
 
 # ─────────────────────────────────────────────

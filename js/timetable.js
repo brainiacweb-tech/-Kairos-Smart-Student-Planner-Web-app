@@ -128,18 +128,34 @@ class TimetableManager {
         this.saveTimetables();
         this.renderUI();
 
-        // Show scanning overlay
         this._showScanModal(fileName);
+        let rawText = '';
         let detected = [];
         try {
             if (timetable.type === 'image') {
-                detected = await this._ocrImage(fileData);
+                rawText = await this._ocrRawText(fileData);
             } else {
-                detected = await this._pdfExtractText(fileData);
+                rawText = await this._pdfRawText(fileData);
             }
         } catch(e) {
-            console.warn('Auto-extraction failed:', e);
+            console.warn('Text extraction failed:', e);
         }
+
+        if (rawText.trim().length > 10) {
+            // Try AI extraction first, fall back to regex
+            try {
+                const aiResult = await this._aiExtractCourses(rawText);
+                if (aiResult && aiResult.length > 0) {
+                    detected = aiResult;
+                }
+            } catch(e) {
+                console.warn('AI extraction failed, using regex fallback:', e);
+            }
+            if (detected.length === 0) {
+                detected = this._parseTimetableText(rawText);
+            }
+        }
+
         document.getElementById('_kairosDetectModal')?.remove();
 
         if (detected.length > 0) {
@@ -148,6 +164,30 @@ class TimetableManager {
             this.showToast(`Could not auto-detect courses from "${fileName}". Enter them manually.`, 'info');
         }
         this.openExtractionEditor(timetable, detected);
+    }
+
+    async _aiExtractCourses(text) {
+        try {
+            const resp = await fetch('/api/timetable/ai-extract', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text }),
+                signal: AbortSignal.timeout(20000)
+            });
+            if (!resp.ok) return null;
+            const data = await resp.json();
+            if (data.error || !Array.isArray(data.courses)) return null;
+            // Normalise field names to match internal format
+            return data.courses.map(c => ({
+                course:    c.course    || c.course_name || 'Unknown',
+                room:      c.room      || 'TBA',
+                startTime: c.startTime || c.start_time  || '08:00',
+                endTime:   c.endTime   || c.end_time    || '10:00',
+                days:      Array.isArray(c.days) ? c.days : (c.days_of_week || ['Mon'])
+            }));
+        } catch {
+            return null;
+        }
     }
 
     _showScanModal(fileName) {
@@ -167,7 +207,7 @@ class TimetableManager {
         document.body.appendChild(m);
     }
 
-    async _ocrImage(dataUrl) {
+    async _ocrRawText(dataUrl) {
         if (!window.Tesseract) throw new Error('Tesseract not loaded');
         const bar = document.getElementById('_kairosDetectBar');
         const result = await Tesseract.recognize(dataUrl, 'eng', {
@@ -178,10 +218,10 @@ class TimetableManager {
                 }
             }
         });
-        return this._parseTimetableText(result.data.text);
+        return result.data.text;
     }
 
-    async _pdfExtractText(dataUrl) {
+    async _pdfRawText(dataUrl) {
         if (!window.pdfjsLib) {
             await new Promise(resolve => {
                 const s = document.createElement('script');
@@ -190,7 +230,7 @@ class TimetableManager {
                 document.head.appendChild(s);
             });
         }
-        if (!window.pdfjsLib) return [];
+        if (!window.pdfjsLib) return '';
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         const b64 = dataUrl.split(',')[1];
         const bin = atob(b64);
@@ -203,59 +243,154 @@ class TimetableManager {
             const tc = await page.getTextContent();
             text += tc.items.map(i => i.str).join(' ') + '\n';
         }
-        return this._parseTimetableText(text);
+        return text;
     }
 
     _parseTimetableText(text) {
         const courses = [], seen = new Set();
         const lines = text.split(/[\n\r]+/).map(l => l.trim()).filter(l => l.length > 2);
 
-        const codeRx   = /\b([A-Z]{2,5}\s?\d{3,4}[A-Z]?)\b/g;
-        const t24Rx    = /\b([01]?\d|2[0-3]):([0-5]\d)\b/g;
-        const t12Rx    = /\b(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([AaPp][Mm])\b/g;
-        const dayRx    = /\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/gi;
+        // ── Pattern helpers ──────────────────────────────────────────────
+        const codeRx = /\b([A-Z]{2,6}\s?\d{3,4}[A-Z]?)\b/g;
 
+        const _parseTimePart = (s) => {
+            s = s.trim();
+            const m12 = s.match(/^(\d{1,2})(?::(\d{2}))?\s*([AaPp][Mm])$/);
+            if (m12) {
+                let h = parseInt(m12[1]); const mn = m12[2] || '00'; const ap = m12[3].toUpperCase();
+                if (ap === 'PM' && h !== 12) h += 12;
+                if (ap === 'AM' && h === 12) h = 0;
+                return `${String(h).padStart(2,'0')}:${mn}`;
+            }
+            const m24 = s.match(/^(\d{1,2}):(\d{2})$/);
+            if (m24) return `${String(parseInt(m24[1])).padStart(2,'0')}:${m24[2]}`;
+            return null;
+        };
+
+        const _extractTimes = (block) => {
+            // Priority 1: explicit range "09:00 - 11:00" or "9am to 11am" or "9:00–11:00"
+            const rangeRx = /\b(\d{1,2}(?::\d{2})?(?:\s*[AaPp][Mm])?)\s*[-–—to]+\s*(\d{1,2}(?::\d{2})?(?:\s*[AaPp][Mm])?)\b/g;
+            let rm;
+            while ((rm = rangeRx.exec(block)) !== null) {
+                const st = _parseTimePart(rm[1]);
+                const et = _parseTimePart(rm[2]);
+                if (st) return [st, et || this._addHours(st, 2)];
+            }
+            // Priority 2: two separate times
+            const t24 = /\b([01]?\d|2[0-3]):([0-5]\d)\b/g;
+            const t12 = /\b(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([AaPp][Mm])\b/g;
+            const times = [];
+            let tm;
+            t24.lastIndex = 0;
+            while ((tm = t24.exec(block)) !== null) times.push(`${tm[1].padStart(2,'0')}:${tm[2]}`);
+            if (!times.length) {
+                t12.lastIndex = 0;
+                while ((tm = t12.exec(block)) !== null) {
+                    let h = parseInt(tm[1]); const mn = tm[2] || '00'; const ap = tm[3].toUpperCase();
+                    if (ap === 'PM' && h !== 12) h += 12;
+                    if (ap === 'AM' && h === 12) h = 0;
+                    times.push(`${String(h).padStart(2,'0')}:${mn}`);
+                }
+            }
+            return [times[0] || null, times[1] || null];
+        };
+
+        const _parseDayCombo = (s) => {
+            const u = s.toUpperCase().replace(/[\s\/\-\.]/g, '');
+            const map = {
+                'MWF': ['Mon','Wed','Fri'], 'MW': ['Mon','Wed'], 'MF': ['Mon','Fri'],
+                'TTH': ['Tue','Thu'], 'TTH': ['Tue','Thu'], 'TUTH': ['Tue','Thu'],
+                'WF': ['Wed','Fri'], 'MTWTHF': ['Mon','Tue','Wed','Thu','Fri'],
+                'MTWRF': ['Mon','Tue','Wed','Thu','Fri'], 'MTWTF': ['Mon','Tue','Wed','Thu','Fri'],
+                'MTWHF': ['Mon','Tue','Wed','Thu','Fri'], 'TT': ['Tue','Thu']
+            };
+            return map[u] || null;
+        };
+
+        const _extractDays = (block) => {
+            const days = [];
+            // Combined abbreviation combos first (MWF, TTh, M/W/F …)
+            const comboRx = /\b(M[\/\-]?W[\/\-]?F|T[\/\-]?T[hH]|M[\/\-]?W|MWF|TTH|TUTH|TT|WF|MTWTHF|MTWRF)\b/gi;
+            let cm;
+            while ((cm = comboRx.exec(block)) !== null) {
+                const d = _parseDayCombo(cm[1]);
+                if (d) d.forEach(dd => { if (!days.includes(dd)) days.push(dd); });
+            }
+            if (days.length) return days;
+            // Full / abbreviated day names
+            const fullRx = /\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Thur|Thurs|Fri|Sat|Sun)\b/gi;
+            const abbrevMap = {
+                monday:'Mon',tuesday:'Tue',wednesday:'Wed',thursday:'Thu',friday:'Fri',saturday:'Sat',sunday:'Sun',
+                mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',thur:'Thu',thurs:'Thu',fri:'Fri',sat:'Sat',sun:'Sun'
+            };
+            let fm;
+            while ((fm = fullRx.exec(block)) !== null) {
+                const key = fm[1].toLowerCase();
+                const nd = abbrevMap[key] || abbrevMap[key.slice(0,3)];
+                if (nd && !days.includes(nd)) days.push(nd);
+            }
+            return days;
+        };
+
+        const _extractRoom = (block) => {
+            const rm = block.match(
+                /(?:Room|Rm\.?|Hall|Lecture\s+(?:Room|Theatre|Hall|Th\.?)|Lab|Venue|Building|Blk|Block|LT)\s*[:\-]?\s*([A-Z0-9][A-Z0-9\-\/\.]{0,9})/i
+            );
+            if (rm) return rm[1].trim();
+            // Standalone room codes like "A101", "LT3", "B204"
+            const standalone = block.match(/\b([A-Z]{1,3}\d{1,4}[A-Z]?)\b/);
+            if (standalone && !standalone[1].match(/^[A-Z]{2,6}\d{3,4}[A-Z]?$/)) return standalone[1];
+            return 'TBA';
+        };
+
+        // ── Main pass: find course codes ─────────────────────────────────
         for (let i = 0; i < lines.length; i++) {
-            const block = lines.slice(Math.max(0, i - 1), i + 3).join(' ');
+            const block = lines.slice(Math.max(0, i - 1), i + 4).join(' ');
             let m; codeRx.lastIndex = 0;
             while ((m = codeRx.exec(block)) !== null) {
                 const code = m[1].replace(/\s+/, '');
                 if (seen.has(code)) continue;
                 seen.add(code);
 
-                const times = [];
-                let tm; t24Rx.lastIndex = 0;
-                while ((tm = t24Rx.exec(block)) !== null)
-                    times.push(`${tm[1].padStart(2,'0')}:${tm[2]}`);
-                if (!times.length) {
-                    t12Rx.lastIndex = 0;
-                    while ((tm = t12Rx.exec(block)) !== null) {
-                        let h = parseInt(tm[1]);
-                        const mn = tm[2] || '00', ap = tm[3].toUpperCase();
-                        if (ap === 'PM' && h !== 12) h += 12;
-                        if (ap === 'AM' && h === 12) h = 0;
-                        times.push(`${String(h).padStart(2,'0')}:${mn}`);
-                    }
-                }
+                const [st, et] = _extractTimes(block);
+                const days     = _extractDays(block);
+                const room     = _extractRoom(block);
 
-                const days = [];
-                dayRx.lastIndex = 0;
-                while ((tm = dayRx.exec(block)) !== null) {
-                    const d = tm[1].slice(0,3);
-                    const nd = d.charAt(0).toUpperCase() + d.slice(1).toLowerCase();
-                    if (!days.includes(nd)) days.push(nd);
-                }
-
-                const roomM = block.match(/\b(Room\s*\w+|Hall\s*[A-Z]?\d*|Lab\s*\w+|[A-Z]{1,2}\d{2,4})\b/i);
-                const st = times[0] || '08:00';
-                const et = times[1] || this._addHours(st, 2);
                 courses.push({
-                    course: code, room: roomM ? roomM[1].trim() : 'TBA',
-                    startTime: st, endTime: et,
-                    days: days.length ? days : ['Mon']
+                    course:    code,
+                    room,
+                    startTime: st || '08:00',
+                    endTime:   et || this._addHours(st || '08:00', 2),
+                    days:      days.length ? days : ['Mon']
                 });
             }
         }
+
+        // ── Secondary pass: find time-bearing lines that have no course code ──
+        // (catches timetables that list full course names only)
+        if (courses.length === 0) {
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                const block = lines.slice(Math.max(0, i - 1), i + 3).join(' ');
+                const [st] = _extractTimes(block);
+                if (!st) continue;
+                // Use the line itself as the course name (clean it up)
+                const name = line.replace(/\d{1,2}[:.]\d{2}(\s*[AaPp][Mm])?/g, '').replace(/\s{2,}/g, ' ').trim();
+                if (name.length < 3 || name.length > 80) continue;
+                if (seen.has(name)) continue;
+                seen.add(name);
+                const [st2, et2] = _extractTimes(block);
+                const days = _extractDays(block);
+                courses.push({
+                    course:    name,
+                    room:      _extractRoom(block),
+                    startTime: st2 || '08:00',
+                    endTime:   et2 || this._addHours(st2 || '08:00', 2),
+                    days:      days.length ? days : ['Mon']
+                });
+            }
+        }
+
         return courses;
     }
 
@@ -336,8 +471,8 @@ class TimetableManager {
                     <span id="exCountBadge" style="font-size:0.85rem;color:#6b7280;"></span>
                     <div style="display:flex;gap:10px;">
                         <button onclick="document.getElementById('extractionModal').remove()" style="padding:9px 18px;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;">Cancel</button>
-                        <button onclick="timetableManager.saveExtractedCourses()" style="padding:9px 22px;background:#6C63FF;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;">
-                            Save ${hasDetected ? preDetected.length : ''} Course(s)
+                        <button id="exSaveBtn" onclick="timetableManager.saveExtractedCourses()" style="padding:9px 22px;background:#6C63FF;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;">
+                            Save ${hasDetected ? preDetected.length : '0'} Course(s)
                         </button>
                     </div>
                 </div>
@@ -354,21 +489,33 @@ class TimetableManager {
         const list = document.getElementById('extractedCoursesList');
         if (!list) return;
         const item = document.createElement('div');
-        item.id = `exItem_${idx}`;
-        item.style.cssText = 'background:#f0eeff;border-left:3px solid #6C63FF;padding:8px 12px;border-radius:7px;font-size:0.83rem;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;cursor:pointer;';
-        item.title = 'Tap to remove';
-        item.innerHTML = `<div>
+        item.dataset.exIdx = idx;
+        item.style.cssText = 'background:#f0eeff;border-left:3px solid #6C63FF;padding:8px 12px;border-radius:7px;font-size:0.83rem;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;';
+        item.innerHTML = `<div style="flex:1;min-width:0;">
             <strong>${entry.course}</strong> <span style="color:#6b7280;font-size:0.75rem;">${entry.room}</span><br>
-            <span style="color:#6C63FF;">${entry.startTime}${entry.endTime ? ' - ' + entry.endTime : ''}</span>
+            <span style="color:#6C63FF;">${entry.startTime}${entry.endTime ? ' – ' + entry.endTime : ''}</span>
             <span style="color:#6b7280;margin-left:6px;font-size:0.75rem;">${(entry.days||[]).join(', ')}</span>
-        </div><button onclick="timetableManager.removeExtractedItem(${idx})" style="background:none;border:none;color:#FF4757;cursor:pointer;font-size:0.95rem;padding:0 2px;">✕</button>`;
+        </div><button data-remove-idx="${idx}" style="background:none;border:none;color:#FF4757;cursor:pointer;font-size:0.95rem;padding:0 4px;flex-shrink:0;" title="Remove">✕</button>`;
+        item.querySelector('[data-remove-idx]').addEventListener('click', () => this._removeExtractedByEl(item));
         list.appendChild(item);
         this._updateExCount();
     }
 
-    removeExtractedItem(idx) {
+    _removeExtractedByEl(itemEl) {
+        const idx = parseInt(itemEl.dataset.exIdx, 10);
+        if (isNaN(idx)) return;
         this._pendingExtracted.splice(idx, 1);
-        // Re-render list
+        // Re-render so indices stay correct
+        const list = document.getElementById('extractedCoursesList');
+        if (!list) return;
+        list.innerHTML = '';
+        this._pendingExtracted.forEach((c, i) => this._renderExtractedItem(c, i));
+        this._updateExCount();
+    }
+
+    removeExtractedItem(idx) {
+        // kept for backwards compat with any inline onclick in old HTML
+        this._pendingExtracted.splice(idx, 1);
         const list = document.getElementById('extractedCoursesList');
         if (!list) return;
         list.innerHTML = '';
@@ -377,8 +524,11 @@ class TimetableManager {
     }
 
     _updateExCount() {
+        const n = (this._pendingExtracted || []).length;
         const badge = document.getElementById('exCountBadge');
-        if (badge) badge.textContent = `${(this._pendingExtracted||[]).length} course(s) ready to save`;
+        if (badge) badge.textContent = `${n} course(s) ready to save`;
+        const saveBtn = document.getElementById('exSaveBtn');
+        if (saveBtn) saveBtn.textContent = `Save ${n} Course(s)`;
     }
 
     addExtractedCourse() {
