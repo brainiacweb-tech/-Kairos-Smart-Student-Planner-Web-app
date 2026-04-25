@@ -21,15 +21,123 @@
     <link rel="stylesheet" href="css/components.css?v=4">
     <link rel="stylesheet" href="css/pages/dashboard.css?v=4">
     <style>
-        /* Mobile Optimization for PDF Tools */
-        @media (max-width: 768px) {
-            [style*="minmax(280px, 1fr)"] {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
-            }
-
-            .page-title {
-                font-size: 1.3rem;
-            }
+        /* ── PDF Tool Cards ──────────────────────────────────────────── */
+        .pdf-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        .pdf-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.18s, box-shadow 0.18s;
+            overflow: hidden;
+        }
+        .pdf-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.1);
+        }
+        .pdf-card-top {
+            padding: var(--spacing-md) var(--spacing-md) 0;
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+        }
+        .pdf-card-icon {
+            width: 46px; height: 46px;
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.35rem;
+            flex-shrink: 0;
+        }
+        .pdf-card-info { flex: 1; min-width: 0; }
+        .pdf-card-title { margin: 0 0 3px; font-size: 1rem; font-weight: 700; }
+        .pdf-card-desc { margin: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; }
+        .pdf-card-body {
+            padding: var(--spacing-md);
+            display: flex; flex-direction: column;
+            gap: var(--spacing-sm);
+            flex: 1;
+        }
+        /* Drop zone */
+        .pdf-drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.18s;
+            color: var(--text-secondary);
+            font-size: 0.83rem;
+            user-select: none;
+        }
+        .pdf-drop-zone:hover, .pdf-drop-zone.drag-over {
+            border-color: var(--primary);
+            background: rgba(108,99,255,0.05);
+            color: var(--primary);
+        }
+        .pdf-drop-zone i { display: block; font-size: 1.5rem; margin-bottom: 5px; opacity: 0.55; }
+        .pdf-drop-zone u { text-decoration-color: var(--primary); color: var(--primary); }
+        /* File meta info line */
+        .pdf-card-meta { font-size: 0.77rem; color: var(--text-secondary); min-height: 16px; }
+        .pdf-card-meta.ok { color: var(--success); font-weight: 600; }
+        /* Inline controls */
+        .pdf-controls { display: flex; flex-direction: column; gap: 7px; }
+        .pdf-controls .form-input,
+        .pdf-controls .form-select { font-size: 0.86rem; padding: 7px 10px; }
+        /* Rotate button group */
+        .rotate-btns { display: flex; gap: 6px; }
+        .rotate-btn {
+            flex: 1; padding: 8px 4px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface);
+            cursor: pointer; font-size: 0.8rem; font-weight: 600;
+            transition: all 0.18s;
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+        }
+        .rotate-btn:hover, .rotate-btn.selected {
+            border-color: var(--primary);
+            background: rgba(108,99,255,0.09);
+            color: var(--primary);
+        }
+        /* Color row */
+        .color-row { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; flex-wrap: wrap; }
+        .color-row input[type=color] { width: 32px; height: 26px; border: 1px solid var(--border); border-radius: 4px; padding: 2px; cursor: pointer; }
+        .color-row input[type=range] { flex: 1; min-width: 60px; }
+        /* Progress overlay */
+        .pdf-progress-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.62);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 99999;
+        }
+        .pdf-progress-box {
+            background: #fff; border-radius: 18px;
+            padding: 36px 44px; text-align: center;
+            width: 340px; max-width: 92vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.32);
+        }
+        .pdf-progress-emoji { font-size: 2.2rem; margin-bottom: 12px; }
+        .pdf-progress-label { font-family: Poppins,sans-serif; font-weight: 700; font-size: 1.05rem; color: #1a1a2e; margin-bottom: 4px; }
+        .pdf-progress-sub { font-size: 0.82rem; color: #6b7280; margin-bottom: 20px; }
+        .pdf-progress-bar-wrap { background: #f0eeff; border-radius: 8px; height: 9px; overflow: hidden; margin-bottom: 8px; }
+        .pdf-progress-bar { height: 100%; background: linear-gradient(90deg,#6C63FF,#a39bff); border-radius: 8px; width: 0%; transition: width 0.3s ease; }
+        .pdf-progress-pct { font-size: 0.85rem; color: #6C63FF; font-weight: 700; }
+        /* History */
+        .history-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.86rem; }
+        .history-row:last-child { border-bottom: none; }
+        .history-badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; background: rgba(108,99,255,0.1); color: var(--primary); white-space: nowrap; }
+        .history-file { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .history-time { color: var(--text-secondary); font-size: 0.75rem; white-space: nowrap; }
+        /* Responsive */
+        @media (max-width: 640px) {
+            .pdf-tools-grid { grid-template-columns: 1fr; }
+            .pdf-progress-box { padding: 28px 24px; }
         }
     </style>
 </head>
@@ -154,182 +262,360 @@
 
             <!-- PAGE CONTENT -->
             <main class="main-content">
-                <div class="page-header">
+                <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                     <div>
                         <h1 class="page-title">📄 PDF Tools</h1>
-                        <p style="color: var(--text-secondary);">Manage, edit, and convert your PDF files</p>
+                        <p style="color:var(--text-secondary);margin-top:var(--spacing-xs);">Merge, split, compress, convert and edit PDFs — processed privately in your browser</p>
                     </div>
+                    <span style="font-size:0.78rem;color:var(--success);display:flex;align-items:center;gap:5px;">
+                        <i class="fas fa-circle" style="font-size:0.5rem;"></i> All tools ready
+                    </span>
                 </div>
 
                 <!-- PDF Tools Grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
-                    <!-- Merge PDF -->
-                    <div class="card">
-                        <div style="text-align: center; padding: var(--spacing-lg);">
-                            <i class="fas fa-object-ungroup" style="font-size: 2.5rem; color: var(--primary); margin-bottom: var(--spacing-md); display: block;"></i>
-                            <h3 style="margin: var(--spacing-md) 0;">Merge PDFs</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Combine multiple PDF files into one</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initMergePDF()">
-                                <i class="fas fa-plus"></i> Upload Files
+                <div class="pdf-tools-grid">
+
+                    <!-- MERGE -->
+                    <div class="pdf-card" id="card-merge">
+                        <div class="pdf-card-top">
+                            <div class="pdf-card-icon" style="background:rgba(108,99,255,0.12);color:#6C63FF;">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div class="pdf-card-info">
+                                <h3 class="pdf-card-title">Merge PDFs</h3>
+                                <p class="pdf-card-desc">Combine multiple PDF files into a single document</p>
+                            </div>
+                        </div>
+                        <div class="pdf-card-body">
+                            <div class="pdf-drop-zone" id="drop-merge">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Drop 2+ PDFs here or <u>browse</u>
+                            </div>
+                            <div class="pdf-card-meta" id="meta-merge"></div>
+                            <button class="btn btn-primary" onclick="initMergePDF()">
+                                <i class="fas fa-layer-group"></i> Select & Merge
                             </button>
                         </div>
                     </div>
 
-                    <!-- Split PDF -->
-                    <div class="card">
-                        <div style="text-align: center; padding: var(--spacing-lg);">
-                            <i class="fas fa-cut" style="font-size: 2.5rem; color: var(--warning); margin-bottom: var(--spacing-md); display: block;"></i>
-                            <h3 style="margin: var(--spacing-md) 0;">Split PDF</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Split PDF into individual pages</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initSplitPDF()">
-                                <i class="fas fa-upload"></i> Choose PDF
+                    <!-- SPLIT -->
+                    <div class="pdf-card" id="card-split">
+                        <div class="pdf-card-top">
+                            <div class="pdf-card-icon" style="background:rgba(255,165,2,0.12);color:#FFA502;">
+                                <i class="fas fa-cut"></i>
+                            </div>
+                            <div class="pdf-card-info">
+                                <h3 class="pdf-card-title">Split PDF</h3>
+                                <p class="pdf-card-desc">Split into individual pages or custom ranges</p>
+                            </div>
+                        </div>
+                        <div class="pdf-card-body">
+                            <div class="pdf-controls">
+                                <select id="splitMode" class="form-select" onchange="document.getElementById('splitRangeWrap').style.display=this.value==='range'?'block':'none'">
+                                    <option value="all">Every page separately</option>
+                                    <option value="range">Custom ranges (e.g. 1-3, 5-7)</option>
+                                </select>
+                                <div id="splitRangeWrap" style="display:none;">
+                                    <input type="text" id="splitRange" class="form-input" placeholder="e.g. 1-3, 5, 7-9">
+                                </div>
+                            </div>
+                            <div class="pdf-drop-zone" id="drop-split">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Drop PDF here or <u>browse</u>
+                            </div>
+                            <div class="pdf-card-meta" id="meta-split"></div>
+                            <button class="btn btn-primary" onclick="initSplitPDF()">
+                                <i class="fas fa-cut"></i> Split PDF
                             </button>
                         </div>
                     </div>
 
-                    <!-- Compress PDF -->
-                    <div class="card">
-                        <div style="text-align: center; padding: var(--spacing-lg);">
-                            <i class="fas fa-compress" style="font-size: 2.5rem; color: var(--success); margin-bottom: var(--spacing-md); display: block;"></i>
-                            <h3 style="margin: var(--spacing-md) 0;">Compress PDF</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Reduce PDF file size</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initCompressPDF()">
-                                <i class="fas fa-upload"></i> Choose PDF
+                    <!-- COMPRESS -->
+                    <div class="pdf-card" id="card-compress">
+                        <div class="pdf-card-top">
+                            <div class="pdf-card-icon" style="background:rgba(46,213,115,0.12);color:#2ED573;">
+                                <i class="fas fa-compress-arrows-alt"></i>
+                            </div>
+                            <div class="pdf-card-info">
+                                <h3 class="pdf-card-title">Compress PDF</h3>
+                                <p class="pdf-card-desc">Reduce file size while preserving quality</p>
+                            </div>
+                        </div>
+                        <div class="pdf-card-body">
+                            <div class="pdf-controls">
+                                <select id="compressQuality" class="form-select">
+                                    <option value="high">High quality (light compression)</option>
+                                    <option value="balanced" selected>Balanced — recommended</option>
+                                    <option value="small">Smaller file (lower quality)</option>
+                                </select>
+                            </div>
+                            <div class="pdf-drop-zone" id="drop-compress">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Drop PDF here or <u>browse</u>
+                            </div>
+                            <div class="pdf-card-meta" id="meta-compress"></div>
+                            <button class="btn btn-primary" onclick="initCompressPDF()">
+                                <i class="fas fa-compress-arrows-alt"></i> Compress PDF
                             </button>
                         </div>
                     </div>
 
-                    <!-- Add Watermark -->
-                    <div class="card">
-                        <div style="text-align: center; padding: var(--spacing-lg);">
-                            <i class="fas fa-stamp" style="font-size: 2.5rem; color: var(--danger); margin-bottom: var(--spacing-md); display: block;"></i>
-                            <h3 style="margin: var(--spacing-md) 0;">Add Watermark</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Add text or image watermark</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initWatermark()">
-                                <i class="fas fa-upload"></i> Choose PDF
+                    <!-- WATERMARK -->
+                    <div class="pdf-card" id="card-watermark">
+                        <div class="pdf-card-top">
+                            <div class="pdf-card-icon" style="background:rgba(255,71,87,0.12);color:#FF4757;">
+                                <i class="fas fa-stamp"></i>
+                            </div>
+                            <div class="pdf-card-info">
+                                <h3 class="pdf-card-title">Add Watermark</h3>
+                                <p class="pdf-card-desc">Overlay text watermark on every page</p>
+                            </div>
+                        </div>
+                        <div class="pdf-card-body">
+                            <div class="pdf-controls">
+                                <input type="text" id="wmText" class="form-input" placeholder="Watermark text" value="CONFIDENTIAL">
+                                <div class="color-row">
+                                    <span>Color</span>
+                                    <input type="color" id="wmColor" value="#808080">
+                                    <span>Opacity</span>
+                                    <input type="range" id="wmOpacity" min="5" max="70" value="35"
+                                        oninput="document.getElementById('wmOpacityVal').textContent=this.value+'%'">
+                                    <span id="wmOpacityVal">35%</span>
+                                </div>
+                                <select id="wmPosition" class="form-select">
+                                    <option value="center">Diagonal — centre</option>
+                                    <option value="tiled">Tiled pattern</option>
+                                    <option value="bottomright">Bottom-right corner</option>
+                                </select>
+                            </div>
+                            <div class="pdf-drop-zone" id="drop-watermark">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Drop PDF here or <u>browse</u>
+                            </div>
+                            <div class="pdf-card-meta" id="meta-watermark"></div>
+                            <button class="btn btn-primary" onclick="initWatermark()">
+                                <i class="fas fa-stamp"></i> Add Watermark
                             </button>
                         </div>
                     </div>
 
-                    <!-- Convert to JPG -->
-                    <div class="card">
-                        <div style="text-align: center; padding: var(--spacing-lg);">
-                            <i class="fas fa-image" style="font-size: 2.5rem; color: #FF9999; margin-bottom: var(--spacing-md); display: block;"></i>
-                            <h3 style="margin: var(--spacing-md) 0;">PDF to JPG</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Convert PDF pages to JPG images</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initConvertToImage('jpg')">
-                                <i class="fas fa-upload"></i> Choose PDF
+                    <!-- PDF TO JPG -->
+                    <div class="pdf-card" id="card-jpg">
+                        <div class="pdf-card-top">
+                            <div class="pdf-card-icon" style="background:rgba(255,107,157,0.12);color:#FF6B9D;">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="pdf-card-info">
+                                <h3 class="pdf-card-title">PDF to JPG</h3>
+                                <p class="pdf-card-desc">Convert each PDF page to a JPG image</p>
+                            </div>
+                        </div>
+                        <div class="pdf-card-body">
+                            <div class="pdf-drop-zone" id="drop-jpg">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Drop PDF here or <u>browse</u>
+                            </div>
+                            <div class="pdf-card-meta" id="meta-jpg"></div>
+                            <button class="btn btn-primary" onclick="initConvertToImage('jpg')">
+                                <i class="fas fa-image"></i> Convert to JPG
                             </button>
                         </div>
                     </div>
 
-                    <!-- Convert to PNG -->
-                    <div class="card">
-                        <div style="text-align: center; padding: var(--spacing-lg);">
-                            <i class="fas fa-image" style="font-size: 2.5rem; color: #99CCFF; margin-bottom: var(--spacing-md); display: block;"></i>
-                            <h3 style="margin: var(--spacing-md) 0;">PDF to PNG</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Convert PDF pages to PNG images</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initConvertToImage('png')">
-                                <i class="fas fa-upload"></i> Choose PDF
+                    <!-- PDF TO PNG -->
+                    <div class="pdf-card" id="card-png">
+                        <div class="pdf-card-top">
+                            <div class="pdf-card-icon" style="background:rgba(78,205,196,0.12);color:#4ECDC4;">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="pdf-card-info">
+                                <h3 class="pdf-card-title">PDF to PNG</h3>
+                                <p class="pdf-card-desc">Convert each PDF page to a PNG image</p>
+                            </div>
+                        </div>
+                        <div class="pdf-card-body">
+                            <div class="pdf-drop-zone" id="drop-png">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Drop PDF here or <u>browse</u>
+                            </div>
+                            <div class="pdf-card-meta" id="meta-png"></div>
+                            <button class="btn btn-primary" onclick="initConvertToImage('png')">
+                                <i class="fas fa-image"></i> Convert to PNG
                             </button>
                         </div>
                     </div>
 
-                    <!-- Rotate PDF -->
-                    <div class="card">
-                        <div style="text-align: center; padding: var(--spacing-lg);">
-                            <i class="fas fa-sync-alt" style="font-size: 2.5rem; color: #FFCC99; margin-bottom: var(--spacing-md); display: block;"></i>
-                            <h3 style="margin: var(--spacing-md) 0;">Rotate PDF</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Rotate pages 90°, 180°, 270°</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initRotatePDF()">
-                                <i class="fas fa-upload"></i> Choose PDF
+                    <!-- ROTATE -->
+                    <div class="pdf-card" id="card-rotate">
+                        <div class="pdf-card-top">
+                            <div class="pdf-card-icon" style="background:rgba(255,204,0,0.14);color:#e6b800;">
+                                <i class="fas fa-sync-alt"></i>
+                            </div>
+                            <div class="pdf-card-info">
+                                <h3 class="pdf-card-title">Rotate PDF</h3>
+                                <p class="pdf-card-desc">Rotate all pages clockwise or counter-clockwise</p>
+                            </div>
+                        </div>
+                        <div class="pdf-card-body">
+                            <div class="rotate-btns">
+                                <button class="rotate-btn selected" data-angle="90" onclick="selectRotate(this)">
+                                    <i class="fas fa-redo"></i> 90° CW
+                                </button>
+                                <button class="rotate-btn" data-angle="180" onclick="selectRotate(this)">
+                                    <i class="fas fa-sync"></i> 180°
+                                </button>
+                                <button class="rotate-btn" data-angle="270" onclick="selectRotate(this)">
+                                    <i class="fas fa-undo"></i> 90° CCW
+                                </button>
+                            </div>
+                            <div class="pdf-drop-zone" id="drop-rotate">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Drop PDF here or <u>browse</u>
+                            </div>
+                            <div class="pdf-card-meta" id="meta-rotate"></div>
+                            <button class="btn btn-primary" onclick="initRotatePDF()">
+                                <i class="fas fa-sync-alt"></i> Rotate PDF
                             </button>
                         </div>
                     </div>
 
-                    <!-- Unlock PDF -->
-                    <div class="card">
-                        <div style="text-align: center; padding: var(--spacing-lg);">
-                            <i class="fas fa-lock-open" style="font-size: 2.5rem; color: #CC99FF; margin-bottom: var(--spacing-md); display: block;"></i>
-                            <h3 style="margin: var(--spacing-md) 0;">Unlock PDF</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Remove password protection</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initUnlockPDF()">
-                                <i class="fas fa-upload"></i> Choose PDF
+                    <!-- UNLOCK -->
+                    <div class="pdf-card" id="card-unlock">
+                        <div class="pdf-card-top">
+                            <div class="pdf-card-icon" style="background:rgba(162,155,254,0.14);color:#6C63FF;">
+                                <i class="fas fa-lock-open"></i>
+                            </div>
+                            <div class="pdf-card-info">
+                                <h3 class="pdf-card-title">Unlock PDF</h3>
+                                <p class="pdf-card-desc">Remove password protection from a PDF</p>
+                            </div>
+                        </div>
+                        <div class="pdf-card-body">
+                            <div class="pdf-controls">
+                                <input type="password" id="unlockPassword" class="form-input"
+                                    placeholder="PDF password (leave blank if none)">
+                            </div>
+                            <div class="pdf-drop-zone" id="drop-unlock">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Drop PDF here or <u>browse</u>
+                            </div>
+                            <div class="pdf-card-meta" id="meta-unlock"></div>
+                            <button class="btn btn-primary" onclick="initUnlockPDF()">
+                                <i class="fas fa-lock-open"></i> Unlock PDF
                             </button>
                         </div>
                     </div>
 
-                    <!-- Extract Pages -->
-                    <div class="card">
-                        <div style="text-align: center; padding: var(--spacing-lg);">
-                            <i class="fas fa-clone" style="font-size: 2.5rem; color: #99FF99; margin-bottom: var(--spacing-md); display: block;"></i>
-                            <h3 style="margin: var(--spacing-md) 0;">Extract Pages</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Extract specific pages from PDF</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initExtractPages()">
-                                <i class="fas fa-upload"></i> Choose PDF
+                    <!-- EXTRACT PAGES -->
+                    <div class="pdf-card" id="card-extract">
+                        <div class="pdf-card-top">
+                            <div class="pdf-card-icon" style="background:rgba(0,184,148,0.12);color:#00B894;">
+                                <i class="fas fa-clone"></i>
+                            </div>
+                            <div class="pdf-card-info">
+                                <h3 class="pdf-card-title">Extract Pages</h3>
+                                <p class="pdf-card-desc">Pull specific pages into a new PDF</p>
+                            </div>
+                        </div>
+                        <div class="pdf-card-body">
+                            <div class="pdf-controls">
+                                <input type="text" id="extractRange" class="form-input"
+                                    placeholder="Pages to keep: e.g. 1-3, 5, 8-10">
+                                <small style="color:var(--text-secondary);font-size:0.77rem;">
+                                    Use commas and hyphens for ranges
+                                </small>
+                            </div>
+                            <div class="pdf-drop-zone" id="drop-extract">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Drop PDF here or <u>browse</u>
+                            </div>
+                            <div class="pdf-card-meta" id="meta-extract"></div>
+                            <button class="btn btn-primary" onclick="initExtractPages()">
+                                <i class="fas fa-clone"></i> Extract Pages
                             </button>
                         </div>
                     </div>
 
-                    <!-- Word to PDF -->
-                    <div class="card">
-                        <div style="text-align: center; padding: var(--spacing-lg);">
-                            <i class="fas fa-file-word" style="font-size: 2.5rem; color: #2B579A; margin-bottom: var(--spacing-md); display: block;"></i>
-                            <h3 style="margin: var(--spacing-md) 0;">Word to PDF</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Convert Word documents (.docx, .doc) to PDF</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initWordToPDF()">
-                                <i class="fas fa-upload"></i> Choose Document
+                    <!-- WORD TO PDF -->
+                    <div class="pdf-card" id="card-word">
+                        <div class="pdf-card-top">
+                            <div class="pdf-card-icon" style="background:rgba(43,87,154,0.12);color:#2B579A;">
+                                <i class="fas fa-file-word"></i>
+                            </div>
+                            <div class="pdf-card-info">
+                                <h3 class="pdf-card-title">Word to PDF</h3>
+                                <p class="pdf-card-desc">Convert .docx Word documents to PDF</p>
+                            </div>
+                        </div>
+                        <div class="pdf-card-body">
+                            <div class="pdf-drop-zone" id="drop-word">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Drop .docx here or <u>browse</u>
+                            </div>
+                            <div class="pdf-card-meta" id="meta-word"></div>
+                            <button class="btn btn-primary" onclick="initWordToPDF()">
+                                <i class="fas fa-file-word"></i> Convert to PDF
                             </button>
                         </div>
                     </div>
 
-                    <!-- PowerPoint to PDF -->
-                    <div class="card">
-                        <div style="text-align: center; padding: var(--spacing-lg);">
-                            <i class="fas fa-file-powerpoint" style="font-size: 2.5rem; color: #D24726; margin-bottom: var(--spacing-md); display: block;"></i>
-                            <h3 style="margin: var(--spacing-md) 0;">PPT to PDF</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: var(--spacing-lg);">Convert PowerPoint (.pptx, .ppt) to PDF</p>
-                            <button class="btn btn-primary" style="width: 100%;" onclick="initPPTToPDF()">
-                                <i class="fas fa-upload"></i> Choose Presentation
+                    <!-- PPT TO PDF -->
+                    <div class="pdf-card" id="card-ppt">
+                        <div class="pdf-card-top">
+                            <div class="pdf-card-icon" style="background:rgba(210,71,38,0.12);color:#D24726;">
+                                <i class="fas fa-file-powerpoint"></i>
+                            </div>
+                            <div class="pdf-card-info">
+                                <h3 class="pdf-card-title">PPT to PDF</h3>
+                                <p class="pdf-card-desc">Convert .pptx PowerPoint files to PDF</p>
+                            </div>
+                        </div>
+                        <div class="pdf-card-body">
+                            <div class="pdf-drop-zone" id="drop-ppt">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                Drop .pptx here or <u>browse</u>
+                            </div>
+                            <div class="pdf-card-meta" id="meta-ppt"></div>
+                            <button class="btn btn-primary" onclick="initPPTToPDF()">
+                                <i class="fas fa-file-powerpoint"></i> Convert to PDF
                             </button>
                         </div>
+                    </div>
+
+                </div><!-- /.pdf-tools-grid -->
+
+                <!-- Recent Activity -->
+                <div class="card" style="margin-bottom:var(--spacing-xl);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:var(--spacing-md) var(--spacing-md) 0;">
+                        <h3 style="margin:0;font-size:1rem;">
+                            <i class="fas fa-history" style="color:var(--primary);margin-right:8px;"></i>Recent Activity
+                        </h3>
+                        <button onclick="clearPDFHistory()"
+                            style="font-size:0.8rem;color:var(--text-secondary);background:none;border:none;cursor:pointer;padding:4px 8px;">
+                            Clear all
+                        </button>
+                    </div>
+                    <div id="historyBody" style="padding:var(--spacing-md) var(--spacing-md) var(--spacing-sm);">
+                        <p style="color:var(--text-secondary);text-align:center;padding:var(--spacing-md) 0;margin:0;font-size:0.88rem;">
+                            No files processed yet
+                        </p>
                     </div>
                 </div>
 
-                <!-- Recently Processed -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 style="margin: 0;">✨ Features</h3>
-                    </div>
-                    <div style="padding: var(--spacing-md);">
-                        <ul style="list-style: none;">
-                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
-                                <i class="fas fa-check" style="color: var(--success);"></i>
-                                <span>Fast and secure PDF processing</span>
-                            </li>
-                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
-                                <i class="fas fa-check" style="color: var(--success);"></i>
-                                <span>No file size limits</span>
-                            </li>
-                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
-                                <i class="fas fa-check" style="color: var(--success);"></i>
-                                <span>Works offline - files stay private</span>
-                            </li>
-                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
-                                <i class="fas fa-check" style="color: var(--success);"></i>
-                                <span>Works on Windows, Mac & Android</span>
-                            </li>
-                            <li style="padding: var(--spacing-sm) 0; display: flex; align-items: center; gap: var(--spacing-md);">
-                                <i class="fas fa-check" style="color: var(--success);"></i>
-                                <span>Tools available 24/7</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- File Input (Hidden) -->
-                <input type="file" id="pdfFileInput" accept=".pdf" style="display: none;" onchange="handlePDFUpload()">
             </main>
+
+            <!-- Progress Overlay -->
+            <div class="pdf-progress-overlay" id="pdfProgressOverlay" style="display:none;">
+                <div class="pdf-progress-box">
+                    <div class="pdf-progress-emoji">⚙️</div>
+                    <div class="pdf-progress-label" id="pdfProgressLabel">Processing…</div>
+                    <div class="pdf-progress-sub" id="pdfProgressSub">Please wait, this may take a moment</div>
+                    <div class="pdf-progress-bar-wrap">
+                        <div class="pdf-progress-bar" id="pdfProgressBar"></div>
+                    </div>
+                    <div class="pdf-progress-pct" id="pdfProgressPct">0%</div>
+                </div>
+            </div>
         </div>
     </div>
 
