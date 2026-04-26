@@ -28,7 +28,7 @@ http.createServer((req, res) => {
 
   const ext = path.extname(found);
   const mime = MIME[ext] || 'application/octet-stream';
-  const noCache = ['.html', '.json'].includes(ext);
+  const noCache = ['.html', '.json', '.js', '.css'].includes(ext);
 
   res.writeHead(200, {
     'Content-Type': mime,

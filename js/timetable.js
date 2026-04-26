@@ -301,8 +301,8 @@ class TimetableManager {
                 currentGroup.push(item);
             } else {
                 const last = currentGroup[currentGroup.length - 1];
-                // Same row if y-diff < 15, horizontal gap < 60 (wider threshold handles PDFs)
-                if (Math.abs(item.y - last.y) < 15 && (item.x - (last.x + last.w)) < 60) {
+                // Same row if y-diff < 15, horizontal gap < 42 (keeps word parts together, separates columns)
+                if (Math.abs(item.y - last.y) < 15 && (item.x - (last.x + last.w)) < 42) {
                     currentGroup.push(item);
                 } else {
                     mergedItems.push(this._mergeGroup(currentGroup));
@@ -449,14 +449,18 @@ class TimetableManager {
     _formatTime(t) {
         if (!t) return "08:00";
         t = t.toUpperCase().replace('.', ':');
-        let isPM = t.includes('PM');
+        const hasAmPm = /[AP]M/.test(t);
+        const isPM = t.includes('PM');
         let timePart = t.replace(/\s*(AM|PM)/, '').trim();
         if (!timePart.includes(':')) timePart += ':00';
         let parts = timePart.split(':');
         let h = parseInt(parts[0]);
-        let m = parts[1] || '00';
-        if (isPM && h !== 12) h += 12;
-        if (!isPM && h === 12) h = 0;
+        let m = (parts[1] || '00').slice(0, 2);
+        if (hasAmPm) {
+            // 12-hour → 24-hour conversion only when AM/PM is present
+            if (isPM && h !== 12) h += 12;
+            if (!isPM && h === 12) h = 0;
+        }
         return `${String(h).padStart(2,'0')}:${m}`;
     }
 
