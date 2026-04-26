@@ -194,140 +194,200 @@ function showCustomPrompt(title, desc, placeholder) {
 
 async function initExtractTimetable(file) {
     await withProgress('Analyzing Document...', async () => {
-        let text = "";
-        
+        let classes = [];
+
         if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-            // PDF.js extraction
             const lib = window.pdfjsLib;
             if (!lib) throw new Error('PDF.js not loaded.');
             lib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
             const bytes = await readFileAsArrayBuffer(file);
             const pdfDoc = await lib.getDocument({ data: bytes }).promise;
+
+            let allItems = [];
+            let fullText = '';
             for (let i = 1; i <= pdfDoc.numPages; i++) {
-                const page = await pdfDoc.getPage(i);
+                const page   = await pdfDoc.getPage(i);
+                const vp     = page.getViewport({ scale: 1 });
                 const content = await page.getTextContent();
-                const strings = content.items.map(item => item.str);
-                text += strings.join(" ") + " \n";
+                content.items.forEach(item => {
+                    if (!item.str.trim()) return;
+                    const x = item.transform[4];
+                    const y = vp.height - item.transform[5]; // flip to top-left origin
+                    allItems.push({ text: item.str.trim(), x, y, w: item.width || 0, h: item.height || 10 });
+                });
+                fullText += content.items.map(it => it.str).join(' ') + '\n';
+            }
+
+            // Try 2D grid parse first (works for tabular timetables)
+            if (typeof TimetableManager !== 'undefined' && window.timetableManager) {
+                classes = window.timetableManager._parseTimetable2D(allItems);
+            }
+            // Fall back to text parser
+            if (classes.length === 0) {
+                classes = parseTimetableText(fullText);
             }
         } else {
-            // Tesseract OCR extraction
             if (!window.Tesseract) throw new Error('Tesseract.js not loaded. Check internet connection.');
-            showToast('⏳ Running OCR on Image (this may take a minute)...', 'info');
+            showToast('⏳ Running OCR on image (this may take a minute)…', 'info');
             const result = await Tesseract.recognize(file, 'eng');
-            text = result.data.text;
+            classes = parseTimetableText(result.data.text);
         }
 
-        // Parse Text
-        const classes = parseTimetableText(text);
-        
         if (classes.length === 0) {
-            showToast('⚠️ Could not automatically detect any classes. Ensure the schedule is readable.', 'warning');
+            showToast('⚠️ Could not detect any classes. Ensure the schedule text is readable.', 'warning');
             return;
         }
-
-        // Show preview modal
         showTimetablePreview(classes);
     });
 }
 
 function parseTimetableText(text) {
     const results = [];
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-    
-    // Split by lines to maintain local context
+
+    const DAY_NORM = {
+        'mo':'Mon','tu':'Tue','we':'Wed','th':'Thu','fr':'Fri','sa':'Sat','su':'Sun',
+        'mon':'Mon','tue':'Tue','wed':'Wed','thu':'Thu','fri':'Fri','sat':'Sat','sun':'Sun',
+        'monday':'Mon','tuesday':'Tue','wednesday':'Wed','thursday':'Thu',
+        'friday':'Fri','saturday':'Sat','sunday':'Sun',
+    };
+    const MWF_EXPAND = {
+        'mwf':['Mon','Wed','Fri'],'mw':['Mon','Wed'],'wf':['Wed','Fri'],
+        'tth':['Tue','Thu'],'tuth':['Tue','Thu'],'tueth':['Tue','Thu'],
+        'mf':['Mon','Fri'],'tw':['Tue','Wed'],'wth':['Wed','Thu'],
+        'thf':['Thu','Fri'],'mtwthf':['Mon','Tue','Wed','Thu','Fri'],
+    };
+
+    const courseRx = /\b([A-Z]{2,5})\s*[-_]?\s*(\d{3,4}[A-Z]?)\b/gi;
+    const timeRx   = /(\d{1,2}[:.]\d{2})\s*(?:AM|PM)?(?:\s*[-–to]+\s*(\d{1,2}[:.]\d{2})\s*(?:AM|PM)?)?/gi;
+    const dayRx    = /\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun|Mo|Tu|We|Th|Fr|Sa|Su|MWF|MW|WF|TTh|TuTh|TueTh|MF|TW)\b/gi;
+    const roomRx   = /\b(?:(?:Room|Rm|Hall|Lab|Classroom|Bldg?|Block|BLK|Lecture|Auditorium)\.?\s*#?\s*[A-Z0-9][\w\s]{0,8}|[A-Z]{2,4}\s+[A-Z]{0,2}[0-9]{1,4}(?:\s+[0-9]{1,2})?|[A-Z]{1,3}[0-9]{2,4}[A-Z]?)\b/i;
+
+    function fmt(t) {
+        if (!t) return null;
+        t = t.replace('.', ':');
+        if (!t.includes(':')) t += ':00';
+        return t.padStart(5, '0').slice(0, 5);
+    }
+
+    // Gather global day mentions across whole text first
+    const globalDays = [];
+    let dm;
+    dayRx.lastIndex = 0;
+    while ((dm = dayRx.exec(text)) !== null) {
+        const k = dm[1].toLowerCase().replace(/[^a-z]/g,'');
+        const expanded = MWF_EXPAND[k];
+        if (expanded) { expanded.forEach(d => globalDays.push(d)); }
+        else { const n = DAY_NORM[k]; if (n) globalDays.push(n); }
+    }
+    const uniqueDays = [...new Set(globalDays)];
+    const fallbackDays = uniqueDays.length > 0 ? uniqueDays : ['Mon'];
+
     const lines = text.split('\n');
-    let currentDay = "Monday";
-    
-    for (let line of lines) {
-        // Check if line contains a day
-        for (let d of days) {
-            if (line.toLowerCase().includes(d.toLowerCase())) {
-                currentDay = d;
-            }
+    let currentDays = fallbackDays;
+
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+
+        // Update day context from this line
+        const lineDays = [];
+        dayRx.lastIndex = 0;
+        let lm;
+        while ((lm = dayRx.exec(trimmed)) !== null) {
+            const k = lm[1].toLowerCase().replace(/[^a-z]/g,'');
+            const expanded = MWF_EXPAND[k];
+            if (expanded) expanded.forEach(d => lineDays.push(d));
+            else { const n = DAY_NORM[k]; if (n) lineDays.push(n); }
         }
-        
-        // Time regex: 09:00, 2:30 PM, 14:00-16:00
-        const timeMatch = line.match(/(\d{1,2}[:.]\d{2})\s*(AM|PM|am|pm)?\s*(?:-|to)?\s*(\d{1,2}[:.]\d{2})?\s*(AM|PM|am|pm)?/);
-        
-        // Course regex: CS101, MATH 202, BIO-101
-        const courseMatch = line.match(/([A-Z]{2,4}[-\s]?\d{3})/i);
-        
-        if (courseMatch) {
-            let startTime = "09:00";
-            let endTime = "10:30";
-            
-            if (timeMatch) {
-                startTime = timeMatch[1].replace('.', ':');
-                if (timeMatch[3]) endTime = timeMatch[3].replace('.', ':');
-            }
-            
-            let title = courseMatch[1].toUpperCase();
-            
-            // Look for additional text that might be the course name
-            let nameMatch = line.replace(courseMatch[1], '').replace(timeMatch ? timeMatch[0] : '', '').replace(currentDay, '').trim();
-            // Remove random symbols
-            nameMatch = nameMatch.replace(/[^a-zA-Z\s]/g, '').trim();
-            if (nameMatch.length > 3 && nameMatch.length < 30) {
-                title += " - " + nameMatch;
-            }
-            
+        if (lineDays.length > 0) currentDays = [...new Set(lineDays)];
+
+        // Extract time from line
+        timeRx.lastIndex = 0;
+        const tm = timeRx.exec(trimmed);
+        const startTime = tm ? (fmt(tm[1]) || '09:00') : '09:00';
+        const endTime   = tm && tm[2] ? (fmt(tm[2]) || '10:30') : '10:30';
+
+        // Extract room from line
+        const roomMatch = trimmed.match(roomRx);
+        const room = roomMatch ? roomMatch[0].trim() : 'TBA';
+
+        // Extract all course codes from line
+        courseRx.lastIndex = 0;
+        let cm;
+        while ((cm = courseRx.exec(trimmed)) !== null) {
+            const code = `${cm[1].toUpperCase()}${cm[2].toUpperCase()}`;
             results.push({
-                id: Date.now() + Math.random().toString().slice(2, 6),
-                title: title,
-                day: currentDay,
-                startTime: startTime,
-                endTime: endTime,
-                type: "lecture",
-                location: "TBD"
+                id: 'pt_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+                course: code,
+                room,
+                startTime,
+                endTime,
+                days: [...currentDays],
+                dateAdded: new Date().toLocaleDateString(),
+                uploadedFile: 'PDF Extract'
             });
         }
     }
-    
-    // Fallback if regex missed everything but text has content
-    if (results.length === 0 && text.length > 50) {
-        results.push({ id: Date.now(), title: "Extracted Class (Verify)", day: "Monday", startTime: "09:00", endTime: "10:00", type: "lecture", location: "" });
-    }
-    
-    return results;
+
+    // Dedup: same course+startTime+days
+    const seen = new Set();
+    return results.filter(r => {
+        const key = r.course + '|' + r.startTime + '|' + r.days.sort().join(',');
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
 }
 
 function showTimetablePreview(classes) {
-    window._tempExtractedClasses = classes; // store globally for saving
+    window._tempExtractedClasses = classes;
     const container = document.getElementById('extractedClassesContainer');
     container.innerHTML = '';
-    classes.forEach(c => {
+    classes.forEach((c, idx) => {
+        const daysStr = Array.isArray(c.days) ? c.days.join(', ') : (c.day || 'Mon');
+        const courseName = c.course || c.title || 'Unknown';
+        const roomStr = c.room || c.location || 'TBA';
         container.innerHTML += `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border, #eee); background: rgba(0,0,0,0.02); margin-bottom: 5px; border-radius: 8px;">
+            <div data-idx="${idx}" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border, #eee); background: rgba(0,0,0,0.02); margin-bottom: 5px; border-radius: 8px;">
                 <div>
-                    <strong style="color: var(--primary);">${c.title}</strong><br>
-                    <small style="color: var(--text-secondary);"><i class="fas fa-calendar-day"></i> ${c.day} &nbsp; <i class="fas fa-clock"></i> ${c.startTime} - ${c.endTime}</small>
+                    <strong style="color: var(--primary);">${courseName}</strong>
+                    <span style="color:var(--text-secondary);font-size:0.8rem;margin-left:8px;"><i class="fas fa-map-marker-alt"></i> ${roomStr}</span><br>
+                    <small style="color: var(--text-secondary);"><i class="fas fa-calendar-day"></i> ${daysStr} &nbsp; <i class="fas fa-clock"></i> ${c.startTime} - ${c.endTime}</small>
                 </div>
-                <button onclick="this.parentElement.remove()" style="background:none; border:none; color: var(--danger); cursor: pointer; padding: 5px;"><i class="fas fa-trash"></i></button>
+                <button onclick="this.closest('[data-idx]').remove()" style="background:none; border:none; color: var(--danger); cursor: pointer; padding: 5px;"><i class="fas fa-trash"></i></button>
             </div>
         `;
     });
-    
     document.getElementById('timetablePreviewModal').style.display = 'flex';
 }
 
 if (document.getElementById('btnImportTimetable')) {
     document.getElementById('btnImportTimetable').addEventListener('click', () => {
-        let existing = JSON.parse(localStorage.getItem('kairos_timetable') || '[]');
-        // We only save the ones that weren't deleted from the DOM
+        const existing = JSON.parse(localStorage.getItem('kairos_lectures') || '[]');
         const container = document.getElementById('extractedClassesContainer');
-        const remainingTitles = Array.from(container.querySelectorAll('strong')).map(s => s.innerText);
-        
-        const finalClasses = window._tempExtractedClasses.filter(c => remainingTitles.includes(c.title));
-        
-        existing = existing.concat(finalClasses);
-        localStorage.setItem('kairos_timetable', JSON.stringify(existing));
-        
+        // Keep only rows still in the DOM (user may have deleted some)
+        const remainingIdxs = new Set(
+            Array.from(container.querySelectorAll('[data-idx]')).map(el => parseInt(el.dataset.idx))
+        );
+        const all = window._tempExtractedClasses || [];
+        const toSave = all
+            .filter((_, i) => remainingIdxs.has(i))
+            .map(c => ({
+                id:          'lec_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+                course:      c.course || c.title || 'Unknown',
+                room:        c.room || c.location || 'TBA',
+                startTime:   c.startTime || '09:00',
+                endTime:     c.endTime   || '10:30',
+                days:        Array.isArray(c.days) ? c.days : (c.day ? [c.day] : ['Mon']),
+                dateAdded:   new Date().toLocaleDateString(),
+                uploadedFile: c.uploadedFile || 'PDF Extract'
+            }));
+
+        localStorage.setItem('kairos_lectures', JSON.stringify(existing.concat(toSave)));
         document.getElementById('timetablePreviewModal').style.display = 'none';
         closeWorkspace();
-        showToast('✅ Classes imported successfully!', 'success');
-        setTimeout(() => {
-            window.location.href = 'timetable.html';
-        }, 1000);
+        showToast(`✅ ${toSave.length} class(es) imported successfully!`, 'success');
+        setTimeout(() => { window.location.href = 'timetable.html'; }, 1000);
     });
 }
 

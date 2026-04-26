@@ -413,11 +413,12 @@ class TimetableManager {
                 // Try to extract room from nearby uncategorized items if not already found
                 let room = cItem.room || 'TBA';
                 if (!cItem.room) {
+                    const roomRx = /\b(?:(?:Room|Rm|Hall|Lab|Classroom|Bldg?|Block|BLK|Lecture|Auditorium)\.?\s*#?\s*[A-Z0-9][\w\s]{0,8}|[A-Z]{2,4}\s+[A-Z]{0,2}[0-9]{1,4}(?:\s+[0-9]{1,2})?|[A-Z]{1,3}[0-9]{2,4}[A-Z]?)\b/i;
                     for (const ui of uncategorized) {
                         const dx = Math.abs(cItem.x - (ui.x + ui.w / 2));
                         const dy = Math.abs(cItem.y - (ui.y + ui.h / 2));
-                        if (dx < 200 && dy < 50) {
-                            const rm = ui.text.match(/\b(?:(?:Room|Rm|Hall|Lab|Bldg?)\.?\s*#?\s*)?([A-Z]{0,3}[0-9]{1,4}[A-Z]?)\b/i);
+                        if (dx < 200 && dy < 120) {
+                            const rm = ui.text.match(roomRx);
                             if (rm) { room = rm[0].trim(); break; }
                         }
                     }
@@ -477,7 +478,8 @@ class TimetableManager {
             'mo':'Mon','tu':'Tue','we':'Wed','th':'Thu','fr':'Fri','sa':'Sat','su':'Sun',
             'mon':'Mon','tue':'Tue','wed':'Wed','thu':'Thu','fri':'Fri','sat':'Sat','sun':'Sun',
         };
-        const roomRegex = /\b(?:Room|Rm|Hall|Lab|Classroom|Building)\s*#?[A-Z0-9-]+\b|\b[A-Z]{1,2}[0-9]{2,4}\b/i;
+        // Matches: "BLK F", "AY FP01", "AY SF 09", "A101", "LH 001", "Room 204"
+        const roomRegex = /\b(?:(?:Room|Rm|Hall|Lab|Classroom|Bldg?|Block|BLK|Lecture|Auditorium)\.?\s*#?\s*[A-Z0-9][\w\s]{0,8}|[A-Z]{2,4}\s+[A-Z0-9]{1,2}[0-9]{0,2}(?:\s+[0-9]{1,2})?|[A-Z]{1,3}[0-9]{2,4}[A-Z]?)\b/i;
 
         let currentDayContext = 'Mon';
 
