@@ -3,9 +3,14 @@
    =========================== */
 
 class KairosStorage {
+    static _parse(key, fallback = []) {
+        try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+        catch(e) { console.warn('KairosStorage parse error for', key, e); return fallback; }
+    }
+
     // ASSIGNMENTS
     static getAssignments(filter = {}) {
-        let assignments = JSON.parse(localStorage.getItem('kairos_assignments') || '[]');
+        let assignments = this._parse('kairos_assignments', []);
         
         if (filter.status) {
             assignments = assignments.filter(a => a.status === filter.status);
@@ -15,17 +20,17 @@ class KairosStorage {
         }
         if (filter.course) {
             const courseTerm = filter.course.toLowerCase();
-            assignments = assignments.filter(a => 
-                a.course.toLowerCase().includes(courseTerm) ||
-                (a.courseName && a.courseName.toLowerCase().includes(courseTerm))
+            assignments = assignments.filter(a =>
+                (a.course || '').toLowerCase().includes(courseTerm) ||
+                (a.courseName || '').toLowerCase().includes(courseTerm)
             );
         }
         if (filter.search) {
             const term = filter.search.toLowerCase();
-            assignments = assignments.filter(a => 
-                a.title.toLowerCase().includes(term) ||
-                a.course.toLowerCase().includes(term) ||
-                (a.courseName && a.courseName.toLowerCase().includes(term))
+            assignments = assignments.filter(a =>
+                (a.title || '').toLowerCase().includes(term) ||
+                (a.course || '').toLowerCase().includes(term) ||
+                (a.courseName || '').toLowerCase().includes(term)
             );
         }
         
@@ -33,12 +38,12 @@ class KairosStorage {
     }
 
     static getAssignmentById(id) {
-        const assignments = JSON.parse(localStorage.getItem('kairos_assignments') || '[]');
-        return assignments.find(a => a.id === parseInt(id));
+        const assignments = this._parse('kairos_assignments', []);
+        return assignments.find(a => String(a.id) === String(id));
     }
 
     static addAssignment(assignment) {
-        const assignments = JSON.parse(localStorage.getItem('kairos_assignments') || '[]');
+        const assignments = this._parse('kairos_assignments', []);
         
         const newAssignment = {
             id: assignments.length > 0 ? Math.max(...assignments.map(a => a.id)) + 1 : 1,
@@ -53,8 +58,8 @@ class KairosStorage {
     }
 
     static updateAssignment(id, updates) {
-        const assignments = JSON.parse(localStorage.getItem('kairos_assignments') || '[]');
-        const index = assignments.findIndex(a => a.id === parseInt(id));
+        const assignments = this._parse('kairos_assignments', []);
+        const index = assignments.findIndex(a => String(a.id) === String(id));
         
         if (index !== -1) {
             assignments[index] = {
@@ -70,8 +75,8 @@ class KairosStorage {
     }
 
     static deleteAssignment(id) {
-        const assignments = JSON.parse(localStorage.getItem('kairos_assignments') || '[]');
-        const filtered = assignments.filter(a => a.id !== parseInt(id));
+        const assignments = this._parse('kairos_assignments', []);
+        const filtered = assignments.filter(a => String(a.id) !== String(id));
         localStorage.setItem('kairos_assignments', JSON.stringify(filtered));
     }
 
@@ -91,9 +96,11 @@ class KairosStorage {
         };
         
         assignments.forEach(a => {
+            if (!a.dueDate) return;
             const dueDate = new Date(a.dueDate);
-            const daysUntil = getDaysUntil(dueDate);
-            
+            if (isNaN(dueDate.getTime())) return;
+            const daysUntil = typeof getDaysUntil === 'function' ? getDaysUntil(dueDate) : Math.ceil((dueDate - now) / 86400000);
+
             if (daysUntil < 0) {
                 stats.overdue++;
             } else if (daysUntil === 0) {
@@ -108,7 +115,7 @@ class KairosStorage {
 
     // CALENDAR EVENTS (for planner)
     static getCalendarEvents() {
-        return JSON.parse(localStorage.getItem('kairos_events') || '[]');
+        return this._parse('kairos_events', []);
     }
 
     static addCalendarEvent(event) {
@@ -128,7 +135,7 @@ class KairosStorage {
 
     static updateCalendarEvent(id, updates) {
         const events = this.getCalendarEvents();
-        const index = events.findIndex(e => e.id === parseInt(id));
+        const index = events.findIndex(e => String(e.id) === String(id));
         
         if (index !== -1) {
             events[index] = {
@@ -160,7 +167,7 @@ class KairosStorage {
 
     // NOTIFICATIONS
     static getNotifications() {
-        return JSON.parse(localStorage.getItem('kairos_notifications') || '[]');
+        return this._parse('kairos_notifications', []);
     }
 
     static addNotification(notification) {
@@ -181,7 +188,7 @@ class KairosStorage {
 
     static markNotificationAsRead(id) {
         const notifications = this.getNotifications();
-        const notification = notifications.find(n => n.id === parseInt(id));
+        const notification = notifications.find(n => String(n.id) === String(id));
         
         if (notification) {
             notification.read = true;
@@ -195,7 +202,7 @@ class KairosStorage {
 
     // SEMESTERS
     static getSemesters() {
-        return JSON.parse(localStorage.getItem('kairos_semesters') || '[]');
+        return this._parse('kairos_semesters', []);
     }
 
     static addSemester(semester) {
@@ -230,7 +237,7 @@ class KairosStorage {
 
     // SETTINGS
     static getSettings() {
-        return JSON.parse(localStorage.getItem('kairos_settings') || JSON.stringify({
+        const defaults = {
             theme: 'dark',
             accentColor: '#6C63FF',
             notifications: {
@@ -241,7 +248,13 @@ class KairosStorage {
                 enabled1h: true
             },
             emailNotifications: true
-        }));
+        };
+        try {
+            return JSON.parse(localStorage.getItem('kairos_settings') || JSON.stringify(defaults));
+        } catch(e) {
+            console.warn('KairosStorage parse error for kairos_settings', e);
+            return defaults;
+        }
     }
 
     static updateSettings(updates) {

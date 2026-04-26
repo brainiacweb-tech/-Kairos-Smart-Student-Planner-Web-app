@@ -47,7 +47,7 @@ function renderTimetable() {
             const eventEl = document.createElement('div');
             eventEl.className = `timetable-event ${event.type}`;
             const timeLbl = event.startTime ? `<small style="font-size:0.6em;display:block;opacity:0.85;margin-top:1px">${event.startTime}${event.endTime ? ' - ' + event.endTime : ''}</small>` : '';
-            eventEl.innerHTML = `<span>${event.title.substring(0, 14)}</span>${timeLbl}<button class="event-delete-btn" onclick="deleteEvent(${index}, event)"><i class="fas fa-trash-alt"></i></button>`;
+            eventEl.innerHTML = `<span>${(event.title || '').substring(0, 14)}</span>${timeLbl}<button class="event-delete-btn" onclick="deleteEvent(${index}, event)"><i class="fas fa-trash-alt"></i></button>`;
             eventEl.style.cursor = 'pointer';
             cells[cellIndex].appendChild(eventEl);
         }
@@ -223,16 +223,3 @@ function deleteSchedule(scheduleId) {
     }
 }
 
-function openDrawer(drawerId) {
-    const drawer = document.getElementById(drawerId);
-    if (drawer) {
-        drawer.classList.add('active');
-    }
-}
-
-function closeDrawer(drawerId) {
-    const drawer = document.getElementById(drawerId);
-    if (drawer) {
-        drawer.classList.remove('active');
-    }
-}

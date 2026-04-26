@@ -9,13 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAvatarUpload();
 });
 
-function showSettingTab(tab) {
-    document.querySelectorAll('[id$="Tab"]').forEach(el => el.classList.add('hidden'));
+function showSettingTab(tab, el) {
+    document.querySelectorAll('[id$="Tab"]').forEach(t => t.classList.add('hidden'));
     document.querySelectorAll('.settings-tab').forEach(btn => btn.classList.remove('active'));
 
     const tabEl = document.getElementById(tab + 'Tab');
     if (tabEl) tabEl.classList.remove('hidden');
-    event.target.classList.add('active');
+    if (el) el.classList.add('active');
 }
 
 // ── PROFILE ──────────────────────────────────────────────────────────────────
@@ -138,18 +138,19 @@ function toggleNotification(el) {
 
 // ── APPEARANCE ────────────────────────────────────────────────────────────────
 
-function applyTheme(theme) {
+function applyTheme(theme, el) {
     document.querySelectorAll('.appearance-option').forEach(opt => opt.classList.remove('selected'));
-    event.target.closest('.appearance-option').classList.add('selected');
+    const option = el ? el.closest('.appearance-option') : null;
+    if (option) option.classList.add('selected');
     const newTheme = theme === 'light' ? 'light-mode' : 'dark-mode';
     document.body.className = newTheme;
     localStorage.setItem('kairos_theme', newTheme);
     showToast(`Theme changed to ${theme}`, 'success');
 }
 
-function changeAccentColor(color) {
+function changeAccentColor(color, el) {
     document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
-    event.target.classList.add('selected');
+    if (el) el.classList.add('selected');
     document.documentElement.style.setProperty('--primary', color);
     localStorage.setItem('kairos_accent_color', color);
     showToast('Accent color updated!', 'success');

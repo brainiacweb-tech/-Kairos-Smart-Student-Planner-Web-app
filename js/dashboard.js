@@ -69,7 +69,7 @@ function renderDeadlines() {
                     ${formatDate(assignment.dueDate)}
                 </div>
                 <div class="deadline-card-description">
-                    Priority: <strong>${assignment.priority}</strong> | Progress: <strong>${assignment.completed}%</strong>
+                    Priority: <strong>${assignment.priority}</strong> | Progress: <strong>${assignment.progress ?? assignment.completed ?? 0}%</strong>
                 </div>
             </div>
         `;

@@ -7,12 +7,7 @@ let charts = {};
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     
-    // Ensure mock data is initialized
-    if (!localStorage.getItem('kairos_assignments')) {
-        KairosStorage.initializeMockData();
-    }
-    
-    // Small delay to ensure data is ready
+    // Small delay to ensure DOM is ready
     setTimeout(() => {
         updateStats();
         renderCharts();
