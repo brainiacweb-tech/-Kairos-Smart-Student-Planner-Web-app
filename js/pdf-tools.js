@@ -526,7 +526,6 @@ async function initExtractPages(file) {
     });
 }
 
-// Word & PPT logic remains largely identical, just passing `file` directly
 async function initWordToPDF(file) {
     if (!file.name.toLowerCase().endsWith('.docx')) {
         showToast('⚠️ Only .docx is supported for in-browser conversion.', 'warning');
@@ -539,14 +538,72 @@ async function initWordToPDF(file) {
         const { value: html } = await mammoth.convertToHtml({ arrayBuffer });
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        
-        // Very basic mock HTML->PDF renderer for mammoth output.
-        // Full implementation omitted here for brevity since it was huge, using a basic fallback text dump:
-        pdf.setFontSize(11);
-        const plainText = html.replace(/<[^>]+>/g, '\n').replace(/\n\n+/g, '\n').substring(0, 5000);
-        const lines = pdf.splitTextToSize(plainText, 180);
-        pdf.text(lines, 15, 15);
-        
+
+        const margin = 15, pageW = 210 - margin * 2, pageH = 297;
+        let y = 20;
+
+        const addPage = () => { pdf.addPage(); y = 20; };
+        const checkPage = (need) => { if (y + need > pageH - 15) addPage(); };
+
+        // Parse mammoth HTML into structural elements
+        const div = document.createElement('div');
+        div.innerHTML = html;
+
+        for (const el of div.children) {
+            const tag = el.tagName.toLowerCase();
+            const text = el.textContent.trim();
+            if (!text) { y += 3; continue; }
+
+            if (['h1','h2','h3','h4'].includes(tag)) {
+                const sz = tag === 'h1' ? 18 : tag === 'h2' ? 15 : tag === 'h3' ? 13 : 12;
+                pdf.setFontSize(sz); pdf.setFont('helvetica', 'bold');
+                const lines = pdf.splitTextToSize(text, pageW);
+                checkPage(lines.length * sz * 0.42 + 5);
+                pdf.text(lines, margin, y);
+                y += lines.length * sz * 0.42 + 5;
+
+            } else if (tag === 'p') {
+                pdf.setFontSize(11); pdf.setFont('helvetica', 'normal');
+                const lines = pdf.splitTextToSize(text, pageW);
+                checkPage(lines.length * 5.5 + 4);
+                pdf.text(lines, margin, y);
+                y += lines.length * 5.5 + 4;
+
+            } else if (tag === 'ul' || tag === 'ol') {
+                pdf.setFontSize(11); pdf.setFont('helvetica', 'normal');
+                let idx = 1;
+                for (const li of el.querySelectorAll('li')) {
+                    const liText = (tag === 'ul' ? '• ' : `${idx++}. `) + li.textContent.trim();
+                    const lines = pdf.splitTextToSize(liText, pageW - 6);
+                    checkPage(lines.length * 5.5 + 2);
+                    pdf.text(lines, margin + 4, y);
+                    y += lines.length * 5.5 + 2;
+                }
+                y += 3;
+
+            } else if (tag === 'table') {
+                pdf.setFontSize(9);
+                const rows = Array.from(el.querySelectorAll('tr'));
+                const cols = Math.max(...rows.map(r => r.querySelectorAll('td,th').length), 1);
+                const colW = pageW / cols;
+                for (const row of rows) {
+                    const cells = row.querySelectorAll('td,th');
+                    const isHeader = row.querySelector('th') !== null;
+                    pdf.setFont('helvetica', isHeader ? 'bold' : 'normal');
+                    checkPage(8);
+                    let x = margin;
+                    for (const cell of cells) {
+                        const ct = pdf.splitTextToSize(cell.textContent.trim(), colW - 2);
+                        pdf.text(ct[0] || '', x + 1, y);
+                        pdf.rect(x, y - 5, colW, 7);
+                        x += colW;
+                    }
+                    y += 7;
+                }
+                y += 4;
+            }
+        }
+
         triggerDownload(pdf.output('blob'), file.name.replace(/\.docx?$/i, '.pdf'), 'application/pdf');
         addToHistory(file.name, 'word-to-pdf');
         showToast('✅ Word document converted to PDF!', 'success');
@@ -560,14 +617,85 @@ async function initPPTToPDF(file) {
         return;
     }
     await withProgress('Converting PowerPoint to PDF', async () => {
-        // Simplified fallback extraction
+        if (!window.JSZip) throw new Error('JSZip not loaded.');
+        if (!window.jspdf) throw new Error('jsPDF not loaded.');
+
+        const arrayBuffer = await readFileAsArrayBuffer(file);
+        const zip = await JSZip.loadAsync(arrayBuffer);
+
+        // Collect slide XML files in order
+        const slideFiles = Object.keys(zip.files)
+            .filter(n => /^ppt\/slides\/slide\d+\.xml$/.test(n))
+            .sort((a, b) => {
+                const na = parseInt(a.match(/slide(\d+)/)[1]);
+                const nb = parseInt(b.match(/slide(\d+)/)[1]);
+                return na - nb;
+            });
+
+        if (slideFiles.length === 0) throw new Error('No slides found in PPTX file.');
+
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [297, 210] });
-        pdf.text("PPTX to PDF Conversion Simulator", 10, 10);
-        pdf.text("Full PPTX rendering requires backend LibreOffice in production.", 10, 20);
+
+        const unescape = s => s
+            .replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+            .replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&apos;/g,"'");
+
+        for (let si = 0; si < slideFiles.length; si++) {
+            if (si > 0) pdf.addPage([297, 210], 'landscape');
+
+            const xmlStr = await zip.files[slideFiles[si]].async('string');
+
+            // Extract text runs grouped by paragraph
+            const paragraphs = [];
+            for (const paraMatch of xmlStr.matchAll(/<a:p\b[^>]*>([\s\S]*?)<\/a:p>/g)) {
+                const paraXml = paraMatch[1];
+                const runs = [...paraXml.matchAll(/<a:t>([^<]*)<\/a:t>/g)]
+                    .map(m => unescape(m[1])).join('').trim();
+                if (runs) paragraphs.push(runs);
+            }
+
+            // Slide background
+            pdf.setFillColor(255, 255, 255);
+            pdf.rect(0, 0, 297, 210, 'F');
+
+            // Slide border
+            pdf.setDrawColor(220, 220, 220);
+            pdf.rect(1, 1, 295, 208);
+
+            // Slide number badge
+            pdf.setFontSize(8); pdf.setTextColor(160, 160, 160);
+            pdf.text(`${si + 1} / ${slideFiles.length}`, 287, 205, { align: 'right' });
+
+            pdf.setTextColor(30, 30, 30);
+
+            if (paragraphs.length === 0) {
+                pdf.setFontSize(12); pdf.setTextColor(180, 180, 180);
+                pdf.text('(Empty slide)', 148, 105, { align: 'center' });
+                continue;
+            }
+
+            // Title (first non-empty paragraph)
+            pdf.setFontSize(24); pdf.setFont('helvetica', 'bold');
+            const titleLines = pdf.splitTextToSize(paragraphs[0], 265);
+            pdf.text(titleLines, 16, 30);
+
+            // Body content
+            if (paragraphs.length > 1) {
+                pdf.setFontSize(12); pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(60, 60, 60);
+                let y = 30 + titleLines.length * 11 + 10;
+                for (let i = 1; i < paragraphs.length && y < 195; i++) {
+                    const lines = pdf.splitTextToSize(`• ${paragraphs[i]}`, 265);
+                    pdf.text(lines, 16, y);
+                    y += lines.length * 6.5;
+                }
+            }
+        }
+
         triggerDownload(pdf.output('blob'), file.name.replace(/\.pptx?$/i, '.pdf'), 'application/pdf');
         addToHistory(file.name, 'ppt-to-pdf');
-        showToast(`✅ Converted to PDF!`, 'success');
+        showToast(`✅ Converted ${slideFiles.length} slide(s) to PDF!`, 'success');
         closeWorkspace();
     });
 }
