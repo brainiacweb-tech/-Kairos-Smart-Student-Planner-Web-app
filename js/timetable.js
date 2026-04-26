@@ -271,29 +271,41 @@ class TimetableManager {
 
         const courses = [];
         const courseRegex = /^([A-Z]{2,5})\s*[-_]?\s*(\d{3,4}[A-Z]?)$/i;
+        const courseInTextRegex = /\b([A-Z]{2,5})\s*[-_]?\s*(\d{3,4}[A-Z]?)\b/i;
         const timeRegex24 = /^(?:[01]?\d|2[0-3])[:.][0-5]\d$/;
         const timeRegex12 = /^(?:1[0-2]|0?[1-9])[:.]?(?:[0-5]\d)?\s*(?:AM|PM)$/i;
-        const dayRegex = /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun)$/i;
+        const dayRegex = /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun|Mo|Tu|We|Th|Fr|Sa|Su)$/i;
+        const DAY_NORMALIZE = {
+            'mo':'Mon','tu':'Tue','we':'Wed','th':'Thu','fr':'Fri','sa':'Sat','su':'Sun',
+            'mon':'Mon','tue':'Tue','wed':'Wed','thu':'Thu','fri':'Fri','sat':'Sat','sun':'Sun',
+            'monday':'Mon','tuesday':'Tue','wednesday':'Wed','thursday':'Thu',
+            'friday':'Fri','saturday':'Sat','sunday':'Sun',
+        };
+        const MWF_MAP = {
+            'mwf':['Mon','Wed','Fri'], 'mw':['Mon','Wed'], 'wf':['Wed','Fri'],
+            'tth':['Tue','Thu'], 'tuth':['Tue','Thu'], 'tueth':['Tue','Thu'],
+            'mf':['Mon','Fri'], 'tw':['Tue','Wed'], 'wth':['Wed','Thu'],
+            'thf':['Thu','Fri'], 'mtwthf':['Mon','Tue','Wed','Thu','Fri'],
+            'mtuth':['Mon','Tue','Thu'], 'mtw':['Mon','Tue','Wed'],
+            'mtwf':['Mon','Tue','Wed','Fri'], 'twf':['Tue','Wed','Fri'],
+        };
 
-        // Merge nearby words into longer phrases (useful for dates "8:00 - 10:00")
+        // Merge nearby words into longer phrases (useful for "8:00 - 10:00")
         const mergedItems = [];
         let currentGroup = [];
-        
-        // Very basic proximity merge (horizontal)
         const sortedItems = [...items].sort((a,b) => a.y - b.y || a.x - b.x);
         for (let i = 0; i < sortedItems.length; i++) {
             const item = sortedItems[i];
             if (!item.text.trim()) continue;
-            
             if (currentGroup.length === 0) {
                 currentGroup.push(item);
             } else {
                 const last = currentGroup[currentGroup.length - 1];
-                // If on same line and close horizontally
-                if (Math.abs(item.y - last.y) < 15 && (item.x - (last.x + last.w)) < 40) {
+                const gap = item.x - (last.x + last.w);
+                // Same row: y-diff < 8 (PDF items on same line), item to the right (gap >= -5), gap < 42
+                if (Math.abs(item.y - last.y) < 8 && gap >= -5 && gap < 42) {
                     currentGroup.push(item);
                 } else {
-                    // Flush
                     mergedItems.push(this._mergeGroup(currentGroup));
                     currentGroup = [item];
                 }
@@ -304,116 +316,127 @@ class TimetableManager {
         const dayRowZones = [];
         const timeColZones = [];
         const courseItems = [];
+        const uncategorized = [];
 
         for (const item of mergedItems) {
-            // Check if day
+            // Check if exact day name, or first word is a day (handles "Tu BLK F" merged items)
             let dMatch = item.text.match(dayRegex);
             if (!dMatch) {
-                // try to find inside if it's the only thing
-                const words = item.text.split(' ');
-                if (words.length === 1) dMatch = words[0].match(dayRegex);
+                const words = item.text.split(/\s+/);
+                dMatch = words[0].match(dayRegex);
             }
             if (dMatch) {
-                const d = dMatch[1].slice(0, 3);
-                dayRowZones.push({
-                    day: d.charAt(0).toUpperCase() + d.slice(1).toLowerCase(),
-                    y: item.y,
-                    h: item.h
-                });
+                const normalized = DAY_NORMALIZE[dMatch[1].toLowerCase()] ||
+                    (dMatch[1].slice(0,3).charAt(0).toUpperCase() + dMatch[1].slice(0,3).slice(1).toLowerCase());
+                dayRowZones.push({ day: normalized, y: item.y, h: item.h });
                 continue;
             }
 
-            // Check if time
-            // e.g. "8:00 - 10:00" or just "8:00"
+            // Check multi-day shorthand (MWF, TTh, TuTh, MW, etc.)
+            const lowerClean = item.text.trim().toLowerCase().replace(/[^a-z]/g, '');
+            if (MWF_MAP[lowerClean]) {
+                MWF_MAP[lowerClean].forEach(d => dayRowZones.push({ day: d, y: item.y, h: item.h }));
+                continue;
+            }
+
+            // Check if time range (e.g. "8:00 - 10:00" or just "8:00")
             const times = [];
-            const timeTokens = item.text.split(/[-to ]+/);
+            const timeTokens = item.text.split(/\s*[-–to]+\s*/);
             for (const tk of timeTokens) {
-                if (tk.match(timeRegex24) || tk.match(timeRegex12)) {
-                    times.push(tk.replace('.', ':'));
-                }
+                const t = tk.trim();
+                if (t.match(timeRegex24) || t.match(timeRegex12)) times.push(t.replace('.', ':'));
             }
             if (times.length > 0) {
-                let st = times[0];
-                let et = times.length > 1 ? times[1] : this._addHours(st, 2); // simplistic formatting needed
-                
-                // Format
-                st = this._formatTime(st);
-                et = this._formatTime(et);
-                
-                timeColZones.push({
-                    startTime: st,
-                    endTime: et,
-                    x: item.x,
-                    w: item.w
-                });
+                const st = this._formatTime(times[0]);
+                const et = times.length > 1 ? this._formatTime(times[1]) : this._addHours(st, 2);
+                timeColZones.push({ startTime: st, endTime: et, x: item.x, w: item.w });
                 continue;
             }
 
-            // Check if course
+            // Check if course code — exact match first
             let cMatch = item.text.match(courseRegex);
+            let detectedRoom = null;
+
             if (!cMatch) {
+                // Try combining adjacent word pairs (handles "CS 101" → "CS101")
                 const words = item.text.split(/\s+/);
-                for (let w=0; w<words.length-1; w++) {
+                for (let w = 0; w < words.length - 1; w++) {
                     const comb = words[w] + words[w+1];
                     const cbMatch = comb.match(/^([A-Z]{2,5})(\d{3,4}[A-Z]?)$/i);
-                    if (cbMatch) {
-                        cMatch = [comb, cbMatch[1], cbMatch[2]];
-                        break;
-                    }
+                    if (cbMatch) { cMatch = [comb, cbMatch[1], cbMatch[2]]; break; }
                 }
             }
-            
+
+            if (!cMatch) {
+                // Try finding course code embedded inside longer text (e.g. "CS101 Room205")
+                const embedded = item.text.match(courseInTextRegex);
+                if (embedded) {
+                    cMatch = embedded;
+                    // Also try to extract a room code from the same item
+                    const roomPart = item.text.replace(embedded[0], '').trim();
+                    const rmMatch = roomPart.match(/\b([A-Z]{0,3}[0-9]{1,4}[A-Z]?)\b/);
+                    if (rmMatch) detectedRoom = rmMatch[0];
+                }
+            }
+
             if (cMatch) {
                 courseItems.push({
                     code: `${cMatch[1].toUpperCase()}${cMatch[2]}`,
-                    x: item.x + item.w/2,
-                    y: item.y + item.h/2
+                    x: item.x + item.w / 2,
+                    y: item.y + item.h / 2,
+                    room: detectedRoom
                 });
+                continue;
             }
+
+            uncategorized.push(item);
         }
 
-        // If we didn't find clear zones, abort 2D parsing
         if (dayRowZones.length === 0 || timeColZones.length === 0 || courseItems.length === 0) {
             return [];
         }
 
-        // Project courses onto grid
+        // Project courses onto day/time grid
         for (const cItem of courseItems) {
-            // Find closest day (row)
-            let closestDay = null;
-            let minDy = Infinity;
+            let closestDay = null, minDy = Infinity;
             for (const rz of dayRowZones) {
                 const dy = Math.abs(cItem.y - rz.y);
-                if (dy < minDy && dy < 150) { // arbitrary row max height
-                    minDy = dy;
-                    closestDay = rz.day;
-                }
+                if (dy < minDy && dy < 150) { minDy = dy; closestDay = rz.day; }
             }
 
-            // Find closest time (col)
-            let closestTime = null;
-            let minDx = Infinity;
+            let closestTime = null, minDx = Infinity;
             for (const cz of timeColZones) {
-                const dx = Math.abs(cItem.x - (cz.x + cz.w/2));
-                if (dx < minDx && dx < 300) {
-                    minDx = dx;
-                    closestTime = cz;
-                }
+                const dx = Math.abs(cItem.x - (cz.x + cz.w / 2));
+                if (dx < minDx && dx < 300) { minDx = dx; closestTime = cz; }
             }
 
             if (closestDay && closestTime) {
-                courses.push({
-                    course: cItem.code,
-                    room: 'TBA', // hard to reliably extract room in 2D without complex bounding, fallback to TBA
-                    startTime: closestTime.startTime,
-                    endTime: closestTime.endTime,
-                    days: [closestDay]
-                });
+                // Pick the CLOSEST matching room in uncategorized items (not just first in list)
+                let room = cItem.room || 'TBA';
+                if (!cItem.room) {
+                    const roomRx = /\b(?:(?:Room|Rm|Hall|Lab|Classroom|Bldg?|Block|BLK|Lecture|Auditorium)\.?\s*#?\s*[A-Z0-9][\w\s]{0,8}|[A-Z]{2,4}\s+[A-Z0-9]{1,2}[0-9]{0,2}(?:\s+[0-9]{1,2})?|[A-Z]{1,3}[0-9]{2,4}[A-Z]?|Virtual|Online)\b/i;
+                    let bestRoom = null, bestDist = Infinity;
+                    for (const ui of uncategorized) {
+                        const dx = Math.abs(cItem.x - (ui.x + ui.w / 2));
+                        const dy = Math.abs(cItem.y - (ui.y + ui.h / 2));
+                        if (dx < 200 && dy < 120) {
+                            const rm = ui.text.match(roomRx);
+                            if (rm) {
+                                const dist = dx + dy * 2; // weight vertical distance more
+                                if (dist < bestDist) { bestDist = dist; bestRoom = rm[0].trim(); }
+                            }
+                        }
+                    }
+                    if (bestRoom) room = bestRoom;
+                }
+                courses.push({ course: cItem.code, room, startTime: closestTime.startTime, endTime: closestTime.endTime, days: [closestDay] });
             }
         }
 
-        // Remove duplicates
-        return courses.filter((v,i,a)=>a.findIndex(v2=>(v2.course===v.course && v2.startTime===v.startTime && v2.days.join()===v.days.join()))===i);
+        // Remove exact duplicates
+        return courses.filter((v,i,a) => a.findIndex(v2 =>
+            v2.course === v.course && v2.startTime === v.startTime && v2.days.join() === v.days.join()
+        ) === i);
     }
 
     _mergeGroup(group) {
@@ -433,14 +456,18 @@ class TimetableManager {
     _formatTime(t) {
         if (!t) return "08:00";
         t = t.toUpperCase().replace('.', ':');
-        let isPM = t.includes('PM');
+        const hasAmPm = /[AP]M/.test(t);
+        const isPM = t.includes('PM');
         let timePart = t.replace(/\s*(AM|PM)/, '').trim();
         if (!timePart.includes(':')) timePart += ':00';
         let parts = timePart.split(':');
         let h = parseInt(parts[0]);
-        let m = parts[1] || '00';
-        if (isPM && h !== 12) h += 12;
-        if (!isPM && h === 12) h = 0;
+        let m = (parts[1] || '00').slice(0, 2);
+        if (hasAmPm) {
+            // 12-hour → 24-hour conversion only when AM/PM is present
+            if (isPM && h !== 12) h += 12;
+            if (!isPM && h === 12) h = 0;
+        }
         return `${String(h).padStart(2,'0')}:${m}`;
     }
 
@@ -452,8 +479,13 @@ class TimetableManager {
         const courseRegex = /\b([A-Z]{2,5})\s*[-_]?\s*(\d{3,4}[A-Z]?)\b/i; // E.g. CS 101, MATH-201, PHY3000
         const timeRegex24 = /\b(?:[01]?\d|2[0-3])[:.][0-5]\d\b/g;
         const timeRegex12 = /\b(?:1[0-2]|0?[1-9])[:.]?(?:[0-5]\d)?\s*(?:AM|PM)\b/gi;
-        const dayRegex = /\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/i;
-        const roomRegex = /\b(?:Room|Rm|Hall|Lab|Classroom|Building)\s*#?[A-Z0-9-]+\b|\b[A-Z]{1,2}[0-9]{2,4}\b/i;
+        const dayRegex = /\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun|Mo|Tu|We|Th|Fr|Sa|Su)\b/i;
+        const DAY_NORM_TEXT = {
+            'mo':'Mon','tu':'Tue','we':'Wed','th':'Thu','fr':'Fri','sa':'Sat','su':'Sun',
+            'mon':'Mon','tue':'Tue','wed':'Wed','thu':'Thu','fri':'Fri','sat':'Sat','sun':'Sun',
+        };
+        // Matches: "BLK F", "AY FP01", "AY SF 09", "A101", "LH 001", "Room 204", "Virtual"
+        const roomRegex = /\b(?:(?:Room|Rm|Hall|Lab|Classroom|Bldg?|Block|BLK|Lecture|Auditorium)\.?\s*#?\s*[A-Z0-9][\w\s]{0,8}|[A-Z]{2,4}\s+[A-Z0-9]{1,2}[0-9]{0,2}(?:\s+[0-9]{1,2})?|[A-Z]{1,3}[0-9]{2,4}[A-Z]?|Virtual|Online)\b/i;
 
         let currentDayContext = 'Mon';
 
@@ -463,8 +495,9 @@ class TimetableManager {
             // Context tracking: If a line explicitly names a day, assume subsequent courses belong to it
             const dayMatch = line.match(dayRegex);
             if (dayMatch) {
-                const d = dayMatch[1].slice(0, 3);
-                currentDayContext = d.charAt(0).toUpperCase() + d.slice(1).toLowerCase();
+                const raw = dayMatch[1].toLowerCase();
+                currentDayContext = DAY_NORM_TEXT[raw] ||
+                    (raw.charAt(0).toUpperCase() + raw.slice(1, 3).toLowerCase());
             }
 
             // Look for a course code in the current or adjacent lines
@@ -500,12 +533,30 @@ class TimetableManager {
                 }
 
                 // Extract Days from block, fallback to context
+                const MWF_EXPAND = {
+                    'MWF':['Mon','Wed','Fri'], 'MW':['Mon','Wed'], 'WF':['Wed','Fri'],
+                    'TTH':['Tue','Thu'], 'TUTH':['Tue','Thu'], 'TUETH':['Tue','Thu'],
+                    'MF':['Mon','Fri'], 'TW':['Tue','Wed'], 'WTH':['Wed','Thu'],
+                    'THF':['Thu','Fri'], 'MTWTHF':['Mon','Tue','Wed','Thu','Fri'],
+                    'MTW':['Mon','Tue','Wed'], 'MTWF':['Mon','Tue','Wed','Fri'],
+                };
                 let days = [];
-                const blockDays = [...block.matchAll(new RegExp(dayRegex.source, 'gi'))];
-                for (const bd of blockDays) {
-                    const d = bd[1].slice(0,3);
-                    const nd = d.charAt(0).toUpperCase() + d.slice(1).toLowerCase();
-                    if (!days.includes(nd)) days.push(nd);
+                // Check for multi-day shorthands first (e.g. MWF, TTh, TuTh)
+                const mwfMatches = [...block.matchAll(/\b(MWF|MW|WF|TuTh|TTh|MF|TW|WTh|ThF|MTWTHF|MTW|MTWF)\b/gi)];
+                for (const mm of mwfMatches) {
+                    const key = mm[1].toUpperCase().replace(/[^A-Z]/g,'');
+                    if (MWF_EXPAND[key]) {
+                        for (const d of MWF_EXPAND[key]) { if (!days.includes(d)) days.push(d); }
+                    }
+                }
+                if (days.length === 0) {
+                    const blockDays = [...block.matchAll(new RegExp(dayRegex.source, 'gi'))];
+                    for (const bd of blockDays) {
+                        const raw = bd[1].toLowerCase();
+                        const nd = DAY_NORM_TEXT[raw] ||
+                            (raw.charAt(0).toUpperCase() + raw.slice(1, 3).toLowerCase());
+                        if (!days.includes(nd)) days.push(nd);
+                    }
                 }
                 if (days.length === 0) days.push(currentDayContext);
 

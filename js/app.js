@@ -800,47 +800,51 @@ function startBackgroundAlarmChecker() {
         const currentTimeString = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
         const currentDay = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][now.getDay()];
         
-        const firedAlarms = JSON.parse(localStorage.getItem('kairos_active_alarms_fired') || '{}');
+        let firedAlarms = {};
+        try { firedAlarms = JSON.parse(localStorage.getItem('kairos_active_alarms_fired') || '{}'); } catch(e) {}
 
-        // 1. Check Timetable for classes starting in 10 minutes
-        const timetable = JSON.parse(localStorage.getItem('kairos_timetable') || '[]');
-        timetable.forEach(cls => {
-            if (cls.day === currentDay) {
-                // Parse class start time
-                const [startH, startM] = cls.startTime.split(':').map(Number);
-                const classTime = new Date();
-                classTime.setHours(startH, startM, 0, 0);
-                
-                // Diff in minutes
-                const diffMs = classTime - now;
-                const diffMins = Math.floor(diffMs / 60000);
-                
-                if (diffMins === 10) { // Exactly 10 minutes away
-                    const alarmKey = `class_${cls.id}_${now.toDateString()}`;
-                    if (!firedAlarms[alarmKey]) {
-                        showAlarmModal(
-                            "Upcoming Class!",
-                            `<strong>${cls.title}</strong> starts in 10 minutes (${cls.startTime}).<br><br>Location: ${cls.location || 'TBA'}`
-                        );
-                        firedAlarms[alarmKey] = true;
-                    }
+        // 1. Check Lectures for classes starting in ~10 minutes
+        let lectures = [];
+        try { lectures = JSON.parse(localStorage.getItem('kairos_lectures') || '[]'); } catch(e) {}
+        lectures.forEach(cls => {
+            if (!cls.startTime) return;
+            const clsDays = Array.isArray(cls.days) ? cls.days : (cls.day ? [cls.day] : []);
+            const matchesDay = clsDays.some(d => currentDay.startsWith(d));
+            if (!matchesDay) return;
+
+            const parts = cls.startTime.split(':').map(Number);
+            if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1])) return;
+            const classTime = new Date();
+            classTime.setHours(parts[0], parts[1], 0, 0);
+
+            const diffMins = Math.floor((classTime - now) / 60000);
+            if (diffMins >= 9 && diffMins <= 11) { // ~10 minutes window
+                const alarmKey = `class_${cls.id || cls.course}_${now.toDateString()}`;
+                if (!firedAlarms[alarmKey]) {
+                    showAlarmModal(
+                        "Upcoming Class!",
+                        `<strong>${cls.course || 'Class'}</strong> starts in 10 minutes (${cls.startTime}).<br><br>Location: ${cls.room || 'TBA'}`
+                    );
+                    firedAlarms[alarmKey] = true;
                 }
             }
         });
 
-        // 2. Check Assignments for due in 1 hour
-        const assignments = JSON.parse(localStorage.getItem('kairos_assignments') || '[]');
+        // 2. Check Assignments for due in ~1 hour
+        let assignments = [];
+        try { assignments = JSON.parse(localStorage.getItem('kairos_assignments') || '[]'); } catch(e) {}
         assignments.forEach(a => {
             if (a.status === 'completed' || !a.dueDate) return;
             const due = new Date(a.dueDate).getTime();
+            if (isNaN(due)) return;
             const remainingMins = Math.floor((due - now.getTime()) / 60000);
-            
-            if (remainingMins === 60) { // Exactly 1 hour away
+
+            if (remainingMins >= 59 && remainingMins <= 61) { // ~1 hour window
                 const alarmKey = `assign_${a.id}_1h`;
                 if (!firedAlarms[alarmKey]) {
                     showAlarmModal(
                         "Deadline Approaching!",
-                        `Your assignment <strong>${a.title}</strong> is due in 1 hour!`
+                        `Your assignment <strong>${a.title || 'Assignment'}</strong> is due in 1 hour!`
                     );
                     firedAlarms[alarmKey] = true;
                 }
