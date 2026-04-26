@@ -301,8 +301,9 @@ class TimetableManager {
                 currentGroup.push(item);
             } else {
                 const last = currentGroup[currentGroup.length - 1];
-                // Same row if y-diff < 15, horizontal gap < 42 (keeps word parts together, separates columns)
-                if (Math.abs(item.y - last.y) < 15 && (item.x - (last.x + last.w)) < 42) {
+                const gap = item.x - (last.x + last.w);
+                // Same row: y-diff < 8 (PDF items on same line), item to the right (gap >= -5), gap < 42
+                if (Math.abs(item.y - last.y) < 8 && gap >= -5 && gap < 42) {
                     currentGroup.push(item);
                 } else {
                     mergedItems.push(this._mergeGroup(currentGroup));
@@ -318,11 +319,11 @@ class TimetableManager {
         const uncategorized = [];
 
         for (const item of mergedItems) {
-            // Check if exact day name
+            // Check if exact day name, or first word is a day (handles "Tu BLK F" merged items)
             let dMatch = item.text.match(dayRegex);
             if (!dMatch) {
-                const words = item.text.split(' ');
-                if (words.length === 1) dMatch = words[0].match(dayRegex);
+                const words = item.text.split(/\s+/);
+                dMatch = words[0].match(dayRegex);
             }
             if (dMatch) {
                 const normalized = DAY_NORMALIZE[dMatch[1].toLowerCase()] ||
@@ -410,18 +411,23 @@ class TimetableManager {
             }
 
             if (closestDay && closestTime) {
-                // Try to extract room from nearby uncategorized items if not already found
+                // Pick the CLOSEST matching room in uncategorized items (not just first in list)
                 let room = cItem.room || 'TBA';
                 if (!cItem.room) {
-                    const roomRx = /\b(?:(?:Room|Rm|Hall|Lab|Classroom|Bldg?|Block|BLK|Lecture|Auditorium)\.?\s*#?\s*[A-Z0-9][\w\s]{0,8}|[A-Z]{2,4}\s+[A-Z]{0,2}[0-9]{1,4}(?:\s+[0-9]{1,2})?|[A-Z]{1,3}[0-9]{2,4}[A-Z]?)\b/i;
+                    const roomRx = /\b(?:(?:Room|Rm|Hall|Lab|Classroom|Bldg?|Block|BLK|Lecture|Auditorium)\.?\s*#?\s*[A-Z0-9][\w\s]{0,8}|[A-Z]{2,4}\s+[A-Z0-9]{1,2}[0-9]{0,2}(?:\s+[0-9]{1,2})?|[A-Z]{1,3}[0-9]{2,4}[A-Z]?|Virtual|Online)\b/i;
+                    let bestRoom = null, bestDist = Infinity;
                     for (const ui of uncategorized) {
                         const dx = Math.abs(cItem.x - (ui.x + ui.w / 2));
                         const dy = Math.abs(cItem.y - (ui.y + ui.h / 2));
                         if (dx < 200 && dy < 120) {
                             const rm = ui.text.match(roomRx);
-                            if (rm) { room = rm[0].trim(); break; }
+                            if (rm) {
+                                const dist = dx + dy * 2; // weight vertical distance more
+                                if (dist < bestDist) { bestDist = dist; bestRoom = rm[0].trim(); }
+                            }
                         }
                     }
+                    if (bestRoom) room = bestRoom;
                 }
                 courses.push({ course: cItem.code, room, startTime: closestTime.startTime, endTime: closestTime.endTime, days: [closestDay] });
             }
@@ -478,8 +484,8 @@ class TimetableManager {
             'mo':'Mon','tu':'Tue','we':'Wed','th':'Thu','fr':'Fri','sa':'Sat','su':'Sun',
             'mon':'Mon','tue':'Tue','wed':'Wed','thu':'Thu','fri':'Fri','sat':'Sat','sun':'Sun',
         };
-        // Matches: "BLK F", "AY FP01", "AY SF 09", "A101", "LH 001", "Room 204"
-        const roomRegex = /\b(?:(?:Room|Rm|Hall|Lab|Classroom|Bldg?|Block|BLK|Lecture|Auditorium)\.?\s*#?\s*[A-Z0-9][\w\s]{0,8}|[A-Z]{2,4}\s+[A-Z0-9]{1,2}[0-9]{0,2}(?:\s+[0-9]{1,2})?|[A-Z]{1,3}[0-9]{2,4}[A-Z]?)\b/i;
+        // Matches: "BLK F", "AY FP01", "AY SF 09", "A101", "LH 001", "Room 204", "Virtual"
+        const roomRegex = /\b(?:(?:Room|Rm|Hall|Lab|Classroom|Bldg?|Block|BLK|Lecture|Auditorium)\.?\s*#?\s*[A-Z0-9][\w\s]{0,8}|[A-Z]{2,4}\s+[A-Z0-9]{1,2}[0-9]{0,2}(?:\s+[0-9]{1,2})?|[A-Z]{1,3}[0-9]{2,4}[A-Z]?|Virtual|Online)\b/i;
 
         let currentDayContext = 'Mon';
 
