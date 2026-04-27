@@ -192,6 +192,188 @@ function showCustomPrompt(title, desc, placeholder) {
 
 // ── TIMETABLE EXTRACTOR ───────────────────────────────────────────────────────
 
+function _tt2dFormatTime(t) {
+    if (!t) return '08:00';
+    t = t.toUpperCase().replace('.', ':');
+    const hasAmPm = /[AP]M/.test(t);
+    const isPM = t.includes('PM');
+    let tp = t.replace(/\s*(AM|PM)/, '').trim();
+    if (!tp.includes(':')) tp += ':00';
+    const parts = tp.split(':');
+    let h = parseInt(parts[0]);
+    const m = (parts[1] || '00').slice(0, 2);
+    if (hasAmPm) { if (isPM && h !== 12) h += 12; if (!isPM && h === 12) h = 0; }
+    return `${String(h).padStart(2,'0')}:${m}`;
+}
+
+function _tt2dAddHours(t, hrs) {
+    const [h, m] = t.split(':').map(Number);
+    const total = h * 60 + m + hrs * 60;
+    return `${String(Math.floor(total/60)%24).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`;
+}
+
+function _tt2dMergeGroup(group) {
+    const x = Math.min(...group.map(g => g.x));
+    const y = Math.min(...group.map(g => g.y));
+    const maxRight  = Math.max(...group.map(g => g.x + g.w));
+    const maxBottom = Math.max(...group.map(g => g.y + g.h));
+    return { text: group.map(g => g.text).join(' '), x, y, w: maxRight - x, h: maxBottom - y };
+}
+
+function parseTimetable2D(items) {
+    if (!items || items.length === 0) return [];
+
+    const courseRegex      = /^([A-Z]{2,5})\s*[-_]?\s*(\d{3,4}[A-Z]?)$/i;
+    const courseInTextRegex = /\b([A-Z]{2,5})\s*[-_]?\s*(\d{3,4}[A-Z]?)\b/i;
+    const timeRegex24 = /^(?:[01]?\d|2[0-3])[:.][0-5]\d$/;
+    const timeRegex12 = /^(?:1[0-2]|0?[1-9])[:.]?(?:[0-5]\d)?\s*(?:AM|PM)$/i;
+    const dayRegex    = /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun|Mo|Tu|We|Th|Fr|Sa|Su)$/i;
+    const DAY_NORMALIZE = {
+        'mo':'Mon','tu':'Tue','we':'Wed','th':'Thu','fr':'Fri','sa':'Sat','su':'Sun',
+        'mon':'Mon','tue':'Tue','wed':'Wed','thu':'Thu','fri':'Fri','sat':'Sat','sun':'Sun',
+        'monday':'Mon','tuesday':'Tue','wednesday':'Wed','thursday':'Thu',
+        'friday':'Fri','saturday':'Sat','sunday':'Sun',
+    };
+    const MWF_MAP = {
+        'mwf':['Mon','Wed','Fri'],'mw':['Mon','Wed'],'wf':['Wed','Fri'],
+        'tth':['Tue','Thu'],'tuth':['Tue','Thu'],'tueth':['Tue','Thu'],
+        'mf':['Mon','Fri'],'tw':['Tue','Wed'],'wth':['Wed','Thu'],
+        'thf':['Thu','Fri'],'mtwthf':['Mon','Tue','Wed','Thu','Fri'],
+        'mtuth':['Mon','Tue','Thu'],'mtw':['Mon','Tue','Wed'],
+        'mtwf':['Mon','Tue','Wed','Fri'],'twf':['Tue','Wed','Fri'],
+    };
+
+    // Merge nearby words into row-level phrases
+    const mergedItems = [];
+    let currentGroup = [];
+    const sortedItems = [...items].sort((a,b) => a.y - b.y || a.x - b.x);
+    for (let i = 0; i < sortedItems.length; i++) {
+        const item = sortedItems[i];
+        if (!item.text.trim()) continue;
+        if (currentGroup.length === 0) {
+            currentGroup.push(item);
+        } else {
+            const last = currentGroup[currentGroup.length - 1];
+            const gap = item.x - (last.x + last.w);
+            if (Math.abs(item.y - last.y) < 8 && gap >= -5 && gap < 42) {
+                currentGroup.push(item);
+            } else {
+                mergedItems.push(_tt2dMergeGroup(currentGroup));
+                currentGroup = [item];
+            }
+        }
+    }
+    if (currentGroup.length > 0) mergedItems.push(_tt2dMergeGroup(currentGroup));
+
+    const dayRowZones = [], timeColZones = [], courseItems = [], uncategorized = [];
+
+    for (const item of mergedItems) {
+        let dMatch = item.text.match(dayRegex);
+        if (!dMatch) {
+            const words = item.text.split(/\s+/);
+            dMatch = words[0].match(dayRegex);
+        }
+        if (dMatch) {
+            const normalized = DAY_NORMALIZE[dMatch[1].toLowerCase()] ||
+                (dMatch[1].slice(0,3).charAt(0).toUpperCase() + dMatch[1].slice(0,3).slice(1).toLowerCase());
+            dayRowZones.push({ day: normalized, y: item.y, h: item.h });
+            continue;
+        }
+
+        const lowerClean = item.text.trim().toLowerCase().replace(/[^a-z]/g, '');
+        if (MWF_MAP[lowerClean]) {
+            MWF_MAP[lowerClean].forEach(d => dayRowZones.push({ day: d, y: item.y, h: item.h }));
+            continue;
+        }
+
+        const times = [];
+        const timeTokens = item.text.split(/\s*[-–to]+\s*/);
+        for (const tk of timeTokens) {
+            const t = tk.trim();
+            if (t.match(timeRegex24) || t.match(timeRegex12)) times.push(t.replace('.', ':'));
+        }
+        if (times.length > 0) {
+            const st = _tt2dFormatTime(times[0]);
+            const et = times.length > 1 ? _tt2dFormatTime(times[1]) : _tt2dAddHours(st, 2);
+            timeColZones.push({ startTime: st, endTime: et, x: item.x, w: item.w });
+            continue;
+        }
+
+        let cMatch = item.text.match(courseRegex);
+        let detectedRoom = null;
+
+        if (!cMatch) {
+            const words = item.text.split(/\s+/);
+            for (let w = 0; w < words.length - 1; w++) {
+                const comb = words[w] + words[w+1];
+                const cbMatch = comb.match(/^([A-Z]{2,5})(\d{3,4}[A-Z]?)$/i);
+                if (cbMatch) { cMatch = [comb, cbMatch[1], cbMatch[2]]; break; }
+            }
+        }
+        if (!cMatch) {
+            const embedded = item.text.match(courseInTextRegex);
+            if (embedded) {
+                cMatch = embedded;
+                const roomPart = item.text.replace(embedded[0], '').trim();
+                const rmMatch = roomPart.match(/\b([A-Z]{0,3}[0-9]{1,4}[A-Z]?)\b/);
+                if (rmMatch) detectedRoom = rmMatch[0];
+            }
+        }
+
+        if (cMatch) {
+            courseItems.push({
+                code: `${cMatch[1].toUpperCase()}${cMatch[2]}`,
+                x: item.x + item.w / 2,
+                y: item.y + item.h / 2,
+                room: detectedRoom
+            });
+            continue;
+        }
+        uncategorized.push(item);
+    }
+
+    if (dayRowZones.length === 0 || timeColZones.length === 0 || courseItems.length === 0) return [];
+
+    const courses = [];
+    const roomRx = /\b(?:(?:Room|Rm|Hall|Lab|Classroom|Bldg?|Block|BLK|Lecture|Auditorium)\.?\s*#?\s*[A-Z0-9][\w\s]{0,8}|[A-Z]{2,4}\s+[A-Z0-9]{1,2}[0-9]{0,2}(?:\s+[0-9]{1,2})?|[A-Z]{1,3}[0-9]{2,4}[A-Z]?|Virtual|Online)\b/i;
+
+    for (const cItem of courseItems) {
+        let closestDay = null, minDy = Infinity;
+        for (const rz of dayRowZones) {
+            const dy = Math.abs(cItem.y - rz.y);
+            if (dy < minDy && dy < 150) { minDy = dy; closestDay = rz.day; }
+        }
+        let closestTime = null, minDx = Infinity;
+        for (const cz of timeColZones) {
+            const dx = Math.abs(cItem.x - (cz.x + cz.w / 2));
+            if (dx < minDx && dx < 300) { minDx = dx; closestTime = cz; }
+        }
+        if (closestDay && closestTime) {
+            let room = cItem.room || 'TBA';
+            if (!cItem.room) {
+                let bestRoom = null, bestDist = Infinity;
+                for (const ui of uncategorized) {
+                    const dx = Math.abs(cItem.x - (ui.x + ui.w / 2));
+                    const dy = Math.abs(cItem.y - (ui.y + ui.h / 2));
+                    if (dx < 200 && dy < 120) {
+                        const rm = ui.text.match(roomRx);
+                        if (rm) {
+                            const dist = dx + dy * 2;
+                            if (dist < bestDist) { bestDist = dist; bestRoom = rm[0].trim(); }
+                        }
+                    }
+                }
+                if (bestRoom) room = bestRoom;
+            }
+            courses.push({ course: cItem.code, room, startTime: closestTime.startTime, endTime: closestTime.endTime, days: [closestDay] });
+        }
+    }
+
+    return courses.filter((v,i,a) => a.findIndex(v2 =>
+        v2.course === v.course && v2.startTime === v.startTime && v2.days.join() === v.days.join()
+    ) === i);
+}
+
 async function initExtractTimetable(file) {
     await withProgress('Analyzing Document...', async () => {
         let classes = [];
@@ -206,8 +388,8 @@ async function initExtractTimetable(file) {
             let allItems = [];
             let fullText = '';
             for (let i = 1; i <= pdfDoc.numPages; i++) {
-                const page   = await pdfDoc.getPage(i);
-                const vp     = page.getViewport({ scale: 1 });
+                const page    = await pdfDoc.getPage(i);
+                const vp      = page.getViewport({ scale: 1 });
                 const content = await page.getTextContent();
                 content.items.forEach(item => {
                     if (!item.str.trim()) return;
@@ -219,10 +401,9 @@ async function initExtractTimetable(file) {
             }
 
             // Try 2D grid parse first (works for tabular timetables)
-            if (typeof TimetableManager !== 'undefined' && window.timetableManager) {
-                classes = window.timetableManager._parseTimetable2D(allItems);
-            }
-            // Fall back to text parser
+            classes = parseTimetable2D(allItems);
+
+            // Fall back to line-by-line text parser
             if (classes.length === 0) {
                 classes = parseTimetableText(fullText);
             }
