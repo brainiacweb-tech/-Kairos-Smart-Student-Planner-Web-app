@@ -1,6 +1,116 @@
-/**
+﻿/**
  * Timetable Manager - File Upload, Extraction & Smart Suggestions
  */
+
+// ── SHARED TIMETABLE PARSING HELPERS (used by TimetableManager methods) ────────
+
+function _ttH_fmtTime(raw) {
+    if (!raw) return null;
+    raw = String(raw).trim().toUpperCase().replace(/[.h]/g, ':').replace(/\s+/g, '');
+    const pm = raw.includes('PM'), am = raw.includes('AM');
+    raw = raw.replace(/(AM|PM)/g, '');
+    if (/^\d{3,4}$/.test(raw)) { raw = raw.padStart(4, '0'); raw = raw.slice(0, 2) + ':' + raw.slice(2); }
+    const p = raw.match(/^(\d{1,2}):(\d{2})$/);
+    if (!p) return null;
+    let h = parseInt(p[1], 10), m = parseInt(p[2], 10);
+    if (m > 59) return null;
+    if (pm && h !== 12) h += 12;
+    else if (am && h === 12) h = 0;
+    else if (!pm && !am && h >= 1 && h <= 6) h += 12;
+    if (h > 23) return null;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+function _ttH_addMins(t, mins) {
+    if (!t) return '10:00';
+    const [h, m] = t.split(':').map(Number);
+    const tot = h * 60 + m + mins;
+    return `${String(Math.floor(tot / 60) % 24).padStart(2, '0')}:${String(tot % 60).padStart(2, '0')}`;
+}
+
+function _ttH_timeRange(text) {
+    const rx = /(\d{1,4}(?:[:.h]\d{2})?\s*(?:AM|PM)?)\s*[-–—]\s*(\d{1,4}(?:[:.h]\d{2})?\s*(?:AM|PM)?)/gi;
+    let m;
+    while ((m = rx.exec(text)) !== null) {
+        const st = _ttH_fmtTime(m[1]), et = _ttH_fmtTime(m[2]);
+        if (st && et && st !== et) return { startTime: st, endTime: et };
+    }
+    const sr = /\b(\d{1,2}[:.]\d{2}\s*(?:AM|PM)?)\b/gi;
+    const found = [];
+    while ((m = sr.exec(text)) !== null) { const t = _ttH_fmtTime(m[1]); if (t && !found.includes(t)) found.push(t); }
+    if (found.length >= 2) return { startTime: found[0], endTime: found[1] };
+    if (found.length === 1) return { startTime: found[0], endTime: _ttH_addMins(found[0], 90) };
+    return null;
+}
+
+const _TTH_DAY_MAP = {
+    'mo':'Mon','tu':'Tue','we':'Wed','th':'Thu','fr':'Fri','sa':'Sat','su':'Sun',
+    'mon':'Mon','tue':'Tue','wed':'Wed','thu':'Thu','fri':'Fri','sat':'Sat','sun':'Sun',
+    'monday':'Mon','tuesday':'Tue','wednesday':'Wed','thursday':'Thu',
+    'friday':'Fri','saturday':'Sat','sunday':'Sun',
+};
+const _TTH_MULTI_DAY = {
+    'mwf':['Mon','Wed','Fri'],'mw':['Mon','Wed'],'wf':['Wed','Fri'],
+    'tth':['Tue','Thu'],'tuth':['Tue','Thu'],'tthu':['Tue','Thu'],
+    'mf':['Mon','Fri'],'tw':['Tue','Wed'],'wth':['Wed','Thu'],
+    'thf':['Thu','Fri'],'mtwthf':['Mon','Tue','Wed','Thu','Fri'],
+    'mtuth':['Mon','Tue','Thu'],'mtw':['Mon','Tue','Wed'],
+    'mtwf':['Mon','Tue','Wed','Fri'],'twf':['Tue','Wed','Fri'],
+    'mtf':['Mon','Tue','Fri'],'mth':['Mon','Thu'],
+};
+
+function _ttH_days(text) {
+    const clean = text.trim().toLowerCase().replace(/[^a-z]/g, '');
+    if (_TTH_MULTI_DAY[clean]) return _TTH_MULTI_DAY[clean];
+    for (const [k, v] of Object.entries(_TTH_MULTI_DAY)) {
+        if (new RegExp('\\b' + k + '\\b', 'i').test(text)) return v;
+    }
+    const days = [];
+    let m;
+    const longRx = /\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/gi;
+    while ((m = longRx.exec(text)) !== null) {
+        const nd = _TTH_DAY_MAP[m[1].toLowerCase()];
+        if (nd && !days.includes(nd)) days.push(nd);
+    }
+    if (days.length > 0) return days;
+    const shortRx = /\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun|Mo|Tu|We|Th|Fr|Sa|Su)\b/g;
+    while ((m = shortRx.exec(text)) !== null) {
+        const nd = _TTH_DAY_MAP[m[1].toLowerCase()];
+        if (nd && !days.includes(nd)) days.push(nd);
+    }
+    return days;
+}
+
+const _TTH_COURSE_PAT = /\b([A-Z]{2,6})\s*[-_]?\s*(\d{3,4}[A-Z]?)\b/gi;
+function _ttH_courses(text) {
+    const codes = [];
+    const rx = new RegExp(_TTH_COURSE_PAT.source, 'gi');
+    let m;
+    while ((m = rx.exec(text)) !== null) {
+        const code = m[1].toUpperCase() + m[2].toUpperCase();
+        if (!codes.includes(code)) codes.push(code);
+    }
+    return codes;
+}
+
+const _TTH_ROOM_RX = /\b((?:(?:Room|Rm|Hall|Lab|Lecture\s*(?:Theatre|Hall)?|Theatre|Auditorium|Block|BLK|LH|JH|BH|LT|SH|ICT\s*Lab?|Senate\s*Hall?|Computer\s*Lab?)\s*[A-Z0-9][\w\s]{0,12})|(?:[A-Z]{1,4}\s*\d{1,4}[A-Z]?)|(?:Virtual|Online|Remote))\b/i;
+function _ttH_room(text) {
+    const stripped = text.replace(/\b[A-Z]{2,6}\s*[-_]?\s*\d{3,4}[A-Z]?\b/gi, ' ');
+    const slashParts = text.split('/');
+    for (let i = 1; i < slashParts.length; i++) {
+        const p = slashParts[i].trim();
+        if (/^[A-Z]{0,4}\s*\d{1,4}[A-Z]?$/i.test(p) && p.length >= 2 && p.length <= 10) return p;
+        const rm = p.match(_TTH_ROOM_RX);
+        if (rm) return rm[0].trim();
+    }
+    const m = stripped.match(_TTH_ROOM_RX);
+    if (m) return m[0].trim();
+    for (const tok of stripped.split(/[\s,;]+/)) {
+        if (/^[A-Z]{1,4}\d{1,4}[A-Z]?$/.test(tok) && tok.length >= 2 && tok.length <= 8) return tok;
+    }
+    return null;
+}
+
 
 class TimetableManager {
     constructor() {
@@ -269,173 +379,150 @@ class TimetableManager {
     _parseTimetable2D(items) {
         if (!items || items.length === 0) return [];
 
-        const courses = [];
-        const courseRegex = /^([A-Z]{2,5})\s*[-_]?\s*(\d{3,4}[A-Z]?)$/i;
-        const courseInTextRegex = /\b([A-Z]{2,5})\s*[-_]?\s*(\d{3,4}[A-Z]?)\b/i;
-        const timeRegex24 = /^(?:[01]?\d|2[0-3])[:.][0-5]\d$/;
-        const timeRegex12 = /^(?:1[0-2]|0?[1-9])[:.]?(?:[0-5]\d)?\s*(?:AM|PM)$/i;
-        const dayRegex = /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun|Mo|Tu|We|Th|Fr|Sa|Su)$/i;
-        const DAY_NORMALIZE = {
-            'mo':'Mon','tu':'Tue','we':'Wed','th':'Thu','fr':'Fri','sa':'Sat','su':'Sun',
-            'mon':'Mon','tue':'Tue','wed':'Wed','thu':'Thu','fri':'Fri','sat':'Sat','sun':'Sun',
-            'monday':'Mon','tuesday':'Tue','wednesday':'Wed','thursday':'Thu',
-            'friday':'Fri','saturday':'Sat','sunday':'Sun',
-        };
-        const MWF_MAP = {
-            'mwf':['Mon','Wed','Fri'], 'mw':['Mon','Wed'], 'wf':['Wed','Fri'],
-            'tth':['Tue','Thu'], 'tuth':['Tue','Thu'], 'tueth':['Tue','Thu'],
-            'mf':['Mon','Fri'], 'tw':['Tue','Wed'], 'wth':['Wed','Thu'],
-            'thf':['Thu','Fri'], 'mtwthf':['Mon','Tue','Wed','Thu','Fri'],
-            'mtuth':['Mon','Tue','Thu'], 'mtw':['Mon','Tue','Wed'],
-            'mtwf':['Mon','Tue','Wed','Fri'], 'twf':['Tue','Wed','Fri'],
-        };
+        // Step 1: Cluster items into rows by y-proximity
+        const sorted = [...items].sort((a, b) => a.y - b.y || a.x - b.x);
+        const rows = [];
+        for (const item of sorted) {
+            if (!item.text || !item.text.trim()) continue;
+            const tol = Math.max(item.h || 10, 8);
+            let placed = false;
+            for (const row of rows) {
+                if (Math.abs(row.cy - item.y) < tol) {
+                    row.items.push(item);
+                    row.cy = row.items.reduce((s, it) => s + it.y, 0) / row.items.length;
+                    placed = true;
+                    break;
+                }
+            }
+            if (!placed) rows.push({ cy: item.y, items: [item] });
+        }
+        rows.sort((a, b) => a.cy - b.cy);
+        rows.forEach(r => r.items.sort((a, b) => a.x - b.x));
 
-        // Merge nearby words into longer phrases (useful for "8:00 - 10:00")
-        const mergedItems = [];
-        let currentGroup = [];
-        const sortedItems = [...items].sort((a,b) => a.y - b.y || a.x - b.x);
-        for (let i = 0; i < sortedItems.length; i++) {
-            const item = sortedItems[i];
-            if (!item.text.trim()) continue;
-            if (currentGroup.length === 0) {
-                currentGroup.push(item);
-            } else {
-                const last = currentGroup[currentGroup.length - 1];
-                const gap = item.x - (last.x + last.w);
-                // Same row: y-diff < 8 (PDF items on same line), item to the right (gap >= -5), gap < 42
-                if (Math.abs(item.y - last.y) < 8 && gap >= -5 && gap < 42) {
-                    currentGroup.push(item);
+        // Step 2: Merge items within each row into cells (gap < 100px)
+        function mergeCells(rowItems) {
+            const cells = [];
+            let cur = null;
+            for (const it of rowItems) {
+                if (!it.text.trim()) continue;
+                if (!cur) {
+                    cur = { text: it.text.trim(), x: it.x, w: it.w || 0, h: it.h || 10, _rx: it.x + (it.w || 0) };
                 } else {
-                    mergedItems.push(this._mergeGroup(currentGroup));
-                    currentGroup = [item];
-                }
-            }
-        }
-        if (currentGroup.length > 0) mergedItems.push(this._mergeGroup(currentGroup));
-
-        const dayRowZones = [];
-        const timeColZones = [];
-        const courseItems = [];
-        const uncategorized = [];
-
-        for (const item of mergedItems) {
-            // Check if exact day name, or first word is a day (handles "Tu BLK F" merged items)
-            let dMatch = item.text.match(dayRegex);
-            if (!dMatch) {
-                const words = item.text.split(/\s+/);
-                dMatch = words[0].match(dayRegex);
-            }
-            if (dMatch) {
-                const normalized = DAY_NORMALIZE[dMatch[1].toLowerCase()] ||
-                    (dMatch[1].slice(0,3).charAt(0).toUpperCase() + dMatch[1].slice(0,3).slice(1).toLowerCase());
-                dayRowZones.push({ day: normalized, y: item.y, h: item.h });
-                continue;
-            }
-
-            // Check multi-day shorthand (MWF, TTh, TuTh, MW, etc.)
-            const lowerClean = item.text.trim().toLowerCase().replace(/[^a-z]/g, '');
-            if (MWF_MAP[lowerClean]) {
-                MWF_MAP[lowerClean].forEach(d => dayRowZones.push({ day: d, y: item.y, h: item.h }));
-                continue;
-            }
-
-            // Check if time range (e.g. "8:00 - 10:00" or just "8:00")
-            const times = [];
-            const timeTokens = item.text.split(/\s*[-–to]+\s*/);
-            for (const tk of timeTokens) {
-                const t = tk.trim();
-                if (t.match(timeRegex24) || t.match(timeRegex12)) times.push(t.replace('.', ':'));
-            }
-            if (times.length > 0) {
-                const st = this._formatTime(times[0]);
-                const et = times.length > 1 ? this._formatTime(times[1]) : this._addHours(st, 2);
-                timeColZones.push({ startTime: st, endTime: et, x: item.x, w: item.w });
-                continue;
-            }
-
-            // Check if course code — exact match first
-            let cMatch = item.text.match(courseRegex);
-            let detectedRoom = null;
-
-            if (!cMatch) {
-                // Try combining adjacent word pairs (handles "CS 101" → "CS101")
-                const words = item.text.split(/\s+/);
-                for (let w = 0; w < words.length - 1; w++) {
-                    const comb = words[w] + words[w+1];
-                    const cbMatch = comb.match(/^([A-Z]{2,5})(\d{3,4}[A-Z]?)$/i);
-                    if (cbMatch) { cMatch = [comb, cbMatch[1], cbMatch[2]]; break; }
-                }
-            }
-
-            if (!cMatch) {
-                // Try finding course code embedded inside longer text (e.g. "CS101 Room205")
-                const embedded = item.text.match(courseInTextRegex);
-                if (embedded) {
-                    cMatch = embedded;
-                    // Also try to extract a room code from the same item
-                    const roomPart = item.text.replace(embedded[0], '').trim();
-                    const rmMatch = roomPart.match(/\b([A-Z]{0,3}[0-9]{1,4}[A-Z]?)\b/);
-                    if (rmMatch) detectedRoom = rmMatch[0];
-                }
-            }
-
-            if (cMatch) {
-                courseItems.push({
-                    code: `${cMatch[1].toUpperCase()}${cMatch[2]}`,
-                    x: item.x + item.w / 2,
-                    y: item.y + item.h / 2,
-                    room: detectedRoom
-                });
-                continue;
-            }
-
-            uncategorized.push(item);
-        }
-
-        if (dayRowZones.length === 0 || timeColZones.length === 0 || courseItems.length === 0) {
-            return [];
-        }
-
-        // Project courses onto day/time grid
-        for (const cItem of courseItems) {
-            let closestDay = null, minDy = Infinity;
-            for (const rz of dayRowZones) {
-                const dy = Math.abs(cItem.y - rz.y);
-                if (dy < minDy && dy < 150) { minDy = dy; closestDay = rz.day; }
-            }
-
-            let closestTime = null, minDx = Infinity;
-            for (const cz of timeColZones) {
-                const dx = Math.abs(cItem.x - (cz.x + cz.w / 2));
-                if (dx < minDx && dx < 300) { minDx = dx; closestTime = cz; }
-            }
-
-            if (closestDay && closestTime) {
-                // Pick the CLOSEST matching room in uncategorized items (not just first in list)
-                let room = cItem.room || 'TBA';
-                if (!cItem.room) {
-                    const roomRx = /\b(?:(?:Room|Rm|Hall|Lab|Classroom|Bldg?|Block|BLK|Lecture|Auditorium)\.?\s*#?\s*[A-Z0-9][\w\s]{0,8}|[A-Z]{2,4}\s+[A-Z0-9]{1,2}[0-9]{0,2}(?:\s+[0-9]{1,2})?|[A-Z]{1,3}[0-9]{2,4}[A-Z]?|Virtual|Online)\b/i;
-                    let bestRoom = null, bestDist = Infinity;
-                    for (const ui of uncategorized) {
-                        const dx = Math.abs(cItem.x - (ui.x + ui.w / 2));
-                        const dy = Math.abs(cItem.y - (ui.y + ui.h / 2));
-                        if (dx < 200 && dy < 120) {
-                            const rm = ui.text.match(roomRx);
-                            if (rm) {
-                                const dist = dx + dy * 2; // weight vertical distance more
-                                if (dist < bestDist) { bestDist = dist; bestRoom = rm[0].trim(); }
-                            }
-                        }
+                    const gap = it.x - cur._rx;
+                    if (gap >= -5 && gap < 100) {
+                        cur.text += (gap > 5 ? ' ' : '') + it.text.trim();
+                        const nr = it.x + (it.w || 0);
+                        if (nr > cur._rx) { cur._rx = nr; cur.w = cur._rx - cur.x; }
+                        cur.h = Math.max(cur.h, it.h || 10);
+                    } else {
+                        cells.push({ text: cur.text, x: cur.x, w: cur.w, h: cur.h });
+                        cur = { text: it.text.trim(), x: it.x, w: it.w || 0, h: it.h || 10, _rx: it.x + (it.w || 0) };
                     }
-                    if (bestRoom) room = bestRoom;
                 }
-                courses.push({ course: cItem.code, room, startTime: closestTime.startTime, endTime: closestTime.endTime, days: [closestDay] });
+            }
+            if (cur) cells.push({ text: cur.text, x: cur.x, w: cur.w, h: cur.h });
+            return cells;
+        }
+
+        // Step 3: Classify each cell
+        const dayZones = [], timeZones = [], courseCells = [], uncategorized = [];
+
+        for (const row of rows) {
+            const cells = mergeCells(row.items);
+            for (const cell of cells) {
+                const text = cell.text.trim();
+                const cx = cell.x + cell.w / 2;
+                const cy = row.cy;
+
+                const timeRange = _ttH_timeRange(text);
+                const days      = _ttH_days(text);
+                const courses   = _ttH_courses(text);
+                const room      = _ttH_room(text);
+
+                if (courses.length > 0) {
+                    courses.forEach(code => courseCells.push({
+                        code, room: room || 'TBA', x: cx, y: cy,
+                        timeRange: timeRange || null,
+                        days: days.length > 0 ? days : null,
+                    }));
+                    if (timeRange && !days.length) timeZones.push({ ...timeRange, y: cy, x: cell.x, w: cell.w, cx });
+                    if (days.length > 0 && !timeRange) days.forEach(d => dayZones.push({ day: d, y: cy, x: cell.x, w: cell.w, cx }));
+                } else if (timeRange && !days.length) {
+                    timeZones.push({ ...timeRange, y: cy, x: cell.x, w: cell.w, cx });
+                } else if (days.length > 0 && !timeRange) {
+                    days.forEach(d => dayZones.push({ day: d, y: cy, x: cell.x, w: cell.w, cx }));
+                } else if (timeRange && days.length > 0) {
+                    timeZones.push({ ...timeRange, y: cy, x: cell.x, w: cell.w, cx });
+                    days.forEach(d => dayZones.push({ day: d, y: cy, x: cell.x, w: cell.w, cx }));
+                } else {
+                    uncategorized.push({ text, x: cx, y: cy, room });
+                }
             }
         }
 
-        // Remove exact duplicates
-        return courses.filter((v,i,a) => a.findIndex(v2 =>
-            v2.course === v.course && v2.startTime === v.startTime && v2.days.join() === v.days.join()
+        if (courseCells.length === 0) return [];
+
+        // Step 4: Determine layout orientation
+        const dayYSpan = dayZones.length > 1 ? Math.max(...dayZones.map(d => d.y)) - Math.min(...dayZones.map(d => d.y)) : 0;
+        const dayXSpan = dayZones.length > 1 ? Math.max(...dayZones.map(d => d.cx)) - Math.min(...dayZones.map(d => d.cx)) : 0;
+        const daysInRows = dayYSpan >= dayXSpan;
+
+        // Step 5: Project each course onto day + time
+        const results = [];
+        for (const c of courseCells) {
+            let days = c.days ? [...c.days] : [];
+            let time = c.timeRange;
+
+            if (!days.length && dayZones.length > 0) {
+                if (daysInRows) {
+                    let best = null, bd = Infinity;
+                    dayZones.forEach(dz => { const d = Math.abs(c.y - dz.y); if (d < bd && d < 250) { bd = d; best = dz.day; } });
+                    if (best) days = [best];
+                } else {
+                    let best = null, bd = Infinity;
+                    dayZones.forEach(dz => { const d = Math.abs(c.x - dz.cx); if (d < bd && d < 350) { bd = d; best = dz.day; } });
+                    if (best) days = [best];
+                }
+            }
+
+            if (!time && timeZones.length > 0) {
+                if (!daysInRows) {
+                    let best = null, bd = Infinity;
+                    timeZones.forEach(tz => { const d = Math.abs(c.y - tz.y); if (d < bd && d < 250) { bd = d; best = tz; } });
+                    if (best) time = best;
+                } else {
+                    let best = null, bd = Infinity;
+                    timeZones.forEach(tz => { const d = Math.abs(c.x - tz.cx); if (d < bd && d < 350) { bd = d; best = tz; } });
+                    if (best) time = best;
+                }
+            }
+
+            let room = (c.room && c.room !== 'TBA') ? c.room : null;
+            if (!room) {
+                let bestRoom = null, bestDist = Infinity;
+                for (const u of uncategorized) {
+                    if (!u.room) continue;
+                    const dx = Math.abs(c.x - u.x), dy = Math.abs(c.y - u.y);
+                    if (dx < 200 && dy < 120) {
+                        const dist = dx + dy * 2;
+                        if (dist < bestDist) { bestDist = dist; bestRoom = u.room; }
+                    }
+                }
+                room = bestRoom || 'TBA';
+            }
+
+            if (time) {
+                const dayList = days.length > 0 ? days : ['Mon'];
+                dayList.forEach(day => results.push({
+                    course: c.code, room,
+                    startTime: time.startTime, endTime: time.endTime,
+                    days: [day],
+                }));
+            }
+        }
+
+        return results.filter((v, i, a) => a.findIndex(v2 =>
+            v2.course === v.course && v2.startTime === v.startTime && v2.days.join() === v2.days.join()
         ) === i);
     }
 
@@ -472,122 +559,44 @@ class TimetableManager {
     }
 
     _parseTimetableText(text) {
-        const courses = [];
-        const lines = text.split(/[\n\r]+/).map(l => l.trim()).filter(l => l.length > 1);
-
-        // Improved heuristics for course extraction
-        const courseRegex = /\b([A-Z]{2,5})\s*[-_]?\s*(\d{3,4}[A-Z]?)\b/i; // E.g. CS 101, MATH-201, PHY3000
-        const timeRegex24 = /\b(?:[01]?\d|2[0-3])[:.][0-5]\d\b/g;
-        const timeRegex12 = /\b(?:1[0-2]|0?[1-9])[:.]?(?:[0-5]\d)?\s*(?:AM|PM)\b/gi;
-        const dayRegex = /\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Wed|Thu|Fri|Sat|Sun|Mo|Tu|We|Th|Fr|Sa|Su)\b/i;
-        const DAY_NORM_TEXT = {
-            'mo':'Mon','tu':'Tue','we':'Wed','th':'Thu','fr':'Fri','sa':'Sat','su':'Sun',
-            'mon':'Mon','tue':'Tue','wed':'Wed','thu':'Thu','fri':'Fri','sat':'Sat','sun':'Sun',
-        };
-        // Matches: "BLK F", "AY FP01", "AY SF 09", "A101", "LH 001", "Room 204", "Virtual"
-        const roomRegex = /\b(?:(?:Room|Rm|Hall|Lab|Classroom|Bldg?|Block|BLK|Lecture|Auditorium)\.?\s*#?\s*[A-Z0-9][\w\s]{0,8}|[A-Z]{2,4}\s+[A-Z0-9]{1,2}[0-9]{0,2}(?:\s+[0-9]{1,2})?|[A-Z]{1,3}[0-9]{2,4}[A-Z]?|Virtual|Online)\b/i;
-
-        let currentDayContext = 'Mon';
+        const results = [];
+        const lines = text.split(/[\n\r]+/).map(l => l.trim()).filter(Boolean);
+        let currentDays = ['Mon'];
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
-            
-            // Context tracking: If a line explicitly names a day, assume subsequent courses belong to it
-            const dayMatch = line.match(dayRegex);
-            if (dayMatch) {
-                const raw = dayMatch[1].toLowerCase();
-                currentDayContext = DAY_NORM_TEXT[raw] ||
-                    (raw.charAt(0).toUpperCase() + raw.slice(1, 3).toLowerCase());
-            }
+            const block = lines.slice(Math.max(0, i - 2), Math.min(lines.length, i + 3)).join(' ');
 
-            // Look for a course code in the current or adjacent lines
-            const block = lines.slice(Math.max(0, i - 1), i + 2).join(' ');
-            const codeMatch = line.match(courseRegex);
-            
-            if (codeMatch) {
-                const code = `${codeMatch[1].toUpperCase()}${codeMatch[2]}`;
-                
-                // Avoid extracting the exact same course on the exact same line twice
-                if (courses.some(c => c.course === code && c._lineIdx === i)) continue;
+            const lineDays = _ttH_days(line);
+            if (lineDays.length > 0) currentDays = lineDays;
 
-                // Extract Times
-                let times = [];
-                let tm; 
-                timeRegex24.lastIndex = 0;
-                while ((tm = timeRegex24.exec(block)) !== null) times.push(tm[0].replace('.', ':'));
-                
-                if (times.length < 2) {
-                    timeRegex12.lastIndex = 0;
-                    while ((tm = timeRegex12.exec(block)) !== null) {
-                        let tstr = tm[0].toUpperCase().replace('.', ':');
-                        // Normalize 12h to 24h for consistency
-                        let isPM = tstr.includes('PM');
-                        let timePart = tstr.replace(/\s*(AM|PM)/, '').trim();
-                        if (!timePart.includes(':')) timePart += ':00';
-                        let [h, m] = timePart.split(':');
-                        h = parseInt(h);
-                        if (isPM && h !== 12) h += 12;
-                        if (!isPM && h === 12) h = 0;
-                        times.push(`${String(h).padStart(2,'0')}:${m}`);
-                    }
-                }
+            const courseRx = new RegExp(_TTH_COURSE_PAT.source, 'gi');
+            let m;
+            while ((m = courseRx.exec(line)) !== null) {
+                const code = m[1].toUpperCase() + m[2].toUpperCase();
+                if (results.some(r => r.course === code && r._li === i)) continue;
 
-                // Extract Days from block, fallback to context
-                const MWF_EXPAND = {
-                    'MWF':['Mon','Wed','Fri'], 'MW':['Mon','Wed'], 'WF':['Wed','Fri'],
-                    'TTH':['Tue','Thu'], 'TUTH':['Tue','Thu'], 'TUETH':['Tue','Thu'],
-                    'MF':['Mon','Fri'], 'TW':['Tue','Wed'], 'WTH':['Wed','Thu'],
-                    'THF':['Thu','Fri'], 'MTWTHF':['Mon','Tue','Wed','Thu','Fri'],
-                    'MTW':['Mon','Tue','Wed'], 'MTWF':['Mon','Tue','Wed','Fri'],
-                };
-                let days = [];
-                // Check for multi-day shorthands first (e.g. MWF, TTh, TuTh)
-                const mwfMatches = [...block.matchAll(/\b(MWF|MW|WF|TuTh|TTh|MF|TW|WTh|ThF|MTWTHF|MTW|MTWF)\b/gi)];
-                for (const mm of mwfMatches) {
-                    const key = mm[1].toUpperCase().replace(/[^A-Z]/g,'');
-                    if (MWF_EXPAND[key]) {
-                        for (const d of MWF_EXPAND[key]) { if (!days.includes(d)) days.push(d); }
-                    }
-                }
-                if (days.length === 0) {
-                    const blockDays = [...block.matchAll(new RegExp(dayRegex.source, 'gi'))];
-                    for (const bd of blockDays) {
-                        const raw = bd[1].toLowerCase();
-                        const nd = DAY_NORM_TEXT[raw] ||
-                            (raw.charAt(0).toUpperCase() + raw.slice(1, 3).toLowerCase());
-                        if (!days.includes(nd)) days.push(nd);
-                    }
-                }
-                if (days.length === 0) days.push(currentDayContext);
+                const timeInfo  = _ttH_timeRange(block);
+                const blockDays = _ttH_days(block);
+                const days      = blockDays.length > 0 ? blockDays : [...currentDays];
+                const room      = _ttH_room(block) || 'TBA';
 
-                // Extract Room
-                const rmMatch = block.match(roomRegex);
-                const room = rmMatch ? rmMatch[0].trim() : 'TBA';
-
-                // Deduce start and end
-                // Sort times to guess start and end
-                times.sort();
-                const st = times[0] || '08:00';
-                const et = times[1] || this._addHours(st, 2);
-
-                courses.push({
-                    course: code,
-                    room: room,
-                    startTime: st,
-                    endTime: et,
-                    days: days,
-                    _lineIdx: i // internal tracker
+                results.push({
+                    course: code, room,
+                    startTime: timeInfo ? timeInfo.startTime : '08:00',
+                    endTime:   timeInfo ? timeInfo.endTime   : '10:00',
+                    days: [...days],
+                    _li: i,
                 });
             }
         }
-        
-        // Cleanup internal trackers
-        courses.forEach(c => delete c._lineIdx);
-        
-        // Remove duplicates (same course, same day, same time)
-        const uniqueCourses = courses.filter((v,i,a)=>a.findIndex(v2=>(v2.course===v.course && v2.startTime===v.startTime && v2.days.join()===v.days.join()))===i);
-        
-        return uniqueCourses;
+
+        results.forEach(r => delete r._li);
+        const seen = new Set();
+        return results.filter(r => {
+            const key = r.course + '|' + r.startTime + '|' + r.days.slice().sort().join(',');
+            return seen.has(key) ? false : (seen.add(key), true);
+        });
     }
 
     _addHours(t, h) {
